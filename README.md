@@ -6,6 +6,8 @@
 
 *You are the rough stone. You are also the mason. Let's get to work.*
 
+[**Read more at the project site →**](https://sampathmannam.github.io/The-Ashlar-Protocol-/)
+
 </div>
 
 ---

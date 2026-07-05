@@ -1,0 +1,18 @@
+title: The Ashlar Protocol
+description: >-
+  A private, fully on-device Android mental-health companion built on
+  Freemasonry's rough-ashlar → perfect-ashlar metaphor for the lifelong
+  work of becoming who you could be.
+theme: jekyll-theme-cayman
+# Only the landing page is Jekyll-rendered; docs/ Markdown is served as-is
+# so relative links keep working on both the site and the GitHub repo view.
+exclude:
+  - app
+  - build
+  - gradle
+  - .gradle
+  - .kotlin
+  - "*.gradle.kts"
+  - gradle.properties
+  - local.properties
+  - debug.keystore

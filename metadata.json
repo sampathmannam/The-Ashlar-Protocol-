@@ -2,5 +2,5 @@
   "name": "The Ashlar Protocol",
   "description": "A private, disciplined mental-health companion for the lifelong work of shaping the self — the rough stone into the perfect ashlar.",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": []
 }
