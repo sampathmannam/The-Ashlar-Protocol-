@@ -14,11 +14,21 @@ The Ashlar Protocol is a mental-health practice built on the oldest structured s
 
 We keep what modern psychology validates, state honestly where the tradition is only a beautiful metaphor, and put the tools in the pocket of anyone willing to pick them up.
 
-## Read first
+## Documentation
 
+**Product & evidence**
 - **[docs/VISION.md](docs/VISION.md)** — the north-star: what this is, who it's for, the principles, and the Freemasonry × mental-health synthesis.
-- **[docs/MASTER_PLAN.md](docs/MASTER_PLAN.md)** — the phased roadmap from prototype to product (safety first).
 - **[docs/RESEARCH_BASIS.md](docs/RESEARCH_BASIS.md)** — every psychological claim, its source, and an honest confidence level. *We never fabricate citations and never overclaim.*
+- **[docs/AUDIT_AND_REDESIGN.md](docs/AUDIT_AND_REDESIGN.md)** — a full audit of the built app, a substance-first redesign plan, and research-grounded feature ideas.
+
+**Planning & status**
+- **[docs/MASTER_PLAN.md](docs/MASTER_PLAN.md)** — the phased roadmap from prototype to product (safety first).
+- **[docs/CHANGELOG.md](docs/CHANGELOG.md)** — what's actually built, and its verification state.
+
+**Engineering**
+- **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** — how the code is organized and the load-bearing design decisions.
+- **[docs/BUILD.md](docs/BUILD.md)** — how to build the APK and install to a device (the hard-won recipe + gotchas).
+- **[docs/VERIFICATION.md](docs/VERIFICATION.md)** — the on-device QA checklist. *The §1 crisis pass is a blocking requirement.*
 
 ## What's inside (the Craft, as an app)
 
