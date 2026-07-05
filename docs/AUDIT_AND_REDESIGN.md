@@ -89,8 +89,8 @@ Ordered by strength of evidence (strongest, safest-to-build first). All effect s
 
 | Step | Work | Gate |
 |---|---|---|
-| **1** | **Honesty Pass** — remove all fabricated data; honest reflection + empty states | Blocking; fast |
-| **2** | **Memory** — surface intention; persist Plumb records; real baseline | High value |
+| ~~**1**~~ | ~~**Honesty Pass** — remove all fabricated data; honest reflection + empty states~~ | ✅ **DONE + device-verified (2026-07-05)** — fake charts/pillars removed; "The Work So Far" shows real counts only |
+| **2** | **Memory** — surface intention; persist Plumb records; real baseline | High value — next |
 | **3** | **Daily check-in** — gentle self-report, honestly framed | Feeds §1's real data |
 | **4** | **Evidence deepening** — if-then Gauge; gratitude; self-compassion; values | Highest-effect adds |
 | **5** | **Retention re-frame** — soften streaks (shame audit); lean on the Lodge | Ethics |

@@ -55,10 +55,16 @@ Initial git commit: `99a83db`. Installed and running on device `ZD2232FCR5`.
   [VERIFICATION.md](VERIFICATION.md), [AUDIT_AND_REDESIGN.md](AUDIT_AND_REDESIGN.md),
   [ARCHITECTURE.md](ARCHITECTURE.md), [BUILD.md](BUILD.md).
 
+### The Honesty Pass (redesign step 1)
+- ✅ **Removed all fabricated data from the Board** (device-verified). Deleted `ResilienceChartCard`
+  (`Random`) and `WisdomPillar` (hardcoded), and the placeholder Strength/Beauty pillars. Replaced
+  with **"The Work So Far"** — an honest card showing *literal counts of real activity* (streak,
+  journal notes, thought-records, gauge days, recalls), footer *"no scores, no predictions."* The
+  Board now shows only real data.
+
 ### ⚠️ Known debt (see [AUDIT_AND_REDESIGN.md](AUDIT_AND_REDESIGN.md))
-- ⚠️ **P0 — fabricated data on the Board** (`ResilienceChartCard` = `Random`, `WisdomPillar` =
-  hardcoded). Violates the never-fabricate rule. The **"Honesty Pass"** is the recommended next build.
 - ⚠️ Initiation intention/baseline captured but not surfaced; Plumb records not persisted.
+  (Redesign steps 2–3: "make it remember" + the honest daily check-in.)
 - ⚠️ `com.example` package + `material-icons-extended` (only core icons used) — pre-release cleanups.
 - ⚠️ WCAG 1.4.1: gold-as-only-cue for tappable text needs a second cue (palette contrast itself passes).
 

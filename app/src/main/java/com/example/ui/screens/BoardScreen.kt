@@ -24,7 +24,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ui.AshlarAppViewModel
-import com.example.ui.components.WisdomPillar
 import com.example.ui.theme.Charcoal
 import com.example.ui.theme.DividerWhite
 import com.example.ui.theme.Gold
@@ -35,8 +34,6 @@ import com.example.ui.theme.Surface
 
 @Composable
 fun BoardScreen(viewModel: AshlarAppViewModel) {
-    val weeklyVolume by viewModel.weeklyVolume.collectAsState()
-
     androidx.compose.foundation.lazy.LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -78,10 +75,21 @@ fun BoardScreen(viewModel: AshlarAppViewModel) {
             )
         }
 
-        // Resilience Chart
+        // The work so far — an honest count of what you have actually done. No scores, no
+        // predictions, no invented trends (the old random/hardcoded charts were removed).
         item {
-            val briefingStreak by viewModel.briefingStreak.collectAsState()
-            com.example.ui.components.ResilienceChartCard(currentStreak = briefingStreak)
+            val streak by viewModel.briefingStreak.collectAsState()
+            val entries by viewModel.aarEntries.collectAsState()
+            val plumb by viewModel.plumbSessions.collectAsState()
+            val gauge by viewModel.gaugeDaysComplete.collectAsState()
+            val recall by viewModel.recallSessions.collectAsState()
+            WorkSoFarCard(
+                streak = streak,
+                journalEntries = entries.size,
+                thoughtRecords = plumb,
+                gaugeDays = gauge,
+                recalls = recall
+            )
         }
 
         // After Action Report
@@ -100,30 +108,6 @@ fun BoardScreen(viewModel: AshlarAppViewModel) {
                 onAddEntry = { viewModel.addAarEntry(it) },
                 onRemoveEntry = { viewModel.removeAarEntry(it) }
             )
-        }
-
-        // Wisdom Pillar
-        item {
-            WisdomPillar()
-        }
-
-        // Pillars row
-        item {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                PillarCard(
-                    title = "Strength",
-                    value = "${weeklyVolume}/25 KM",
-                    modifier = Modifier.weight(1f)
-                )
-                PillarCard(
-                    title = "Beauty",
-                    value = "Guitar Practice",
-                    modifier = Modifier.weight(1f)
-                )
-            }
         }
 
     }
@@ -260,26 +244,64 @@ fun TracingBoardVisual(
     }
 }
 
+/**
+ * An honest reflection of what the user has actually done — literal counts, nothing invented.
+ * Replaces the removed fabricated "resilience"/"wisdom" charts. No score, no trend, no prediction.
+ */
 @Composable
-fun PillarCard(title: String, value: String, modifier: Modifier = Modifier) {
+fun WorkSoFarCard(
+    streak: Int,
+    journalEntries: Int,
+    thoughtRecords: Int,
+    gaugeDays: Int,
+    recalls: Int
+) {
     Column(
-        modifier = modifier
-            .clip(RoundedCornerShape(24.dp))
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(32.dp))
             .background(Surface)
-            .border(1.dp, DividerWhite.copy(alpha = 0.05f), RoundedCornerShape(24.dp))
-            .padding(16.dp)
+            .border(1.dp, DividerWhite.copy(alpha = 0.05f), RoundedCornerShape(32.dp))
+            .padding(24.dp)
     ) {
         Text(
-            text = title.uppercase(),
+            text = "THE WORK SO FAR",
             style = MaterialTheme.typography.labelSmall,
-            color = Gold,
-            fontSize = 9.dp.value.sp
+            color = Gold.copy(alpha = 0.3f),
+            letterSpacing = 2.sp
         )
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(16.dp))
+
+        WorkRow("Days tended in a row", streak)
+        WorkRow("Notes in the journal", journalEntries)
+        WorkRow("Thoughts set to the plumb", thoughtRecords)
+        WorkRow("Days fully divided by the gauge", gaugeDays)
+        WorkRow("Principles held to memory", recalls)
+
+        Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = value,
-            style = MaterialTheme.typography.labelMedium,
-            color = Silver
+            text = "Only what you've actually done — no scores, no predictions.",
+            style = MaterialTheme.typography.labelSmall,
+            color = Silver.copy(alpha = 0.5f),
+            lineHeight = 16.sp
+        )
+    }
+}
+
+@Composable
+private fun WorkRow(label: String, count: Int) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 6.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(text = label, style = MaterialTheme.typography.bodyMedium, color = Silver)
+        Text(
+            text = count.toString(),
+            style = MaterialTheme.typography.titleLarge,
+            color = if (count > 0) Gold else Silver.copy(alpha = 0.3f)
         )
     }
 }
