@@ -165,6 +165,9 @@ People who are struggling and can't open up to anyone need a private, on-device 
 
 ## §9. Milestone 0 — the framing pre-test (gating protocol)
 
+> **OUTCOME (founder, Jul 8 2026): Variant A — the stone framing — chosen. Gate marked PASS; the stone visual system (M2 / T2.x) is unblocked.**
+> Caveat on record: this is the founder's selection of design direction, not yet the 5–8-person distressed-user reaction data the protocol below calls for. The residual risk the test targets — that "a stone to be chiselled" reads as *cold* to someone at their lowest — is **not** de-risked by a founder preference. Recommendation: still run the protocol below with 3–8 real users when feasible; if it surfaces "cold/harsh," apply the **Soften** rule (lean on "not broken," ease off "chiselled/struck") rather than re-opening the metaphor. Proceeding with A either way.
+
 **Why it gates everything:** the entire Phase 1 visual and narrative system rests on one unproven assumption — that "you are a stone being worked" feels *empowering* to a distressed user. If it reads as cold or objectifying ("I'm a rock to be chiseled"), every downstream investment compounds a mistake. This is the cheapest, highest-leverage test in the whole plan.
 
 **Method (lightweight, qualitative, n≈5–8):**

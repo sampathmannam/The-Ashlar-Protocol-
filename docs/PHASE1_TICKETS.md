@@ -9,7 +9,7 @@ Legend: 🔒 = blocking gate · ⚠️ = safety-critical (needs design+copy sign
 ## Milestone 0 — Framing pre-test 🔒 (no code; gates M2)
 
 - **T0.1 — Build two static onboarding mockups (stone vs plain).** *(S, design)* Two counterbalanced screens per SPEC §9. No mortality imagery. → deliverable feeds the reaction test. *(Mockups drafted — see the Onboarding Framing Test artifact.)*
-- **T0.2 — Run the 5–8 person reaction test & decide.** *(S, founder/research)* Apply the pass/soften/pivot rule. **Output gates T2.x.** AC: written decision recorded in-repo; if "pivot," swap central metaphor before any M2 work.
+- **T0.2 — Run the 5–8 person reaction test & decide.** *(S, founder/research)* Apply the pass/soften/pivot rule. **Output gates T2.x.** AC: written decision recorded in-repo; if "pivot," swap central metaphor before any M2 work. → **RESOLVED: Variant A (stone) chosen; gate PASS; T2.x unblocked** (founder selection — real-user reaction data still recommended as insurance; see SPEC §9 outcome note).
 
 ---
 
