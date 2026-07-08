@@ -8,6 +8,8 @@ import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import com.example.tools.KindStreak
+import com.example.tools.StreakState
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "ashlar_prefs")
 
@@ -28,6 +30,12 @@ class LocalDataStore(private val context: Context) {
     private val INITIATED_KEY = androidx.datastore.preferences.core.booleanPreferencesKey("initiated")
     private val INTENTION_KEY = androidx.datastore.preferences.core.stringPreferencesKey("intention")
     private val BASELINE_KEY = floatPreferencesKey("baseline_weight")
+    // The kind streak ("tending the stone", tools/KindStreak.kt): a cumulative total that never
+    // decreases, plus a grace-softened current run. Supersedes the old resettable briefing_streak.
+    private val DAYS_TENDED_KEY = androidx.datastore.preferences.core.intPreferencesKey("days_tended")
+    private val CURRENT_RUN_KEY = androidx.datastore.preferences.core.intPreferencesKey("current_run")
+    private val GRACE_KEY = androidx.datastore.preferences.core.intPreferencesKey("grace_remaining")
+    private val LAST_TENDED_DAY_KEY = androidx.datastore.preferences.core.longPreferencesKey("last_tended_day")
 
     val workProgress: Flow<Float> = context.dataStore.data.map { preferences ->
         preferences[PROGRESS_KEY] ?: 0.1f
@@ -61,6 +69,41 @@ class LocalDataStore(private val context: Context) {
         context.dataStore.edit { preferences ->
             preferences[STREAK_KEY] = streak
             preferences[LAST_DATE_KEY] = dateMillis
+        }
+    }
+
+    /** Cumulative days tended — monotonic, never decreases. Feeds the degree score and the stone. */
+    val daysTended: Flow<Int> = context.dataStore.data.map { preferences ->
+        preferences[DAYS_TENDED_KEY] ?: (preferences[STREAK_KEY] ?: 0)
+    }
+
+    /**
+     * The full kind-streak state. On first read after the upgrade (no [DAYS_TENDED_KEY] yet), it
+     * migrates the legacy briefing streak so no one loses progress (see KindStreak.seedFromLegacy).
+     */
+    val streakState: Flow<StreakState> = context.dataStore.data.map { preferences ->
+        if (preferences[DAYS_TENDED_KEY] != null) {
+            StreakState(
+                daysTended = preferences[DAYS_TENDED_KEY] ?: 0,
+                currentRun = preferences[CURRENT_RUN_KEY] ?: 0,
+                graceRemaining = preferences[GRACE_KEY] ?: KindStreak.MAX_GRACE,
+                lastTendedDay = preferences[LAST_TENDED_DAY_KEY] ?: -1L
+            )
+        } else {
+            val legacyMillis = preferences[LAST_DATE_KEY] ?: 0L
+            val legacyDay = if (legacyMillis > 0L)
+                KindStreak.epochDay(legacyMillis, java.util.TimeZone.getDefault().getOffset(legacyMillis))
+            else -1L
+            KindStreak.seedFromLegacy(preferences[STREAK_KEY] ?: 0, legacyDay)
+        }
+    }
+
+    suspend fun saveStreakState(state: StreakState) {
+        context.dataStore.edit { preferences ->
+            preferences[DAYS_TENDED_KEY] = state.daysTended
+            preferences[CURRENT_RUN_KEY] = state.currentRun
+            preferences[GRACE_KEY] = state.graceRemaining
+            preferences[LAST_TENDED_DAY_KEY] = state.lastTendedDay
         }
     }
 

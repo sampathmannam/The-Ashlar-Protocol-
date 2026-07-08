@@ -108,4 +108,26 @@ object KindStreak {
     fun comebackMessage(): String =
         "Welcome back. Yesterday was hard, and that's okay — one day away doesn't erase the work " +
             "you've done. Pick up the tools again when you're ready."
+
+    /**
+     * Whole days since the Unix epoch in LOCAL time. [tzOffsetMillis] is the timezone's offset at
+     * that instant (e.g. `TimeZone.getDefault().getOffset(millis)`), so a "day" rolls over at LOCAL
+     * midnight rather than UTC midnight. Pure — the ViewModel supplies the offset at the boundary.
+     */
+    fun epochDay(millisSinceEpoch: Long, tzOffsetMillis: Int): Long =
+        Math.floorDiv(millisSinceEpoch + tzOffsetMillis, 86_400_000L)
+
+    /**
+     * Migrate an existing user from the old resettable briefing streak to the kind model WITHOUT
+     * wiping their progress: their prior streak becomes both the cumulative total and the current
+     * run. A zero or negative legacy value means there was no prior progress.
+     */
+    fun seedFromLegacy(legacyStreak: Int, lastTendedDay: Long): StreakState =
+        if (legacyStreak <= 0) StreakState()
+        else StreakState(
+            daysTended = legacyStreak,
+            currentRun = legacyStreak,
+            graceRemaining = MAX_GRACE,
+            lastTendedDay = lastTendedDay
+        )
 }
