@@ -80,6 +80,28 @@ class AshlarAppViewModel(application: Application) : AndroidViewModel(applicatio
         viewModelScope.launch { dataStore.completeInitiation(intention, weight) }
     }
 
+    // The re-authoring engine: the app remembers what you're working toward, and your own words.
+    val intention: StateFlow<String> = dataStore.intention.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), ""
+    )
+
+    val plumbRecords: StateFlow<List<com.example.data.PlumbRecord>> = dataStore.plumbRecords.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList()
+    )
+
+    fun addPlumbRecord(thought: String, reflection: String) {
+        if (thought.isBlank()) return
+        viewModelScope.launch {
+            val entry = com.example.data.PlumbRecord(
+                id = java.util.UUID.randomUUID().toString(),
+                thought = thought.trim(),
+                reflection = reflection.trim(),
+                timestamp = System.currentTimeMillis()
+            )
+            dataStore.setPlumbRecords((listOf(entry) + plumbRecords.value).take(50))
+        }
+    }
+
     // Chamber reflections the user chose to keep.
     val reflections: StateFlow<List<com.example.data.Reflection>> = dataStore.reflections.stateIn(
         viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList()

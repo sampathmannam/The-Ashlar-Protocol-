@@ -11,7 +11,7 @@ This file is the evidence spine for [`VISION.md`](VISION.md) and [`MASTER_PLAN.m
 | 1 | Behavioral Activation for depression | **Strong** (NICE first-line) | The 24-inch Gauge / daily structure can claim real backing |
 | 2 | Social connection ↔ mortality/wellbeing | **Strong** (quantified meta-analyses) | Brotherhood/connection is a headline mechanism, not decoration |
 | 3 | Expressive/reflective writing | **Moderate** (small–moderate, heterogeneous) | Journal/Chamber: present modestly, don't oversell |
-| 4 | Rituals ↓ anxiety/grief, ↑ performance | **Moderate** (lab studies, emerging) | Ritual framing is justified; label as emerging |
+| 4 | Ritual ↓ anxiety, restores sense of control | **Moderate** (multi-lab, incl. physiological; retracted sources removed — see §4) | Ritual framing justified for *anxiety-regulation*; drop performance/grief claims |
 | 5 | Self-compassion | **Strong** (r ≈ −0.54 with distress) | The ashlar "unfinished, not broken" stance is well-founded |
 | 6 | ACT / values-based living | **Strong** (20+ meta-analyses) | The Plumb (values) can claim strong backing |
 | 7 | PERMA wellbeing model | **Mixed** — useful heuristic; 5 factors NOT distinct | Three Pillars = heuristic lens, not a validated factor structure |
@@ -43,10 +43,13 @@ This file is the evidence spine for [`VISION.md`](VISION.md) and [`MASTER_PLAN.m
 - **Pennebaker, J. W. (2018).** *Perspectives on Psychological Science*, 13(2), 226–229. https://journals.sagepub.com/doi/10.1177/1745691617707315
 - **Finding:** Small-to-moderate, heterogeneous benefits. Present the journal/Chamber modestly.
 
-## §4 — Rituals reduce anxiety/grief, improve performance — **Moderate**
-- **Norton, M. I., & Gino, F. (2014).** "Rituals alleviate grieving for loved ones, lovers, and lotteries." *J. Experimental Psychology: General*, 143(1), 266–272. *(Mediated by restored sense of control.)* https://www.hbs.edu/ris/Publication%20Files/norton%20gino%202014_e44eb177-f8f4-4f0d-a458-625c1268b391.pdf
-- **Brooks, A. W., et al. (2016).** "Don't stop believing: Rituals improve performance by decreasing anxiety." *OBHDP*, 137, 71–85. https://www.hbs.edu/ris/Publication%20Files/Rituals%20OBHDP_5cbc5848-ef4d-4192-a320-68d30169763c.pdf
-- **Finding:** Deliberate ritual lowers grief and performance anxiety via a restored sense of control. Emerging, lab-based — label as such.
+## §4 — Ritual reduces anxiety and restores a sense of control — **Moderate** *(sources corrected 2026-07-05)*
+> ⚠️ **Correction.** This section previously cited Brooks et al. (2016) and Norton & Gino (2014). **Brooks et al. (2016) was RETRACTED (Nov 2024)** over data-integrity issues; Norton & Gino (2014) is **co-authored by a researcher Harvard found committed misconduct** and has been *hard to replicate*. Do **not** use them as support. The claim is re-anchored below on independent labs.
+- **Lang, M., Krátký, J., & Xygalatas, D. (2020).** "The role of ritual behaviour in anxiety reduction." *Phil. Trans. R. Soc. B*, 375(1805), 20190431. — after a stressor, performing a habitual ritual lowered **both perceived and physiological anxiety (higher HRV)**. https://royalsocietypublishing.org/doi/10.1098/rstb.2019.0431 — *best anchor; field experiment, physiological outcome, non-Gino lab.*
+- **Lang, M., et al. (2015).** "Effects of Anxiety on Spontaneous Ritualized Behavior." *Current Biology*, 25(14), 1892–1897. — induced anxiety *increases* ritualization (the natural anxiety→ritual direction). https://www.cell.com/current-biology/fulltext/S0960-9822(15)00652-1
+- **Legare, C. H., & Souza, A. L. (2012).** "Evaluating ritual efficacy." *Cognition*, 124(1), 1–15. — repetition/procedural steps drive *perceived* efficacy. https://www.sciencedirect.com/science/article/abs/pii/S0010027712000546
+- **Hobson, N. M., et al. (2018).** "The Psychology of Rituals: An Integrative Review." *Pers. Soc. Psychol. Review*, 22(3), 260–284. — framework: ritual serves emotion-regulation, performance, and social-connection functions. https://journals.sagepub.com/doi/abs/10.1177/1088868317734944
+- **Finding:** Ritual's **anxiety-regulation and control-restoring** functions have real, multi-lab support (incl. physiological). We claim *that*, cautiously, and drop the retracted performance/grief studies.
 
 ## §5 — Self-compassion — **Strong**
 - **Neff, K. D. (2003).** "The development and validation of a scale to measure self-compassion." *Self and Identity*, 2(3), 223–250. *(Defines "common humanity.")*

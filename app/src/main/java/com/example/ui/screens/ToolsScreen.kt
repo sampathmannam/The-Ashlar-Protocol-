@@ -46,7 +46,7 @@ val TAMIL_CHALLENGES = listOf(
 @Composable
 fun ToolsScreen(
     currentDegree: Degree = Degree.ENTERED_APPRENTICE,
-    onPlumbComplete: () -> Unit = {},
+    onPlumbComplete: (thought: String, reflection: String) -> Unit = { _, _ -> },
     onGaugeDayComplete: () -> Unit = {},
     onRecallHeld: () -> Unit = {}
 ) {
@@ -243,7 +243,7 @@ fun GavelOption(text: String, modifier: Modifier = Modifier, onClick: () -> Unit
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ThePlumb(onComplete: () -> Unit = {}) {
+fun ThePlumb(onComplete: (thought: String, reflection: String) -> Unit = { _, _ -> }) {
     // A four-step CBT thought-record. Pure logic lives in com.example.tools.PlumbLine (tested);
     // this composable only gathers the person's own words and reflects them back "squared".
     var step by remember { mutableStateOf(0) } // 0 situation, 1 thought, 2 tilts, 3 evidence, 4 result
@@ -257,7 +257,14 @@ fun ThePlumb(onComplete: () -> Unit = {}) {
     }
 
     // Count one plumb session when the person reaches the "squared" reflection.
-    LaunchedEffect(step) { if (step == 4) onComplete() }
+    LaunchedEffect(step) {
+        if (step == 4) {
+            val reflection = composeSquaredReflection(
+                PlumbEntry(situation = situation, thought = thought, tiltIds = selectedTilts.toList(), evidence = evidence)
+            )
+            onComplete(thought, reflection)
+        }
+    }
 
     Column(
         modifier = Modifier

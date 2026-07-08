@@ -34,6 +34,7 @@ import com.example.ui.theme.Surface
 
 @Composable
 fun BoardScreen(viewModel: AshlarAppViewModel) {
+    val intention by viewModel.intention.collectAsState()
     androidx.compose.foundation.lazy.LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -60,6 +61,12 @@ fun BoardScreen(viewModel: AshlarAppViewModel) {
                 nextName = next?.display,
                 progressToNext = com.example.tools.Degrees.progressToNext(score)
             )
+        }
+
+        // Your intention — the app remembers what you said you're working toward (the re-authoring
+        // engine; docs/ACTION_PLAN §1A). Shown only once it's been set at initiation.
+        if (intention.isNotBlank()) {
+            item { IntentionCard(intention = intention) }
         }
 
         // Cognitive Briefing
@@ -240,6 +247,36 @@ fun TracingBoardVisual(
             style = MaterialTheme.typography.labelSmall,
             color = Silver.copy(alpha = 0.6f),
             textAlign = TextAlign.Center
+        )
+    }
+}
+
+/**
+ * The user's stated intention from initiation, surfaced so the app never forgets what they're
+ * working toward. The first visible piece of the re-authoring engine (docs/ACTION_PLAN §1A).
+ */
+@Composable
+fun IntentionCard(intention: String) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(32.dp))
+            .background(Surface)
+            .border(1.dp, Gold.copy(alpha = 0.2f), RoundedCornerShape(32.dp))
+            .padding(24.dp)
+    ) {
+        Text(
+            text = "YOU'RE WORKING TOWARD",
+            style = MaterialTheme.typography.labelSmall,
+            color = Gold.copy(alpha = 0.5f),
+            letterSpacing = 2.sp
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+        Text(
+            text = "“${intention}”",
+            style = MaterialTheme.typography.bodyLarge,
+            color = LightText,
+            lineHeight = 26.sp
         )
     }
 }
