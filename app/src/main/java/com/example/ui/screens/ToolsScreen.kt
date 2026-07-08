@@ -34,6 +34,7 @@ import com.example.tools.BreathPacer
 import com.example.tools.BreathPattern
 import com.example.tools.BreathPhase
 import com.example.tools.Square
+import com.example.tools.Trowel
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 
@@ -52,7 +53,8 @@ fun ToolsScreen(
     onPlumbComplete: (thought: String, reflection: String) -> Unit = { _, _ -> },
     onGaugeDayComplete: () -> Unit = {},
     onRecallHeld: () -> Unit = {},
-    onSquareSetIntention: (String) -> Unit = {}
+    onSquareSetIntention: (String) -> Unit = {},
+    onTrowelKeep: (String) -> Unit = {}
 ) {
     var activeTool by remember { mutableStateOf("menu") } // menu, gavel, plumb, gauge, level, mouth
 
@@ -80,6 +82,7 @@ fun ToolsScreen(
             item { ToolMenuItem("gavel", "The Gavel", "Sharpen the Mind", Degree.ENTERED_APPRENTICE, currentDegree) { activeTool = it } }
             item { ToolMenuItem("level", "The Level", "Steady the Breath", Degree.ENTERED_APPRENTICE, currentDegree) { activeTool = it } }
             item { ToolMenuItem("square", "The Square", "Square to Your Values", Degree.ENTERED_APPRENTICE, currentDegree) { activeTool = it } }
+            item { ToolMenuItem("trowel", "The Trowel", "Spread the Cement Inward", Degree.ENTERED_APPRENTICE, currentDegree) { activeTool = it } }
             item { ToolMenuItem("plumb", "The Plumb", "Straighten a Thought", Degree.FELLOWCRAFT, currentDegree) { activeTool = it } }
             item { ToolMenuItem("mouth", "Mouth to Ear", "Memory Work", Degree.MASTER_MASON, currentDegree) { activeTool = it } }
         } else {
@@ -101,6 +104,7 @@ fun ToolsScreen(
                     "gauge" -> TheGauge(onDayComplete = onGaugeDayComplete)
                     "level" -> TheLevel()
                     "square" -> TheSquare(onSetIntention = onSquareSetIntention)
+                    "trowel" -> TheTrowel(onKeep = onTrowelKeep)
                     "mouth" -> MouthToEarTool(onRecallHeld = onRecallHeld)
                 }
             }
@@ -700,6 +704,125 @@ fun TheSquare(onSetIntention: (String) -> Unit = {}) {
                 PlumbPrimary("SET AS MY INTENTION", enabled = true) {
                     onSetIntention(intention)
                     saved = true
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun TheTrowel(onKeep: (String) -> Unit = {}) {
+    // The self-compassion rite. Pure logic (the three movements + the words) lives in
+    // com.example.tools.Trowel (tested); this composable only gathers the person's own words and
+    // hands them back. It never forces feeling, and the grounding off-ramp is reachable throughout —
+    // the gentle exit backdraft demands (see docs/RESEARCH_BASIS.md).
+    var step by remember { mutableStateOf(0) } // 0 name, 1 not-alone, 2 spread, 3 keep
+    var struggle by remember { mutableStateOf("") }
+    var kindWords by remember { mutableStateOf("") }
+    var kept by remember { mutableStateOf(false) }
+    var showGrounding by remember { mutableStateOf(false) }
+
+    fun reset() { step = 0; struggle = ""; kindWords = ""; kept = false }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(androidx.compose.foundation.shape.RoundedCornerShape(32.dp))
+            .background(com.example.ui.theme.Surface)
+            .border(1.dp, com.example.ui.theme.DividerWhite.copy(alpha = 0.05f), androidx.compose.foundation.shape.RoundedCornerShape(32.dp))
+            .padding(24.dp)
+    ) {
+        Text("THE TROWEL", style = MaterialTheme.typography.titleLarge, color = Gold)
+        Text("SPREAD THE CEMENT OF BROTHERLY LOVE — INWARD.", style = MaterialTheme.typography.labelSmall, color = Gold.copy(alpha = 0.5f))
+
+        Spacer(modifier = Modifier.height(16.dp))
+        // The unconditional permission to stop, always in view.
+        Text(Trowel.grounding.first(), style = MaterialTheme.typography.labelSmall, color = Silver.copy(alpha = 0.7f), lineHeight = 18.sp)
+        Spacer(modifier = Modifier.height(16.dp))
+
+        when (step) {
+            0 -> {
+                Text(Trowel.MOVEMENTS[0].label.uppercase(), style = MaterialTheme.typography.labelSmall, color = Gold.copy(alpha = 0.4f), letterSpacing = 2.sp)
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(Trowel.MOVEMENTS[0].prompt, style = MaterialTheme.typography.bodyMedium, color = Silver, lineHeight = 22.sp)
+                Spacer(modifier = Modifier.height(12.dp))
+                PlumbField(struggle, { struggle = it }, "Name what you're carrying…")
+                Spacer(modifier = Modifier.height(16.dp))
+                PlumbPrimary("CONTINUE", enabled = struggle.isNotBlank()) { step = 1 }
+            }
+            1 -> {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
+                        .background(Slate.copy(alpha = 0.3f))
+                        .border(1.dp, Gold.copy(alpha = 0.2f), androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
+                        .padding(16.dp)
+                ) {
+                    Text("YOU ARE NOT ALONE IN IT", style = MaterialTheme.typography.labelSmall, color = Gold, letterSpacing = 2.sp)
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Text(Trowel.commonHumanity(struggle), style = MaterialTheme.typography.bodyLarge, color = Silver, lineHeight = 26.sp)
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+                PlumbNav(onBack = { step = 0 }, forwardLabel = "CONTINUE", forwardEnabled = true) { step = 2 }
+            }
+            2 -> {
+                Text(Trowel.MOVEMENTS[2].label.uppercase(), style = MaterialTheme.typography.labelSmall, color = Gold.copy(alpha = 0.4f), letterSpacing = 2.sp)
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(Trowel.asABrother(struggle), style = MaterialTheme.typography.bodyMedium, color = Silver, lineHeight = 22.sp)
+                Spacer(modifier = Modifier.height(12.dp))
+                PlumbField(kindWords, { kindWords = it }, "Say it to yourself…")
+                Spacer(modifier = Modifier.height(16.dp))
+                // No pressure to write — the door onward stays open either way.
+                PlumbNav(onBack = { step = 1 }, forwardLabel = "READ IT BACK", forwardEnabled = true) { step = 3 }
+            }
+            else -> {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
+                        .background(Slate.copy(alpha = 0.4f))
+                        .border(1.dp, Gold.copy(alpha = 0.2f), androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
+                        .padding(16.dp)
+                ) {
+                    Text("KEEP THIS", style = MaterialTheme.typography.labelSmall, color = Gold, letterSpacing = 2.sp)
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Text(Trowel.closing(kindWords), style = MaterialTheme.typography.bodyLarge, color = Silver, lineHeight = 26.sp)
+                }
+                if (kindWords.isNotBlank()) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    if (kept) {
+                        Text("Kept — it's with what you hold onto.", style = MaterialTheme.typography.labelSmall, color = Gold.copy(alpha = 0.7f))
+                    } else {
+                        PlumbPrimary("KEEP THESE WORDS", enabled = true) { onKeep(kindWords); kept = true }
+                    }
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    "BEGIN AGAIN",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Gold.copy(alpha = 0.6f),
+                    modifier = Modifier.clickable { reset() }
+                )
+            }
+        }
+
+        // The grounding off-ramp — reachable at every step, never gated. The way out backdraft demands.
+        Spacer(modifier = Modifier.height(20.dp))
+        HorizontalDivider(color = Slate.copy(alpha = 0.4f))
+        Spacer(modifier = Modifier.height(12.dp))
+        Text(
+            if (showGrounding) "HIDE" else "PAUSE & GROUND",
+            style = MaterialTheme.typography.labelSmall,
+            color = Gold.copy(alpha = 0.6f),
+            letterSpacing = 1.sp,
+            modifier = Modifier.clickable { showGrounding = !showGrounding }
+        )
+        if (showGrounding) {
+            Spacer(modifier = Modifier.height(12.dp))
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Trowel.grounding.forEach { line ->
+                    Text("·  $line", style = MaterialTheme.typography.bodyMedium, color = Silver.copy(alpha = 0.85f), lineHeight = 22.sp)
                 }
             }
         }

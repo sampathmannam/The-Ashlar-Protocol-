@@ -110,7 +110,8 @@ fun TracingBoardApp(
                             },
                             onGaugeDayComplete = { viewModel.recordGaugeDayComplete() },
                             onRecallHeld = { viewModel.recordRecallSession() },
-                            onSquareSetIntention = { viewModel.setIntention(it) }
+                            onSquareSetIntention = { viewModel.setIntention(it) },
+                            onTrowelKeep = { viewModel.addReflection(it) }
                         )
                     }
                 }
