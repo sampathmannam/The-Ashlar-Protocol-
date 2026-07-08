@@ -73,4 +73,13 @@ object Strengths {
      */
     fun newWayPrompt(strength: Strength): String =
         "Use your ${strength.display} in a new way today — somewhere you normally wouldn't think to."
+
+    /**
+     * Today's strength to use "in a new way" — a deterministic rotation through the user's
+     * [signature] set keyed on [epochDay], so it's stable within a day and cycles fairly through
+     * them. Returns null when no signature strengths have been chosen yet.
+     */
+    fun strengthOfTheDay(signature: List<Strength>, epochDay: Long): Strength? =
+        if (signature.isEmpty()) null
+        else signature[Math.floorMod(epochDay, signature.size.toLong()).toInt()]
 }

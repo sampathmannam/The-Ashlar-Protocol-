@@ -67,4 +67,30 @@ class StrengthsTest {
         assertTrue("names the strength", prompt.contains(s.display.lowercase()))
         assertTrue("invites a NEW way", prompt.contains("new way") || prompt.contains("new "))
     }
+
+    @Test
+    fun strengthOfTheDayIsNullWithoutAnySignatureStrengths() {
+        assertEquals(null, Strengths.strengthOfTheDay(emptyList(), 100L))
+    }
+
+    @Test
+    fun strengthOfTheDayIsDeterministicForAGivenDay() {
+        val sig = Strengths.signature(Strengths.all(), 5)
+        assertEquals(Strengths.strengthOfTheDay(sig, 100L), Strengths.strengthOfTheDay(sig, 100L))
+    }
+
+    @Test
+    fun strengthOfTheDayRotatesThroughTheSignatureSetAndWraps() {
+        val sig = Strengths.signature(Strengths.all(), 3)
+        assertEquals(sig[0], Strengths.strengthOfTheDay(sig, 0L))
+        assertEquals(sig[1], Strengths.strengthOfTheDay(sig, 1L))
+        assertEquals(sig[2], Strengths.strengthOfTheDay(sig, 2L))
+        assertEquals("wraps back to the first", sig[0], Strengths.strengthOfTheDay(sig, 3L))
+    }
+
+    @Test
+    fun strengthOfTheDayHandlesNegativeDaysSafely() {
+        val sig = Strengths.signature(Strengths.all(), 3)
+        assertEquals("floorMod keeps it in range", sig[2], Strengths.strengthOfTheDay(sig, -1L))
+    }
 }
