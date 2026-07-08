@@ -80,6 +80,12 @@ class AshlarAppViewModel(application: Application) : AndroidViewModel(applicatio
         viewModelScope.launch { dataStore.completeInitiation(intention, weight) }
     }
 
+    /** Set the intention from the Square rite (updates what the Board shows). */
+    fun setIntention(text: String) {
+        if (text.isBlank()) return
+        viewModelScope.launch { dataStore.setIntention(text.trim()) }
+    }
+
     // The re-authoring engine: the app remembers what you're working toward, and your own words.
     val intention: StateFlow<String> = dataStore.intention.stateIn(
         viewModelScope, SharingStarted.WhileSubscribed(5000), ""

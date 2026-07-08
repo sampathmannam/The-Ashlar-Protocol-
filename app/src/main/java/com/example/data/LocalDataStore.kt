@@ -111,6 +111,11 @@ class LocalDataStore(private val context: Context) {
         }
     }
 
+    /** Update just the intention (e.g. from the Square rite), without re-running initiation. */
+    suspend fun setIntention(text: String) {
+        context.dataStore.edit { it[INTENTION_KEY] = text }
+    }
+
     val reflections: Flow<List<Reflection>> = context.dataStore.data.map { preferences ->
         val jsonString = preferences[REFLECTIONS_KEY] ?: "[]"
         try {

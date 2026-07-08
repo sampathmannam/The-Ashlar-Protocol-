@@ -33,6 +33,9 @@ import com.example.tools.Degrees
 import com.example.tools.BreathPacer
 import com.example.tools.BreathPattern
 import com.example.tools.BreathPhase
+import com.example.tools.Square
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 
 data class TamilChallenge(val question: String, val answer: String)
 
@@ -48,7 +51,8 @@ fun ToolsScreen(
     currentDegree: Degree = Degree.ENTERED_APPRENTICE,
     onPlumbComplete: (thought: String, reflection: String) -> Unit = { _, _ -> },
     onGaugeDayComplete: () -> Unit = {},
-    onRecallHeld: () -> Unit = {}
+    onRecallHeld: () -> Unit = {},
+    onSquareSetIntention: (String) -> Unit = {}
 ) {
     var activeTool by remember { mutableStateOf("menu") } // menu, gavel, plumb, gauge, level, mouth
 
@@ -75,6 +79,7 @@ fun ToolsScreen(
             item { ToolMenuItem("gauge", "The Gauge", "Divide the Day", Degree.ENTERED_APPRENTICE, currentDegree) { activeTool = it } }
             item { ToolMenuItem("gavel", "The Gavel", "Sharpen the Mind", Degree.ENTERED_APPRENTICE, currentDegree) { activeTool = it } }
             item { ToolMenuItem("level", "The Level", "Steady the Breath", Degree.ENTERED_APPRENTICE, currentDegree) { activeTool = it } }
+            item { ToolMenuItem("square", "The Square", "Square to Your Values", Degree.ENTERED_APPRENTICE, currentDegree) { activeTool = it } }
             item { ToolMenuItem("plumb", "The Plumb", "Straighten a Thought", Degree.FELLOWCRAFT, currentDegree) { activeTool = it } }
             item { ToolMenuItem("mouth", "Mouth to Ear", "Memory Work", Degree.MASTER_MASON, currentDegree) { activeTool = it } }
         } else {
@@ -95,6 +100,7 @@ fun ToolsScreen(
                     "plumb" -> ThePlumb(onComplete = onPlumbComplete)
                     "gauge" -> TheGauge(onDayComplete = onGaugeDayComplete)
                     "level" -> TheLevel()
+                    "square" -> TheSquare(onSetIntention = onSquareSetIntention)
                     "mouth" -> MouthToEarTool(onRecallHeld = onRecallHeld)
                 }
             }
@@ -620,6 +626,82 @@ fun MouthToEarTool(onRecallHeld: () -> Unit = {}) {
                 color = Gold.copy(alpha = 0.6f),
                 modifier = Modifier.clickable { practicing = false; custom = "" }
             )
+        }
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun TheSquare(onSetIntention: (String) -> Unit = {}) {
+    val selected = remember { mutableStateListOf<String>() }
+    var saved by remember { mutableStateOf(false) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(androidx.compose.foundation.shape.RoundedCornerShape(32.dp))
+            .background(com.example.ui.theme.Surface)
+            .border(1.dp, com.example.ui.theme.DividerWhite.copy(alpha = 0.05f), androidx.compose.foundation.shape.RoundedCornerShape(32.dp))
+            .padding(24.dp)
+    ) {
+        Text("THE SQUARE", style = MaterialTheme.typography.titleLarge, color = Gold)
+        Text("SQUARE YOUR LIFE TO WHAT YOU VALUE.", style = MaterialTheme.typography.labelSmall, color = Gold.copy(alpha = 0.5f))
+        Spacer(modifier = Modifier.height(16.dp))
+        Text("Which few things matter most? Choose up to three.", style = MaterialTheme.typography.bodyMedium, color = Silver, lineHeight = 22.sp)
+        Spacer(modifier = Modifier.height(16.dp))
+
+        FlowRow(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Square.VALUES.forEach { value ->
+                val isSel = selected.contains(value)
+                Box(
+                    modifier = Modifier
+                        .clip(androidx.compose.foundation.shape.RoundedCornerShape(20.dp))
+                        .background(if (isSel) Gold.copy(alpha = 0.2f) else Slate.copy(alpha = 0.2f))
+                        .border(1.dp, if (isSel) Gold.copy(alpha = 0.5f) else Slate, androidx.compose.foundation.shape.RoundedCornerShape(20.dp))
+                        .clickable {
+                            if (isSel) selected.remove(value)
+                            else if (selected.size < 3) selected.add(value)
+                            saved = false
+                        }
+                        .padding(horizontal = 14.dp, vertical = 9.dp)
+                ) {
+                    Text(value, style = MaterialTheme.typography.bodyMedium, color = if (isSel) Gold else Silver)
+                }
+            }
+        }
+
+        if (selected.isNotEmpty()) {
+            val intention = Square.squareIntention(selected.toList())
+            Spacer(modifier = Modifier.height(20.dp))
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
+                    .background(Slate.copy(alpha = 0.3f))
+                    .border(1.dp, Gold.copy(alpha = 0.2f), androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
+                    .padding(16.dp)
+            ) {
+                Text("YOUR SQUARE", style = MaterialTheme.typography.labelSmall, color = Gold, letterSpacing = 2.sp)
+                Spacer(modifier = Modifier.height(8.dp))
+                Text("“$intention”", style = MaterialTheme.typography.bodyLarge, color = Silver, lineHeight = 26.sp)
+            }
+            Spacer(modifier = Modifier.height(12.dp))
+            if (saved) {
+                Text(
+                    "Set as your intention — it's on your Board now.",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Gold.copy(alpha = 0.7f)
+                )
+            } else {
+                PlumbPrimary("SET AS MY INTENTION", enabled = true) {
+                    onSetIntention(intention)
+                    saved = true
+                }
+            }
         }
     }
 }
