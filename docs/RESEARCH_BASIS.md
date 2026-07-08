@@ -94,6 +94,13 @@ Mortality-salience (**contested — flag**):
 - **Many Labs 4 (Klein, R. A., et al., 2022), *Collabra: Psychology*** and **Sætrevik & Sjåstad (2022), *PLOS ONE*** — **failed to replicate** the core mortality-salience effect.
 - **Finding:** Build the Chamber around **meaning, values, and what matters now.** Memento-mori imagery is philosophical framing, never an evidence claim.
 
+**Safety gate (BINDING — operational rule, not an evidence claim):** Mortality/death-adjacent content is the **highest-risk element** in the Masonic source material, because this app operates where mortality themes intersect suicide safety. See [MASONIC_DESIGN_PRIMITIVES.md § "The Safety Wall"](MASONIC_DESIGN_PRIMITIVES.md) for the full rules. In brief:
+- **Default UX carries zero death imagery.** No skull, scythe, grave, coffin, hourglass-as-death, countdowns, or "life in weeks." Audit for *accidental* mortality salience (timers, "time remaining") too.
+- **Crisis screening is a hard gate in front of anything death-adjacent.** On any risk signal → suppress the content entirely and route to support. **Do not "soften" it.**
+- **Extract the function, discard the death trigger.** Every healthy outcome (values clarity, gratitude, present focus) is reachable through ACT/gratitude/mindfulness framing. Never use death as the motivational lever.
+- **Cut "write your last will"** (rehearsal risk) → replace with a *future-self* letter. **Hiram Abiff**: keep only the "brought low → raised" rising arc; never depict the blows, murder, weapons, or corpse; reframe "fidelity unto death" as *integrity under stress*, never martyrdom.
+- **Never manufacture suffering** — no ordeals, hazing, or "earn it through pain." Progress is never gated on distress.
+
 ## §11 — Freemasonry, social capital, men's mental health — **Weak/absent for the Craft itself**
 - **HONEST VERDICT: no credible empirical research links Freemasonry specifically to mental-health outcomes.** Do not claim it. Use the analogs below.
 - **Putnam, R. D. (2000).** *Bowling Alone.* Simon & Schuster. Documents the collapse of fraternal orders (names Freemasonry, Elks, Lions, Rotary) as declining social capital. *(Describes decline/civic cost, not member clinical outcomes.)* https://www.journalofdemocracy.org/articles/bowling-alone-americas-declining-social-capital/
@@ -101,6 +108,7 @@ Mortality-salience (**contested — flag**):
   - **Foettinger, L., et al. (2022).** "The Role of Community-Based Men's Sheds in Health Promotion for Older Men." *American Journal of Men's Health*, 16(2). Counteracts isolation/loneliness; wellbeing benefits substantiated. https://journals.sagepub.com/doi/full/10.1177/15579883221084490
   - Milligan et al. (2016); Wilson & Cordier (2013) — foundational Men's Sheds reviews.
 - **Finding:** Frame Freemasonry as a *structural/historical exemplar* of the belonging and social-capital mechanisms that Putnam and the Men's Sheds evidence actually support. The mechanism is real; the Craft is the metaphor.
+- **Design mapping:** The full symbol-by-symbol translation of Masonic primitives into evidence-backed features (with the cardinal-virtues → DBT mapping, the working-tools → exercise modules, degrees → progression, and the do-not-borrow list) lives in [MASONIC_DESIGN_PRIMITIVES.md](MASONIC_DESIGN_PRIMITIVES.md).
 
 ---
 *Compiled 2026-07-04 via dedicated research pass. Confidence labels favor caution. When in doubt, under-claim.*
