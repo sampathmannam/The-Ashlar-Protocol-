@@ -60,6 +60,25 @@ class GaugeTest {
     }
 
     @Test
+    fun implementationIntentionFormsAnIfThenPlan() {
+        assertEquals(
+            "If I finish dinner, then I will walk ten minutes",
+            Gauge.implementationIntention("I finish dinner", "walk ten minutes")
+        )
+    }
+
+    @Test
+    fun implementationIntentionFallsBackToActionWhenNoCue() {
+        assertEquals("Call a friend", Gauge.implementationIntention("", "call a friend"))
+        assertEquals("Call a friend", Gauge.implementationIntention("   ", "  call a friend "))
+    }
+
+    @Test
+    fun implementationIntentionIsBlankWithNoAction() {
+        assertEquals("", Gauge.implementationIntention("after lunch", ""))
+    }
+
+    @Test
     fun isDayCompleteOnlyWhenAllThreePartsPresentAndEveryItemDone() {
         assertTrue("empty day is not complete", !Gauge.isDayComplete(emptyList()))
 

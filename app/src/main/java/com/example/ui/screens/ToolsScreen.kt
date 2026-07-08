@@ -381,6 +381,31 @@ fun ThePlumb(onComplete: (thought: String, reflection: String) -> Unit = { _, _ 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+private fun GaugeField(value: String, onChange: (String) -> Unit, placeholder: String) {
+    TextField(
+        value = value,
+        onValueChange = onChange,
+        singleLine = true,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(58.dp)
+            .clip(androidx.compose.foundation.shape.RoundedCornerShape(12.dp))
+            .background(Slate.copy(alpha = 0.2f))
+            .border(1.dp, Gold.copy(alpha = 0.15f), androidx.compose.foundation.shape.RoundedCornerShape(12.dp)),
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = Color.Transparent,
+            unfocusedContainerColor = Color.Transparent,
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+            cursorColor = Gold
+        ),
+        placeholder = { Text(placeholder, style = MaterialTheme.typography.bodyMedium, color = Silver.copy(alpha = 0.4f)) },
+        textStyle = MaterialTheme.typography.bodyMedium.copy(color = Silver)
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
 private fun PlumbField(value: String, onChange: (String) -> Unit, placeholder: String) {
     TextField(
         value = value,
@@ -604,6 +629,7 @@ fun MouthToEarTool(onRecallHeld: () -> Unit = {}) {
 fun TheGauge(onDayComplete: () -> Unit = {}) {
     val items = remember { mutableStateListOf<GaugeItem>() }
     var draft by remember { mutableStateOf("") }
+    var cue by remember { mutableStateOf("") }
     var part by remember { mutableStateOf(DayPart.WORK) }
 
     // Count a completed gauge-day when all three parts are planned and every item is done.
@@ -649,10 +675,25 @@ fun TheGauge(onDayComplete: () -> Unit = {}) {
         Text(part.intent, style = MaterialTheme.typography.labelSmall, color = Silver.copy(alpha = 0.6f))
 
         Spacer(modifier = Modifier.height(12.dp))
-        PlumbField(draft, { draft = it }, "Plan one thing for ${part.display.lowercase()}…")
+        Text(
+            "Make it a plan: name the cue, then what you'll do.",
+            style = MaterialTheme.typography.labelSmall,
+            color = Silver.copy(alpha = 0.6f)
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        GaugeField(cue, { cue = it }, "When or where… (e.g. after dinner)")
+        Spacer(modifier = Modifier.height(8.dp))
+        GaugeField(draft, { draft = it }, "…then I will (e.g. walk ten minutes)")
         Spacer(modifier = Modifier.height(12.dp))
         PlumbPrimary("ADD TO THE DAY", enabled = draft.isNotBlank()) {
-            items.add(GaugeItem(id = java.util.UUID.randomUUID().toString(), part = part, text = draft.trim()))
+            items.add(
+                GaugeItem(
+                    id = java.util.UUID.randomUUID().toString(),
+                    part = part,
+                    text = Gauge.implementationIntention(cue, draft)
+                )
+            )
+            cue = ""
             draft = ""
         }
 

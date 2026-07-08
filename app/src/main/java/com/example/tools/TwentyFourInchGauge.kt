@@ -32,6 +32,21 @@ object Gauge {
         return items.count { it.done }.toFloat() / items.size
     }
 
+    /**
+     * Compose an implementation intention — an "if [cue], then I will [action]" plan. Specifying the
+     * *when/where* cue alongside the action is the mechanism behind the effect (Gollwitzer & Sheeran
+     * 2006, d≈0.65; see docs/RESEARCH_BASIS.md). A missing cue falls back to the bare action.
+     */
+    fun implementationIntention(cue: String, action: String): String {
+        val c = cue.trim()
+        val a = action.trim()
+        return when {
+            a.isEmpty() -> ""
+            c.isEmpty() -> a.replaceFirstChar { it.uppercase() }
+            else -> "If $c, then I will $a"
+        }
+    }
+
     /** The parts of the day that have nothing planned yet, in canonical order. */
     fun missingParts(items: List<GaugeItem>): List<DayPart> {
         val present = items.map { it.part }.toSet()
