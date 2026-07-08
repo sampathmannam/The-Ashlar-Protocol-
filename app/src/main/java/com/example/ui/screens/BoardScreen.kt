@@ -1,7 +1,6 @@
 package com.example.ui.screens
 
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -18,7 +17,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -152,54 +154,10 @@ fun TracingBoardVisual(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        Box(
-            modifier = Modifier
-                .size(120.dp)
-                .padding(16.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Canvas(modifier = Modifier.fillMaxSize()) {
-                val roughness = (1f - animatedProgress) * 40f
-                val strokeWidth = if (animatedProgress > 0.9f) 3f else 6f
-
-                val pathEffect = if (animatedProgress > 0.9f) {
-                    null
-                } else {
-                    PathEffect.dashPathEffect(floatArrayOf(roughness, roughness / 2f), 0f)
-                }
-
-                // Inner Geometry
-                drawLine(
-                    color = Gold.copy(alpha = 0.3f),
-                    start = Offset(size.width * 0.5f, size.height * 0.1f),
-                    end = Offset(size.width * 0.5f, size.height * 0.9f),
-                    strokeWidth = 1f
-                )
-                drawLine(
-                    color = Gold.copy(alpha = 0.3f),
-                    start = Offset(size.width * 0.1f, size.height * 0.5f),
-                    end = Offset(size.width * 0.9f, size.height * 0.5f),
-                    strokeWidth = 1f
-                )
-
-                // The 'Rough' edges
-                drawRect(
-                    color = Gold,
-                    topLeft = Offset(size.width * 0.1f, size.height * 0.1f),
-                    size = Size(size.width * 0.8f, size.height * 0.8f),
-                    style = Stroke(width = strokeWidth, pathEffect = pathEffect)
-                )
-
-                // The 'Refining' core
-                if (animatedProgress > 0.5f) {
-                    drawRect(
-                        color = Gold.copy(alpha = 0.05f),
-                        topLeft = Offset(size.width * 0.2f, size.height * 0.2f),
-                        size = Size(size.width * 0.6f, size.height * 0.6f)
-                    )
-                }
-            }
-        }
+        AshlarStone(
+            progress = animatedProgress,
+            modifier = Modifier.size(190.dp)
+        )
 
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -247,6 +205,124 @@ fun TracingBoardVisual(
             style = MaterialTheme.typography.labelSmall,
             color = Silver.copy(alpha = 0.6f),
             textAlign = TextAlign.Center
+        )
+    }
+}
+
+/**
+ * The ashlar — a real 3D carved stone that slowly turns, its faces catching a fixed light as it
+ * rotates (that's the life in it). Roughness (chisel hatching, dull dark faces, thick edges) smooths
+ * toward gold-edged, brighter stone as [progress] rises: the rough ashlar becoming the perfect one.
+ * Pure Canvas + 3D math — no assets.
+ */
+@Composable
+fun AshlarStone(progress: Float, modifier: Modifier = Modifier) {
+    val rotation by rememberInfiniteTransition(label = "ashlar").animateFloat(
+        initialValue = 0f,
+        targetValue = 360f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(30000, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "rotation"
+    )
+    Canvas(modifier = modifier) {
+        drawAshlar(rotationDeg = rotation, progress = progress)
+    }
+}
+
+private fun DrawScope.drawAshlar(rotationDeg: Float, progress: Float) {
+    val cx = size.width / 2f
+    val cy = size.height / 2f
+    val unit = size.minDimension * 0.23f
+
+    val a = Math.toRadians(rotationDeg.toDouble())
+    val tilt = Math.toRadians(24.0)
+    val ca = kotlin.math.cos(a); val sa = kotlin.math.sin(a)
+    val ct = kotlin.math.cos(tilt); val st = kotlin.math.sin(tilt)
+
+    fun rot(p: FloatArray): FloatArray {
+        val x = p[0].toDouble(); val y = p[1].toDouble(); val z = p[2].toDouble()
+        val x1 = x * ca + z * sa
+        val z1 = -x * sa + z * ca
+        val y2 = y * ct - z1 * st
+        val z2 = y * st + z1 * ct
+        return floatArrayOf(x1.toFloat(), y2.toFloat(), z2.toFloat())
+    }
+    val focal = 6f
+    fun proj(r: FloatArray): Offset {
+        val s = focal / (focal - r[2])
+        return Offset(cx + r[0] * s * unit, cy - r[1] * s * unit)
+    }
+
+    val h = 1f
+    val cube = arrayOf(
+        floatArrayOf(-h, -h, -h), floatArrayOf(h, -h, -h), floatArrayOf(h, h, -h), floatArrayOf(-h, h, -h),
+        floatArrayOf(-h, -h, h), floatArrayOf(h, -h, h), floatArrayOf(h, h, h), floatArrayOf(-h, h, h)
+    )
+    val rotated = Array(8) { rot(cube[it]) }
+    val screen = Array(8) { proj(rotated[it]) }
+
+    drawOval(
+        color = Color.Black.copy(alpha = 0.35f),
+        topLeft = Offset(cx - unit * 1.3f, cy + unit * 1.15f),
+        size = Size(unit * 2.6f, unit * 0.7f)
+    )
+
+    val faces = listOf(
+        intArrayOf(4, 5, 6, 7) to floatArrayOf(0f, 0f, 1f),
+        intArrayOf(1, 0, 3, 2) to floatArrayOf(0f, 0f, -1f),
+        intArrayOf(5, 1, 2, 6) to floatArrayOf(1f, 0f, 0f),
+        intArrayOf(0, 4, 7, 3) to floatArrayOf(-1f, 0f, 0f),
+        intArrayOf(3, 2, 6, 7) to floatArrayOf(0f, 1f, 0f),
+        intArrayOf(0, 1, 5, 4) to floatArrayOf(0f, -1f, 0f)
+    )
+
+    val lx = -0.4f; val ly = 0.72f; val lz = 0.56f
+    val stoneDark = Color(0xFF221A12)
+    val stoneLit = lerp(Color(0xFF6E5A3C), Gold, (progress * 0.55f).coerceIn(0f, 1f))
+    val edgeColor = lerp(Color(0xFF3A2E1E), Gold, progress)
+    val roughness = 1f - progress
+
+    val visible = faces
+        .map { (idx, n) ->
+            val rn = rot(n)
+            val depth = idx.map { rotated[it][2] }.average().toFloat()
+            Triple(idx, rn, depth)
+        }
+        .filter { it.second[2] > 0.02f }
+        .sortedBy { it.third }
+
+    for ((idx, rn, _) in visible) {
+        val nl = (rn[0] * lx + rn[1] * ly + rn[2] * lz).coerceIn(0f, 1f)
+        val shade = 0.30f + 0.70f * nl
+        val faceColor = lerp(stoneDark, stoneLit, shade)
+
+        val path = Path().apply {
+            moveTo(screen[idx[0]].x, screen[idx[0]].y)
+            lineTo(screen[idx[1]].x, screen[idx[1]].y)
+            lineTo(screen[idx[2]].x, screen[idx[2]].y)
+            lineTo(screen[idx[3]].x, screen[idx[3]].y)
+            close()
+        }
+        drawPath(path, color = faceColor)
+
+        if (roughness > 0.02f) {
+            val p0 = screen[idx[0]]; val p1 = screen[idx[1]]; val p2 = screen[idx[2]]; val p3 = screen[idx[3]]
+            for (f in listOf(0.32f, 0.5f, 0.68f)) {
+                drawLine(
+                    color = Color(0xFF120D08).copy(alpha = roughness * 0.30f),
+                    start = Offset(p0.x + (p3.x - p0.x) * f, p0.y + (p3.y - p0.y) * f),
+                    end = Offset(p1.x + (p2.x - p1.x) * f, p1.y + (p2.y - p1.y) * f),
+                    strokeWidth = 1f
+                )
+            }
+        }
+
+        drawPath(
+            path,
+            color = edgeColor.copy(alpha = 0.45f + 0.55f * progress),
+            style = Stroke(width = 1.5f + roughness * 1.5f)
         )
     }
 }
