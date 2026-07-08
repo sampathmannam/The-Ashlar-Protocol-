@@ -3,6 +3,7 @@ package com.example
 import com.example.tools.PlumbEntry
 import com.example.tools.TILTS
 import com.example.tools.composeSquaredReflection
+import com.example.tools.relativeDay
 import com.example.tools.tiltById
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -77,5 +78,27 @@ class PlumbLineTest {
         )
         assertTrue(out.lowercase().contains("always / never".lowercase()) || out.lowercase().contains("always"))
         assertTrue(out.lowercase().contains("mind-reading"))
+    }
+
+    @Test
+    fun relativeDaySameDayReadsAsToday() {
+        val now = 1_000_000_000_000L
+        assertEquals("Today", relativeDay(now, now))
+        assertEquals("Today", relativeDay(now - 3 * 3_600_000L, now)) // 3 hours ago
+        assertEquals("Today", relativeDay(now + 3_600_000L, now))     // slight clock skew → not scolded
+    }
+
+    @Test
+    fun relativeDayOneDayReadsAsYesterday() {
+        val now = 1_000_000_000_000L
+        assertEquals("Yesterday", relativeDay(now - 86_400_000L, now))              // exactly 24h
+        assertEquals("Yesterday", relativeDay(now - 86_400_000L - 3_600_000L, now)) // 25h
+    }
+
+    @Test
+    fun relativeDayCountsWholeDays() {
+        val now = 1_000_000_000_000L
+        assertEquals("3 days ago", relativeDay(now - 3 * 86_400_000L, now))
+        assertEquals("10 days ago", relativeDay(now - 10 * 86_400_000L - 5_000L, now))
     }
 }

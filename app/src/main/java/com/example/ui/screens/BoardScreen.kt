@@ -41,6 +41,7 @@ import com.example.ui.theme.Surface
 @Composable
 fun BoardScreen(viewModel: AshlarAppViewModel) {
     val intention by viewModel.intention.collectAsState()
+    val plumbRecords by viewModel.plumbRecords.collectAsState()
     androidx.compose.foundation.lazy.LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -142,6 +143,12 @@ fun BoardScreen(viewModel: AshlarAppViewModel) {
                 gaugeDays = gauge,
                 recalls = recall
             )
+        }
+
+        // Thoughts you've straightened — your own words from The Plumb, kept so you can read them
+        // again and watch a leaning thought get squared (narrative agency; docs/ACTION_PLAN §1).
+        if (plumbRecords.isNotEmpty()) {
+            item { PlumbRecordsCard(records = plumbRecords) }
         }
 
         // After Action Report
@@ -1037,3 +1044,92 @@ fun AarNotesCard(
     }
 }
 
+
+/**
+ * The thoughts you've straightened — your own words from The Plumb, kept so you can read them
+ * again. Seeing a leaning thought squared, and squared again on another day, is the point: it's
+ * how you notice your own story can change (narrative agency, the strongest evidence lever —
+ * Adler 2012; docs/ACTION_PLAN §1). Tap a record to re-read how you squared it. Nothing invented.
+ */
+@Composable
+fun PlumbRecordsCard(records: List<com.example.data.PlumbRecord>) {
+    val now = remember { System.currentTimeMillis() }
+    var expandedId by remember { mutableStateOf<String?>(null) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(32.dp))
+            .background(Surface)
+            .border(1.dp, DividerWhite.copy(alpha = 0.05f), RoundedCornerShape(32.dp))
+            .padding(24.dp)
+    ) {
+        Text(
+            text = "THOUGHTS YOU'VE STRAIGHTENED",
+            style = MaterialTheme.typography.labelSmall,
+            color = Gold.copy(alpha = 0.3f),
+            letterSpacing = 2.sp
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            records.take(6).forEach { rec ->
+                val open = expandedId == rec.id
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(Slate.copy(alpha = 0.2f))
+                        .border(1.dp, DividerWhite.copy(alpha = 0.05f), RoundedCornerShape(16.dp))
+                        .clickable { expandedId = if (open) null else rec.id }
+                        .padding(16.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = com.example.tools.relativeDay(rec.timestamp, now).uppercase(),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Silver.copy(alpha = 0.5f),
+                            letterSpacing = 1.sp
+                        )
+                        Text(
+                            text = if (open) "READING" else "RE-READ",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Gold.copy(alpha = 0.5f),
+                            fontSize = 9.sp
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "“${rec.thought}”",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = LightText,
+                        lineHeight = 22.sp
+                    )
+                    if (open && rec.reflection.isNotBlank()) {
+                        Spacer(modifier = Modifier.height(12.dp))
+                        HorizontalDivider(color = DividerWhite.copy(alpha = 0.08f))
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Text(
+                            text = rec.reflection,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Silver,
+                            lineHeight = 24.sp
+                        )
+                    }
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = "Your own words, kept. A thought can lean — and be straightened, and straightened again.",
+            style = MaterialTheme.typography.labelSmall,
+            color = Silver.copy(alpha = 0.5f),
+            lineHeight = 16.sp
+        )
+    }
+}

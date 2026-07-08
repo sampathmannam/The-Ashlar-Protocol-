@@ -38,6 +38,23 @@ val TILTS: List<Tilt> = listOf(
 
 fun tiltById(id: String): Tilt? = TILTS.firstOrNull { it.id == id }
 
+/**
+ * A gentle relative-day label for a past record ("Today" / "Yesterday" / "N days ago"), so someone
+ * re-reading their own words feels the passage of time rather than a clock stamp — the point of the
+ * record is to see your own thoughts change across days (narrative agency; see RESEARCH_BASIS).
+ *
+ * Pure: the reference "now" is passed in, never read from the clock, so it's deterministic to test.
+ * Approximates by elapsed days (not calendar midnight), which is honest enough for a review and free
+ * of timezone ambiguity. A record timestamped slightly in the future (clock skew) reads as "Today".
+ */
+fun relativeDay(thenMs: Long, nowMs: Long): String {
+    val dayMs = 86_400_000L
+    val elapsed = nowMs - thenMs
+    if (elapsed < dayMs) return "Today"
+    val days = (elapsed / dayMs).toInt()
+    return if (days == 1) "Yesterday" else "$days days ago"
+}
+
 /** Everything the person recorded while checking one thought against the plumb line. */
 data class PlumbEntry(
     val situation: String,
