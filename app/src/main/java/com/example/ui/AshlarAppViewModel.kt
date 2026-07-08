@@ -14,8 +14,11 @@ import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.TimeZone
 import com.example.tools.KindStreak
+import com.example.tools.Strength
+import com.example.tools.Strengths
 
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 
 class AshlarAppViewModel(application: Application) : AndroidViewModel(application) {
     private val dataStore = LocalDataStore(application)
@@ -145,6 +148,21 @@ class AshlarAppViewModel(application: Application) : AndroidViewModel(applicatio
     private val _streakComeback = MutableStateFlow<String?>(null)
     val streakComeback: StateFlow<String?> = _streakComeback.asStateFlow()
     fun clearStreakComeback() { _streakComeback.value = null }
+
+    // VIA signature strengths (intrinsic progression) + today's "use it in a new way" prompt.
+    val signatureStrengths: StateFlow<List<Strength>> = dataStore.signatureStrengths.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList()
+    )
+
+    fun setSignatureStrengths(strengths: List<Strength>) {
+        viewModelScope.launch { dataStore.setSignatureStrengths(strengths) }
+    }
+
+    val todayStrengthPrompt: StateFlow<String?> = dataStore.signatureStrengths.map { sig ->
+        val now = System.currentTimeMillis()
+        val today = KindStreak.epochDay(now, TimeZone.getDefault().getOffset(now))
+        Strengths.strengthOfTheDay(sig, today)?.let { Strengths.newWayPrompt(it) }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     // Bundled, on-device word rotation — no network, no API key, no cost. Starts on today's word;
     // SYNC advances to the next. Replaces the old paid Gemini call.

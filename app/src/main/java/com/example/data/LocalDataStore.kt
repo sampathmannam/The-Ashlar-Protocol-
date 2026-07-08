@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import com.example.tools.KindStreak
 import com.example.tools.StreakState
+import com.example.tools.Strength
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "ashlar_prefs")
 
@@ -104,6 +105,23 @@ class LocalDataStore(private val context: Context) {
             preferences[CURRENT_RUN_KEY] = state.currentRun
             preferences[GRACE_KEY] = state.graceRemaining
             preferences[LAST_TENDED_DAY_KEY] = state.lastTendedDay
+        }
+    }
+
+    // The user's chosen VIA signature strengths, highest first, stored as enum names (see tools/Strengths.kt).
+    private val SIGNATURE_STRENGTHS_KEY =
+        androidx.datastore.preferences.core.stringPreferencesKey("signature_strengths")
+
+    val signatureStrengths: Flow<List<Strength>> = context.dataStore.data.map { preferences ->
+        (preferences[SIGNATURE_STRENGTHS_KEY] ?: "")
+            .split(",")
+            .filter { it.isNotBlank() }
+            .mapNotNull { name -> runCatching { Strength.valueOf(name) }.getOrNull() }
+    }
+
+    suspend fun setSignatureStrengths(strengths: List<Strength>) {
+        context.dataStore.edit { preferences ->
+            preferences[SIGNATURE_STRENGTHS_KEY] = strengths.joinToString(",") { it.name }
         }
     }
 
