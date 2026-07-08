@@ -43,8 +43,9 @@ object BreathPacer {
         val total = pattern.totalMs
         if (total <= 0) return BreathState(BreathPhase.INHALE, 0f, 0)
 
-        // Wrap into the range 0 until total, tolerating negative input.
-        val t = (((elapsedMs % total) + total) % total).toInt()
+        // A stray negative elapsed is treated as the very start (INHALE), not wrapped to the cycle's end.
+        val safeElapsed = if (elapsedMs < 0L) 0L else elapsedMs
+        val t = (safeElapsed % total).toInt()
 
         val inhaleEnd = pattern.inhaleMs
         val holdInEnd = inhaleEnd + pattern.holdInMs
