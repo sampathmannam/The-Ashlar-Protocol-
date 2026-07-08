@@ -44,6 +44,15 @@ fun BoardScreen(viewModel: AshlarAppViewModel) {
         verticalArrangement = Arrangement.spacedBy(16.dp),
         contentPadding = PaddingValues(bottom = 80.dp)
     ) {
+        // A warm welcome back after a lapse — surfaced only when returning, never loss-framed
+        // (see tools/KindStreak.comebackMessage). Dismissed on tap.
+        item {
+            val comeback by viewModel.streakComeback.collectAsState()
+            comeback?.let { message ->
+                ComebackCard(message = message, onDismiss = { viewModel.clearStreakComeback() })
+            }
+        }
+
         // The Path — the home's center of gravity. One hero: the rough→perfect ashlar (driven by
         // real journey progress, not a manual slider) fused with the current degree and what's next.
         item {
@@ -385,7 +394,7 @@ fun WorkSoFarCard(
         )
         Spacer(modifier = Modifier.height(16.dp))
 
-        WorkRow("Days tended in a row", streak)
+        WorkRow("Days tended", streak)
         WorkRow("Notes in the journal", journalEntries)
         WorkRow("Thoughts set to the plumb", thoughtRecords)
         WorkRow("Days fully divided by the gauge", gaugeDays)
@@ -419,6 +428,39 @@ private fun WorkRow(label: String, count: Int) {
     }
 }
 
+// Shown when the user returns after a lapse: a warm, self-forgiving welcome (KindStreak), never a
+// "you lost your streak". The cumulative count never dropped, so this reassures rather than scolds.
+@Composable
+private fun ComebackCard(message: String, onDismiss: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(32.dp))
+            .background(Surface)
+            .border(1.dp, Gold.copy(alpha = 0.15f), RoundedCornerShape(32.dp))
+            .padding(24.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Text(
+            text = "WELCOME BACK",
+            style = MaterialTheme.typography.labelSmall,
+            color = Gold.copy(alpha = 0.5f)
+        )
+        Text(
+            text = message,
+            style = MaterialTheme.typography.bodyMedium,
+            color = LightText
+        )
+        TextButton(
+            onClick = onDismiss,
+            contentPadding = PaddingValues(0.dp),
+            modifier = Modifier.height(24.dp)
+        ) {
+            Text(text = "CONTINUE", style = MaterialTheme.typography.labelSmall, color = Gold)
+        }
+    }
+}
+
 @Composable
 fun CognitiveBriefingCard(
     briefing: String?,
@@ -447,7 +489,7 @@ fun CognitiveBriefingCard(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 if (streak > 0) {
                     Text(
-                        text = "STREAK: $streak",
+                        text = "TENDED: $streak",
                         style = MaterialTheme.typography.labelSmall,
                         color = Gold,
                         fontSize = 10.sp,
