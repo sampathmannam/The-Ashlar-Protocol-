@@ -11,7 +11,7 @@ This file is the evidence spine for [`VISION.md`](VISION.md) and [`MASTER_PLAN.m
 | 1 | Behavioral Activation for depression | **Strong** (NICE first-line) | The 24-inch Gauge / daily structure can claim real backing |
 | 2 | Social connection ↔ mortality/wellbeing | **Strong** (quantified meta-analyses) | Brotherhood/connection is a headline mechanism, not decoration |
 | 3 | Expressive/reflective writing | **Moderate** (small–moderate, heterogeneous) | Journal/Chamber: present modestly, don't oversell |
-| 4 | Rituals ↓ anxiety/grief, ↑ performance | **Moderate** (lab studies, emerging) | Ritual framing is justified; label as emerging |
+| 4 | Ritual ↓ anxiety, restores sense of control | **Moderate** (multi-lab, incl. physiological; retracted sources removed — see §4) | Ritual framing justified for *anxiety-regulation*; drop performance/grief claims |
 | 5 | Self-compassion | **Strong** (r ≈ −0.54 with distress) | The ashlar "unfinished, not broken" stance is well-founded |
 | 6 | ACT / values-based living | **Strong** (20+ meta-analyses) | The Plumb (values) can claim strong backing |
 | 7 | PERMA wellbeing model | **Mixed** — useful heuristic; 5 factors NOT distinct | Three Pillars = heuristic lens, not a validated factor structure |
@@ -43,10 +43,13 @@ This file is the evidence spine for [`VISION.md`](VISION.md) and [`MASTER_PLAN.m
 - **Pennebaker, J. W. (2018).** *Perspectives on Psychological Science*, 13(2), 226–229. https://journals.sagepub.com/doi/10.1177/1745691617707315
 - **Finding:** Small-to-moderate, heterogeneous benefits. Present the journal/Chamber modestly.
 
-## §4 — Rituals reduce anxiety/grief, improve performance — **Moderate**
-- **Norton, M. I., & Gino, F. (2014).** "Rituals alleviate grieving for loved ones, lovers, and lotteries." *J. Experimental Psychology: General*, 143(1), 266–272. *(Mediated by restored sense of control.)* https://www.hbs.edu/ris/Publication%20Files/norton%20gino%202014_e44eb177-f8f4-4f0d-a458-625c1268b391.pdf
-- **Brooks, A. W., et al. (2016).** "Don't stop believing: Rituals improve performance by decreasing anxiety." *OBHDP*, 137, 71–85. https://www.hbs.edu/ris/Publication%20Files/Rituals%20OBHDP_5cbc5848-ef4d-4192-a320-68d30169763c.pdf
-- **Finding:** Deliberate ritual lowers grief and performance anxiety via a restored sense of control. Emerging, lab-based — label as such.
+## §4 — Ritual reduces anxiety and restores a sense of control — **Moderate** *(sources corrected 2026-07-05)*
+> ⚠️ **Correction.** This section previously cited Brooks et al. (2016) and Norton & Gino (2014). **Brooks et al. (2016) was RETRACTED (Nov 2024)** over data-integrity issues; Norton & Gino (2014) is **co-authored by a researcher Harvard found committed misconduct** and has been *hard to replicate*. Do **not** use them as support. The claim is re-anchored below on independent labs.
+- **Lang, M., Krátký, J., & Xygalatas, D. (2020).** "The role of ritual behaviour in anxiety reduction." *Phil. Trans. R. Soc. B*, 375(1805), 20190431. — after a stressor, performing a habitual ritual lowered **both perceived and physiological anxiety (higher HRV)**. https://royalsocietypublishing.org/doi/10.1098/rstb.2019.0431 — *best anchor; field experiment, physiological outcome, non-Gino lab.*
+- **Lang, M., et al. (2015).** "Effects of Anxiety on Spontaneous Ritualized Behavior." *Current Biology*, 25(14), 1892–1897. — induced anxiety *increases* ritualization (the natural anxiety→ritual direction). https://www.cell.com/current-biology/fulltext/S0960-9822(15)00652-1
+- **Legare, C. H., & Souza, A. L. (2012).** "Evaluating ritual efficacy." *Cognition*, 124(1), 1–15. — repetition/procedural steps drive *perceived* efficacy. https://www.sciencedirect.com/science/article/abs/pii/S0010027712000546
+- **Hobson, N. M., et al. (2018).** "The Psychology of Rituals: An Integrative Review." *Pers. Soc. Psychol. Review*, 22(3), 260–284. — framework: ritual serves emotion-regulation, performance, and social-connection functions. https://journals.sagepub.com/doi/abs/10.1177/1088868317734944
+- **Finding:** Ritual's **anxiety-regulation and control-restoring** functions have real, multi-lab support (incl. physiological). We claim *that*, cautiously, and drop the retracted performance/grief studies.
 
 ## §5 — Self-compassion — **Strong**
 - **Neff, K. D. (2003).** "The development and validation of a scale to measure self-compassion." *Self and Identity*, 2(3), 223–250. *(Defines "common humanity.")*
@@ -91,6 +94,13 @@ Mortality-salience (**contested — flag**):
 - **Many Labs 4 (Klein, R. A., et al., 2022), *Collabra: Psychology*** and **Sætrevik & Sjåstad (2022), *PLOS ONE*** — **failed to replicate** the core mortality-salience effect.
 - **Finding:** Build the Chamber around **meaning, values, and what matters now.** Memento-mori imagery is philosophical framing, never an evidence claim.
 
+**Safety gate (BINDING — operational rule, not an evidence claim):** Mortality/death-adjacent content is the **highest-risk element** in the Masonic source material, because this app operates where mortality themes intersect suicide safety. See [MASONIC_DESIGN_PRIMITIVES.md § "The Safety Wall"](MASONIC_DESIGN_PRIMITIVES.md) for the full rules. In brief:
+- **Default UX carries zero death imagery.** No skull, scythe, grave, coffin, hourglass-as-death, countdowns, or "life in weeks." Audit for *accidental* mortality salience (timers, "time remaining") too.
+- **Crisis screening is a hard gate in front of anything death-adjacent.** On any risk signal → suppress the content entirely and route to support. **Do not "soften" it.**
+- **Extract the function, discard the death trigger.** Every healthy outcome (values clarity, gratitude, present focus) is reachable through ACT/gratitude/mindfulness framing. Never use death as the motivational lever.
+- **Cut "write your last will"** (rehearsal risk) → replace with a *future-self* letter. **Hiram Abiff**: keep only the "brought low → raised" rising arc; never depict the blows, murder, weapons, or corpse; reframe "fidelity unto death" as *integrity under stress*, never martyrdom.
+- **Never manufacture suffering** — no ordeals, hazing, or "earn it through pain." Progress is never gated on distress.
+
 ## §11 — Freemasonry, social capital, men's mental health — **Weak/absent for the Craft itself**
 - **HONEST VERDICT: no credible empirical research links Freemasonry specifically to mental-health outcomes.** Do not claim it. Use the analogs below.
 - **Putnam, R. D. (2000).** *Bowling Alone.* Simon & Schuster. Documents the collapse of fraternal orders (names Freemasonry, Elks, Lions, Rotary) as declining social capital. *(Describes decline/civic cost, not member clinical outcomes.)* https://www.journalofdemocracy.org/articles/bowling-alone-americas-declining-social-capital/
@@ -98,6 +108,7 @@ Mortality-salience (**contested — flag**):
   - **Foettinger, L., et al. (2022).** "The Role of Community-Based Men's Sheds in Health Promotion for Older Men." *American Journal of Men's Health*, 16(2). Counteracts isolation/loneliness; wellbeing benefits substantiated. https://journals.sagepub.com/doi/full/10.1177/15579883221084490
   - Milligan et al. (2016); Wilson & Cordier (2013) — foundational Men's Sheds reviews.
 - **Finding:** Frame Freemasonry as a *structural/historical exemplar* of the belonging and social-capital mechanisms that Putnam and the Men's Sheds evidence actually support. The mechanism is real; the Craft is the metaphor.
+- **Design mapping:** The full symbol-by-symbol translation of Masonic primitives into evidence-backed features (with the cardinal-virtues → DBT mapping, the working-tools → exercise modules, degrees → progression, and the do-not-borrow list) lives in [MASONIC_DESIGN_PRIMITIVES.md](MASONIC_DESIGN_PRIMITIVES.md).
 
 ---
 *Compiled 2026-07-04 via dedicated research pass. Confidence labels favor caution. When in doubt, under-claim.*

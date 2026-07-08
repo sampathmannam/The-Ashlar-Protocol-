@@ -104,9 +104,13 @@ fun TracingBoardApp(
                         )
                         ToolsScreen(
                             currentDegree = degree,
-                            onPlumbComplete = { viewModel.recordPlumbSession() },
+                            onPlumbComplete = { thought, reflection ->
+                                viewModel.recordPlumbSession()
+                                viewModel.addPlumbRecord(thought, reflection)
+                            },
                             onGaugeDayComplete = { viewModel.recordGaugeDayComplete() },
-                            onRecallHeld = { viewModel.recordRecallSession() }
+                            onRecallHeld = { viewModel.recordRecallSession() },
+                            onSquareSetIntention = { viewModel.setIntention(it) }
                         )
                     }
                 }

@@ -19,6 +19,7 @@ class LocalDataStore(private val context: Context) {
     private val AAR_ENTRIES_KEY = androidx.datastore.preferences.core.stringPreferencesKey("aar_entries")
     private val AAR_DRAFT_KEY = androidx.datastore.preferences.core.stringPreferencesKey("aar_draft")
     private val REFLECTIONS_KEY = androidx.datastore.preferences.core.stringPreferencesKey("chamber_reflections")
+    private val PLUMB_RECORDS_KEY = androidx.datastore.preferences.core.stringPreferencesKey("plumb_records")
     // Counts of deliberate practice, feeding the degree progression (see tools/Degrees.kt).
     private val PLUMB_SESSIONS_KEY = androidx.datastore.preferences.core.intPreferencesKey("plumb_sessions")
     private val GAUGE_DAYS_KEY = androidx.datastore.preferences.core.intPreferencesKey("gauge_days_complete")
@@ -110,6 +111,11 @@ class LocalDataStore(private val context: Context) {
         }
     }
 
+    /** Update just the intention (e.g. from the Square rite), without re-running initiation. */
+    suspend fun setIntention(text: String) {
+        context.dataStore.edit { it[INTENTION_KEY] = text }
+    }
+
     val reflections: Flow<List<Reflection>> = context.dataStore.data.map { preferences ->
         val jsonString = preferences[REFLECTIONS_KEY] ?: "[]"
         try {
@@ -123,6 +129,24 @@ class LocalDataStore(private val context: Context) {
         context.dataStore.edit { preferences ->
             preferences[REFLECTIONS_KEY] = kotlinx.serialization.json.Json.encodeToString(
                 kotlinx.serialization.builtins.ListSerializer(Reflection.serializer()),
+                entries
+            )
+        }
+    }
+
+    val plumbRecords: Flow<List<PlumbRecord>> = context.dataStore.data.map { preferences ->
+        val jsonString = preferences[PLUMB_RECORDS_KEY] ?: "[]"
+        try {
+            kotlinx.serialization.json.Json.decodeFromString(jsonString)
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
+
+    suspend fun setPlumbRecords(entries: List<PlumbRecord>) {
+        context.dataStore.edit { preferences ->
+            preferences[PLUMB_RECORDS_KEY] = kotlinx.serialization.json.Json.encodeToString(
+                kotlinx.serialization.builtins.ListSerializer(PlumbRecord.serializer()),
                 entries
             )
         }

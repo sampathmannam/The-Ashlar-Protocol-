@@ -1,146 +1,91 @@
-# The Ashlar Protocol — Vision
+# The Ashlar Protocol — Vision Plan
 
-> *"We are not building with brick and stone. We are building the self."*
+> *"You are not broken. You are unfinished. And there is a craft for the work."*
 
-**Status:** North-star document. Read this first. Everything the app does should trace back to a principle here.
-**Last updated:** 2026-07-04
-**Companion docs:** [`MASTER_PLAN.md`](MASTER_PLAN.md) (the roadmap) · [`RESEARCH_BASIS.md`](RESEARCH_BASIS.md) (every claim's evidence + honest confidence level)
+**What this is:** the north-star. Read it first. Every feature traces to a principle here.
+**Companion docs:** [`ACTION_PLAN.md`](ACTION_PLAN.md) (how we build it) · [`RESEARCH_BASIS.md`](RESEARCH_BASIS.md) (every claim, its source, honest confidence) · [`AUDIT_AND_REDESIGN.md`](AUDIT_AND_REDESIGN.md).
+**Last updated:** 2026-07-05, after a five-stream research pass (frontier of digital mental health, the psychology of ritual & transformation, the Freemasonry system, competitive landscape, immersive design).
 
 ---
 
-## 1. The one-sentence vision
+## 1. The one sentence
 
-**The Ashlar Protocol is a private, disciplined companion for the lifelong work of becoming who you could be — a modern mental-health practice built on the oldest self-improvement system humanity ever wrote down: the craft of shaping the rough stone into the perfect one.**
+**The Ashlar Protocol is the first mental-wellness app built as a rite of passage** — it doesn't manage your symptoms, it *initiates you into the lifelong craft of building yourself*: clinically-grounded practice delivered as embodied rites, staged as a journey of becoming, wrapped in a fail-safe crisis net, and kept ruthlessly honest about what it can and can't claim.
 
-## 2. The metaphor that is the whole product
+## 2. Why now — the four problems the field has not solved
 
-In the stonemason's craft, the **rough ashlar** is a block as it comes from the quarry — raw, uneven, full of imperfections. The **perfect ashlar** is that same stone, patiently worked with tools until it is true, square, and fit to build with. Freemasonry took this and made it a metaphor for a human life: *you are not broken; you are unfinished. You are the rough stone, and also the mason working it.*
+The research is unambiguous, and it's the reason this can be genuinely new rather than another skinned meditation app:
 
-That single idea is the therapeutic spine of this app, and it happens to be one of the most psychologically healthy stances a person can take toward themselves:
+1. **The symptom-management ceiling.** Aggregated across 145 RCTs, phone-based mental-health interventions produce only **small effects (d ≈ 0.3)**, and the best meta-review "failed to find convincing evidence in support of any" of them ([Goldberg et al., 2022, *PLOS Digital Health*](https://journals.plos.org/digitalhealth/article?id=10.1371/journal.pdig.0000002)). Re-skinning CBT worksheets is a dead end. The critique that apps are "reductionist symptom-chasers" that ignore meaning and context is now in the literature ([Babu & Joseph, 2025](https://www.frontiersin.org/journals/psychiatry/articles/10.3389/fpsyt.2025.1581779/full)).
+2. **Retention collapse.** Real-world mental-health apps retain **~3.9% of users at 15 days and ~3.3% at 30 days** ([Baumel et al., 2019, *JMIR*](https://pmc.ncbi.nlm.nih.gov/articles/PMC6785720/)). Utility doesn't hold people. *Meaning and identity might.*
+3. **The men's gap.** Men die by suicide ~4× as often yet seek help far less (~17% vs ~28.5%), driven by the "mental health is feminine" stereotype ([CDC](https://www.cdc.gov/suicide/disparities/index.html); [SPSP](https://spsp.org/news/character-and-context-blog/lee-men-avoid-using-mental-health-apps)). Nearly every app is pastel and female-coded. A serious, craft-and-mastery frame reaches people no one else is reaching.
+4. **The meaning / identity / durability white space.** The field's own frontier synthesis names *meaning, values, identity, and durable change* as the under-built frontier. That is exactly what a rite of passage is *for*.
 
-- **You are a work in progress, not a defect.** This is the growth-mindset and self-compassion stance — treating your struggle as part of being human rather than proof you are uniquely failing. (Self-compassion is strongly linked to lower depression and anxiety — see [`RESEARCH_BASIS.md`](RESEARCH_BASIS.md) §5.)
-- **The work is daily and never "done."** No streak-shaming, no "cured" state. The perfect ashlar is a direction, not a finish line.
-- **You already hold the tools.** The app does not fix you. It hands you instruments and teaches you to use them on yourself.
+## 3. The novel thesis (and the honest "world-first")
 
-Everything else in this document is downstream of the ashlar.
+Freemasonry, stripped of mystique, is humanity's most refined, centuries-tested **system of symbolic self-transformation**: a staged rite of passage (the degrees), embodied ritual (the working tools, the Chamber), a narrative of becoming (rough → perfect ashlar), and a brotherhood. It turns self-improvement into *initiation*.
 
-## 3. Who this is for (and the repositioning decision)
+**The move no one has made** is to fuse three things:
 
-**The current prototype is dressed as a tactical-operator tool** — "cognitive resilience for tactical professionals," `SYS_LOCAL_430`, `SECURE`, "deposit operational weight," police-protocol memorization. That aesthetic is atmospheric and disciplined, but it narrows a universal system to a niche and slightly militarizes a tradition whose entire point is inward.
+- **Evidence-based practice** — behavioral activation, CBT, ACT, self-compassion, paced breathing (the *what that works*).
+- **The rite-of-passage architecture** — degrees, tools, ritual — grounded in the real psychology of *narrative identity, ritual, and meaning* that explains why transformation frames make change stick (the *how that lasts*).
+- **State-of-the-art, safety-first delivery** — a relationally-credible but hard-capped voice, transparent on-device personalization, immersive-but-honest atmosphere, and (eventually) adaptive timing (the *frontier that makes it modern*).
 
-**Decision: reposition the audience from "operators" to "any person doing the work."** The craftsman, not the commando.
+**The honest world-first claim** (competitive research found no direct competitor after hard searching): *"the first app to use Freemasonry's initiatory framework — the rough-to-perfect ashlar, the graded degrees, the Chamber of Reflection — as its therapeutic architecture."* We do **not** claim "first ritual app" (Be Ceremonial), "first men's mental-fitness app" (Mettle), or that we invented the ashlar allegory (it's centuries old). The novelty is the **synthesis**, and that is a strong, defensible, honest claim.
 
-- **Keep** the serious, earned, non-saccharine tone. That is the real differentiator against the crowded market of pastel-gradient, infantilizing meditation apps. The Ashlar Protocol respects the user as an adult doing hard, dignified work.
-- **Widen** the frame from "tactical professionals" to everyone carrying weight who wants structure, meaning, and a way forward — people who bounce off cutesy wellness apps precisely because they want gravity.
-- **Preserve, don't delete.** The tactical/operational language survives as an *optional theme* ("The Operator's Path"), not the spine. Nothing built is wasted.
+## 4. What is actually load-bearing (the science under the metaphor)
 
-**Primary audience:** adults — with a natural early strength among men, who are underserved by existing mental-health products and are drawn to structure, mastery, and brotherhood (the demographic the Men's Sheds movement reaches; see [`RESEARCH_BASIS.md`](RESEARCH_BASIS.md) §11). But the craft is for anyone. The rough stone has no gender.
+This is the discipline that keeps us credible: **the rite-of-passage frame is the *architecture*; the *sub-mechanisms* are the evidence.** We build the cathedral without claiming the scaffolding is proven medicine.
 
-## 4. What we believe (principles)
+| The frame gives us… | The load-bearing science under it | Confidence |
+|---|---|---|
+| A story of *becoming* | **Narrative identity**: re-authoring toward *agency & coherence* tracks wellbeing — and agency *rose before* symptoms improved in a prospective study ([Adler 2012](https://pubmed.ncbi.nlm.nih.gov/21910554/); [McAdams & McLean 2013](https://journals.sagepub.com/doi/abs/10.1177/0963721413475622)) | **Strong-ish** — our single best lever |
+| Ritual & ceremony | Ritual **reduces physiological anxiety and restores a sense of control** ([Lang & Xygalatas 2020](https://royalsocietypublishing.org/doi/10.1098/rstb.2019.0431); [Legare & Souza 2012](https://www.sciencedirect.com/science/article/abs/pii/S0010027712000546); framework: [Hobson 2018](https://journals.sagepub.com/doi/abs/10.1177/1088868317734944)) | **Moderate** |
+| The working tools | Real techniques: 24-inch gauge → **behavioral activation** (BA ≈ CBT, [Cochrane 2020](https://pubmed.ncbi.nlm.nih.gov/32628293/)); Plumb → **CBT/values**; Level → **paced breathing ~6/min**; Compasses → **self-regulation** | **Strong** (the practices) |
+| The Master's degree (meaning, mortality) | **Meaning-making** from adversity predicts adjustment ([Park 2010](https://pubmed.ncbi.nlm.nih.gov/20192563/)); **awe / the sacred** aid wellbeing & connection ([Piff 2015](https://pubmed.ncbi.nlm.nih.gov/25984788/)) | **Moderate** |
+| Earned degrees | **Self-Determination Theory**: competence + autonomy + relatedness drive motivation — *if* self-endorsed, not gate-like ([Ryan & Deci 2000](https://selfdeterminationtheory.org/SDT/documents/2000_RyanDeci_SDT.pdf)) | **Strong** |
+| The Lodge / brotherhood | **Social connection** is a top protective factor (Holt-Lunstad); **Men's Sheds** reduce isolation ([Foettinger 2022](https://journals.sagepub.com/doi/10.1177/15579883221084490)); the men's associational collapse is real ([Putnam](https://www.journalofdemocracy.org/articles/bowling-alone-americas-declining-social-capital/)) | **Strong** (connection); **weak** for Freemasonry itself |
 
-1. **Help is the only metric.** We measure success by whether a person's life got better — not engagement, not retention, not time-in-app. If a feature is "sticky" but not *helpful*, it is a bug. (Inherited north-star across this maker's mental-health work.)
-2. **Your inner work is yours.** Privacy is not a feature; it is a moral position and it is *thematically native* — Freemasonry is famously a private craft. All personal reflection lives **on-device by default**. We never harvest, sell, or mine what people confide. Any AI personalization grows as **local, on-device memory retrieved into context**, never by shipping a person's soul to a server.
-3. **Every claim earns its place.** No pillar, tool, or piece of copy makes a psychological promise the evidence can't back. Where the science is strong we say so; where it's a useful metaphor we say *that* instead. We never fabricate authority. (See the honest confidence table in [`RESEARCH_BASIS.md`](RESEARCH_BASIS.md).)
-4. **Ritual over notification.** We build practices, not pings. A rite the user chooses to perform beats an alert we push at them — and the act of deliberate ritual itself reduces anxiety by restoring a sense of control ([`RESEARCH_BASIS.md`](RESEARCH_BASIS.md) §4).
-5. **Progress, not perfection; direction, not diagnosis.** This is a practice for building a life, **not** a medical device and **not** a therapist. We are explicit about that line, and we build a real bridge to human help when someone needs more than a practice.
-6. **Dignity in the dark.** The tone is calm, adult, and grounded — a lodge at night, not a nursery. Seriousness is a form of respect.
+**What is metaphor, not mechanism** (design language only — never a health claim): van Gennep/Turner's rite-of-passage *stages* (anthropology, not RCTs); symbolic "cleansing"/priming (the Macbeth effect **failed to replicate** — [Earp 2014](https://www.tandfonline.com/doi/abs/10.1080/01973533.2013.856792), [Siev 2018](https://econtent.hogrefe.com/doi/10.1027/1864-9335/a000349)); and "growth through suffering" (self-reported post-traumatic growth ≠ actual growth and can co-occur with *more* distress — [Frazier 2009](https://journals.sagepub.com/doi/abs/10.1111/j.1467-9280.2009.02381.x)). And there is **no RCT that a rite-of-passage-structured app improves outcomes** — that specific claim is untested, and we say so.
 
-## 5. Why Freemasonry × mental health is a real synthesis, not a costume
+## 5. The arc: Arrive → Build → Reckon
 
-Freemasonry is, structurally, **one of humanity's oldest continuously-practiced programs of moral and psychological self-improvement through symbol, ritual, staged progression, and peer fellowship.** Strip away the regalia and what remains is a remarkably modern architecture for changing a human being — and its instruments map cleanly onto today's evidence-based psychology.
+The three Craft degrees map, honestly, onto a coherent therapeutic journey (this is *our* reframe, inspired by the degrees, grounded in psychology):
 
-**Honest framing (this is load-bearing):** There is **no credible research showing Freemasonry itself improves mental health** — that literature does not exist. So we never claim it. Instead we treat the Craft as a *structural and symbolic exemplar*, and we ground the actual mechanisms in the real science of the things the Craft happens to do: structure, ritual, reflection, values, brotherhood, and progression. The symbolism carries the *meaning*; the citations carry the *claim*.
+- **I. Arrive (Entered Apprentice) — *accept the rough stone.*** Self-acceptance, orientation, the foundational fast-acting skills (structure the day, breathe, show up). You are unfinished, not broken. *Anti-perfectionism is law here: the perfect ashlar is a direction, never a destination, and self-worth is never tied to progress.*
+- **II. Build (Fellowcraft) — *work the mind.*** Cognitive and emotional skill: straighten a leaning thought, act by your values, steady yourself. Re-author toward agency.
+- **III. Reckon (Master Mason) — *meaning, mortality, and turning outward.*** Purpose, values-in-action, resilience, and connection — earned, and *opt-in*. The mortality/meaning material is powerful and firewalled from anyone in distress.
 
-### The working tools, mapped to evidence-based practice
+## 6. The design laws (drawn directly from the research)
 
-| Masonic instrument | What it means in the Craft | The mental skill it becomes | Evidence (confidence) |
-|---|---|---|---|
-| **Rough → Perfect Ashlar** | The self, worked over a lifetime | Growth stance + self-compassion; "unfinished, not broken" | Self-compassion **strong** (§5) |
-| **The 24-inch Gauge** | Divide the day: labour, rest, and a worthy cause | Behavioral activation + daily structure + rest/sleep hygiene | BA **strong**, NICE first-line (§1) |
-| **The Common Gavel** | Knock the rough excrescences off the stone | Habit change; noticing and interrupting a maladaptive pattern | (habit/CBT; framed modestly) |
-| **The Plumb** | Test uprightness — live "on the plumb" | Values-based living; act in line with what you stand for (ACT) | ACT **strong** (§6) |
-| **The Level** | All meet on the level; equanimity | Emotional regulation via paced breathing (~6 breaths/min) | Paced breathing/HRV **strong** (§8) |
-| **The Square** | Square your actions; integrity | Behavioral integrity; small right actions, "small wins" | SDT + progress principle **strong** (§9) |
-| **The Compasses** | Circumscribe desires within due bounds | Self-regulation, distress tolerance, healthy boundaries | (DBT-adjacent; framed modestly) |
-| **The Chamber of Reflection** | Descend, reflect, rectify (solitude, mortality, renewal) | Expressive/reflective writing + contemplative pause | Expressive writing **moderate** (§3) |
-| **The Three Pillars — Wisdom, Strength, Beauty** | The supports of the temple | A whole-person model: mind, body, spirit | Multi-domain wellbeing (§7, framed as heuristic) |
-| **The Lodge / Brotherhood** | Meeting on the level; relief; belonging | Social connection — the strongest protective factor there is | Connection **strong** (§2, §11) |
-| **The Degrees** (Apprentice → Fellowcraft → Master) | Staged initiation and mastery | Gamified, meaningful progression; competence + autonomy | SDT + small wins **strong** (§9) |
-| **Memento mori** (mortality symbolism) | Reflect on the end to value the now | *Meaning-making and purpose* (NOT "reflect on death") | Purpose **strong**; mortality-salience **contested** — see §10 |
+These are non-negotiable, because the research shows each is where apps in this space fail or do harm:
 
-> **A discipline we hold:** the last row is where honesty matters most. The evidence for cultivating **meaning and purpose** is strong (purpose even predicts lower mortality). The stronger claim that *reflecting on death itself* reliably helps has **failed key replications**. So in-app we lean the Chamber toward *meaning, values, and what matters now* — the memento-mori imagery is philosophical framing, never an evidence claim.
+1. **Safety wraps everything.** The crisis net is model-independent, fail-safe, always-open, never gated by degree or onboarding. *Liminality is a vulnerable state* — staging someone "in between" creates a duty to support them there. Crisis logic always outranks ritual, meaning, or mortality content.
+2. **Atmosphere, not attachment.** Invest in calm aesthetics and natural soundscapes (real, low-risk affect benefit) — but the moment "the place" optimizes for time-in-app, streaks, or bonding *to the app*, it becomes the exact profile now producing companion-app lawsuits. The **practice is always the hero**; presence routes people *into* it.
+3. **Earned, never gated.** Progression satisfies competence and autonomy (informational, self-paced) — not shallow points/badges/streaks, which *reduce* intrinsic motivation and become dark patterns for someone in distress. **Never gate the talking, the release, or the help.**
+4. **Anti-perfectionism.** Reject "become flawless." Growth is direction; the stone is never finished, and that's the point.
+5. **Anti-sycophancy — including about transformation.** Never tell someone they've "leveled up" or "transformed" without substance. False progress narratives are an integrity risk and can *increase* distress.
+6. **Personalize with humility, on-device.** Passive prediction of mood is scientifically shaky and doesn't generalize; we favor **transparent, on-device "personal sensing"** the user can see and control — never covert profiling.
+7. **Ship the static protocol first; make adaptation prove itself.** Adaptive timing (JITAI) has *not* yet beaten a good static app, and mistimed prompts backfire. Earn it against a working baseline.
+8. **Never oversell.** 64% of top apps claim effectiveness; 2.7% cite evidence for their own app. We claim only what the evidence supports, and name the metaphor as metaphor. This honesty *is* the brand.
 
-## 6. The architecture of transformation: the Three Pillars & the Degrees
+## 7. Who it's for
 
-Two structures from the Craft become the app's information architecture.
+**Men-forward, but not men-only or essentialist.** The men's gap is real and under-served, the craft/mastery frame reaches men who bounce off both therapy and pastel apps, and Men's Sheds show a gendered belonging intervention can work. But: the mythopoetic "deep masculine" framing is discredited and essentialist — we avoid it. Brotherhood is a *spirit of mutual aid*, and the door is open to anyone drawn to the work. (Freemasonry itself has women's and co-masonic traditions; we honor that rather than claim brotherhood is inherently male.)
 
-### The Three Pillars (the daily whole-person model)
-Every day of practice touches three supports of the temple — already present in your code as *Wisdom, Strength, Beauty*:
+## 8. What it is NOT
 
-- **Wisdom** — the mind. Clarity, reflection, meaning, cognitive skills. *(The Plumb, the Chamber, journaling, meaning work.)*
-- **Strength** — the body and will. Discipline, energy, movement, rest, resilience. *(The Gauge, activity, sleep, breathing.)*
-- **Beauty** — the spirit. Connection, creativity, joy, gratitude, the reasons life is worth building. *(Brotherhood, creative practice, savoring.)*
+- **Not** a therapist, a diagnosis, or a medical device. A practice that builds a real bridge to human help.
+- **Not** an actual Masonic lodge, and **not affiliated** with any Masonic body. It borrows the *philosophy and pedagogy* — self-as-unfinished-stone; staged, symbolic, habit-forming, socially-supported growth — and leaves the institution (regalia, secrecy theater, gender/religion requirements). Secular and inclusive.
+- **Not** an engagement-maximizing dopamine machine, a data business, or a companion you bond with instead of people.
+- **Not** cute. That's the point.
 
-A life that neglects any one pillar leans. The dashboard's job is to show the user, gently, which pillar is thin this week.
+## 9. The honesty charter
 
-### The Degrees (the spine of the whole experience)
+This app's credibility rests on one discipline: **every psychological claim is traceable to real evidence and hedged to its true confidence; the Freemasonry frame is inspiration and metaphor, never our evidence base.** The research pass that produced this document caught our own errors — it retracted a study we had been citing (Brooks et al. 2016) and tempered claims we'd overstated (gratitude, self-serve progress feedback). That is the process working. We would rather under-promise to a suffering person than mislead them.
 
-This is the app's central architecture — not a progress bar bolted onto a dashboard. The user's journey is a **rite of passage** from rough ashlar toward perfect, and the Craft's three degrees map, with almost eerie precision, onto the actual arc of good mental-health work:
+## 10. The north star
 
-| Degree | The Craft's theme | The therapeutic work it becomes | Tools received |
-|---|---|---|---|
-| **Entered Apprentice** — *Arrival & Foundations* | Labour on the rough stone; the ground floor | **Behavioral foundations** — structure the day, basic habits, simply show up. The fastest-acting, most stabilizing skills come first. | The 24-inch Gauge, the Common Gavel |
-| **Fellowcraft** — *The Work of the Mind* | Study, the liberal arts, the middle chamber | **Cognitive & emotional work** — examine and straighten your thinking, steady your body, live by your values. | The Plumb, the Level, the Square |
-| **Master Mason** — *Meaning & the Turn Outward* | Mortality, integrity, rebirth; raising others | **Existential & relational** — purpose, values-in-action, resilience under load, and *reconnecting with and serving others*. | The Compasses, Mouth-to-Ear, the bridge to brotherhood |
-
-**This mapping is the strongest evidence that the synthesis is structural, not cosmetic.** The arc of therapy — *stabilize behavior → work the mind → find meaning and turn outward* — is the exact sequence the three degrees have taught for three centuries. It also dissolves the hardest design problem in the whole product: **belonging is not a social feature to bolt on; it is the Master Mason degree, earned when a person is ready to carry the work to others** (and squarely supported by SDT + the "small wins" literature, §9).
-
-### The rite of passage (what "the journey is the spine" changes)
-
-The app is **not a toolbox with Masonic skins** — not a flat menu of features you pick from. It is a **staged rite of becoming**:
-
-- **Onboarding is an initiation, not a form.** The Chamber of Reflection is itself the real Masonic pre-initiation rite; the app begins there — a few quiet, serious questions about where you stand and what you want to become. It doubles as a gentle clinical baseline, disguised as crossing a threshold.
-- **Tools are received, not listed.** You begin with the Apprentice's tools. The later tools sit veiled — *"these await you"* — and are *given* as you reach the degree that needs them, exactly as a Mason receives the working tools at each stage. This is pedagogy, not a paywall: skills arrive in the order that actually helps.
-- **The journey is the home screen.** The app's center is *where you stand on the ashlar's path* — the rough stone visibly becoming true. Everything hangs from the progression.
-
-**Tone of the threshold: solemn, never gatekeeping.** Crossing into the practice should feel like a real threshold — weight, gravity, a door of oak, not a cheerful signup carousel. But the seriousness is *respect*, never a test you can fail, and never a wall that shames anyone for where they begin.
-
-### The hard line the rite must honor: gate depth, never safety
-
-Because the app withholds *advanced curriculum* to make the journey mean something, it must be absolute about what is **never** gated: **crisis help, the Chamber's release, and basic grounding are always open — degree zero, no initiation required.** Pacing advanced practices is good teaching. Locking away help from a person in pain is indefensible. The foundational, fastest-acting tools live at Entered Apprentice precisely so no one in distress is ever told to "come back at a higher degree."
-
-## 7. Tone & experience principles
-
-- **The lodge at night, not the nursery at noon.** Charcoal, gold, silver; film grain; quiet gravity. (This already exists in the code and it's good — keep it.)
-- **Speak to an adult doing dignified work.** No baby talk, no toxic positivity, no shame. Calm, direct, respectful.
-- **Ritual has weight.** Haptics, deliberate pacing, ceremony. The "purge" in the Chamber already does this — lean in.
-- **Earned, not given.** Progress is worked for. That is why it means something.
-- **Silence is allowed.** The app does not need to fill every moment. Sometimes the most therapeutic screen is a still one.
-
-## 8. Safety, ethics, and the hard line (non-negotiable)
-
-A companion that invites people to *"deposit their weight"* **must** be able to catch the person who deposits *"I don't want to be here anymore."* The current prototype cannot. This is the single most important gap and it is a **blocking requirement** before any public release (see [`MASTER_PLAN.md`](MASTER_PLAN.md), Phase 1).
-
-Our commitments:
-
-1. **A crisis pathway that is model-independent and fail-safe.** If a person expresses suicidal or crisis intent — in the Chamber, the journal, anywhere free text is entered — the app surfaces immediate, unconditional, tappable human help (crisis lines, localized) and never buries it behind a chatbot. Crisis detection must not depend on a cloud call succeeding.
-2. **We are a practice, not a clinician.** Explicit, repeated, honest: this app does not diagnose, treat, or replace professional care. We say so plainly and we build the bridge *to* human help rather than pretending to be it.
-3. **Never harvest the confessional.** What people write is theirs. On-device by default. No selling, no ad-targeting, no training on private confessions without explicit, revocable, informed consent.
-4. **Honest claims only.** Every psychological assertion in the product is traceable to [`RESEARCH_BASIS.md`](RESEARCH_BASIS.md) and hedged to its real confidence level. We would rather under-promise than mislead a suffering person.
-5. **No dependency-farming.** We do not engineer compulsion. Streaks encourage practice; they must never punish or shame a relapse. The goal is a person who needs us *less* over time, not more.
-
-## 9. What The Ashlar Protocol is NOT
-
-- **Not** a therapist, a diagnosis, or a medical device.
-- **Not** a religion or an actual Masonic lodge. It borrows the Craft's *symbolic architecture of self-improvement*; it does not initiate anyone into Freemasonry, claim its authority, or require any belief.
-- **Not** an engagement-maximizing dopamine machine. Help is the metric, not screen time.
-- **Not** a data business. The user is the customer, never the product.
-- **Not** cute. And that's the point.
-
-## 10. The north star, restated
-
-Most people never get a structured, dignified, private way to work on themselves — a set of tools, a path with stages, and a sense of belonging to something larger than their worst day. Therapy is scarce and expensive; wellness apps are often thin and patronizing; and the old institutions that once gave men and women a *craft of character* have largely dissolved (Putnam's *Bowling Alone*, §11).
-
-The Ashlar Protocol picks up that dropped thread. It takes the most enduring self-improvement system ever built, keeps what modern psychology validates, states honestly where it's only a beautiful metaphor, and puts it in the pocket of anyone willing to pick up the tools.
+Most people never get a structured, dignified, private way to *become* — a path with stages, a set of real tools, a sense of belonging to something older than their worst day. Therapy is scarce; wellness apps are thin and patronizing; and the institutions that once gave people a *craft of character* have dissolved. The Ashlar Protocol picks up that dropped thread — the oldest self-improvement system humanity wrote down, kept only where modern science agrees, honest where it's only a beautiful metaphor, wrapped in a real safety net, and put in the pocket of anyone willing to pick up the tools.
 
 **You are the rough stone. You are also the mason. Let's get to work.**
