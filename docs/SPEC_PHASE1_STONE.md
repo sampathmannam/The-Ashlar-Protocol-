@@ -147,7 +147,7 @@ People who are struggling and can't open up to anyone need a private, on-device 
 
 ## Open Questions
 
-- **Q1 (design/founder, blocking scope):** For P0, do we ship the stone with **one** starter practice type or the **full four-tool set**? Recommendation: start with the **Gavel↔Level matched pair + Integrity Check** (3), since shipping "Letting Go" without its "Self-Compassion" counterweight is unsafe (self-attack risk). Daily Balance can be P1.
+- **Q1 — RESOLVED (founder, Jul 8 2026):** P0 ships **three tools — the Gavel↔Level matched pair (Letting Go + Self-Compassion) + Integrity Check.** "Letting Go" never ships without its "Self-Compassion" counterweight (self-attack risk). **Daily Balance → P1.**
 - **Q2 (design/founder):** Does the Milestone-0 test compare stone-framing vs. plain "wellness journey," or also test a *third* softer framing ("tending a garden")? Recommendation: two arms (stone vs plain) to keep the test clean; park the garden idea.
 - **Q3 (engineering):** Can the existing on-device compounding-memory store surface "remembered context" fast enough for a warm greeting on cold app start, or do we need a cached digest? (Non-blocking; affects P0.5 latency.)
 - **Q4 (data/clinical):** WHO-5 cadence — how often can we re-prompt without it feeling like a test? Recommendation: baseline + every ~2 weeks, skippable. (Non-blocking.)
