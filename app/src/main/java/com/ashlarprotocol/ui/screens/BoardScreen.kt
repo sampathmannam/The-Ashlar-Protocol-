@@ -119,6 +119,20 @@ fun BoardScreen(viewModel: AshlarAppViewModel) {
             )
         }
 
+        // The rite of passage made legible (Phase 2): the earned degree and the arc toward the next,
+        // shown as "the work beneath the stone" — distinct from the stone itself, which is tending-
+        // driven and never completes. The degree advances by deliberate work (plumb/gauge/recall), so
+        // an advancement (the Raising) is anticipated, not a surprise.
+        item {
+            val degree by viewModel.currentDegree.collectAsState()
+            val degreeProgress by viewModel.degreeProgress.collectAsState()
+            DegreePathCard(
+                degree = degree,
+                progress = degreeProgress,
+                towardLabel = com.ashlarprotocol.tools.Degrees.towardNextLabel(degree)
+            )
+        }
+
         // Your intention — the app remembers what you said you're working toward (the re-authoring
         // engine; docs/ACTION_PLAN §1A). Shown only once it's been set at initiation.
         if (intention.isNotBlank()) {
@@ -649,6 +663,71 @@ private fun DrawScope.drawAshlar(rotationDeg: Float, progress: Float, flash: Flo
  * The user's stated intention from initiation, surfaced so the app never forgets what they're
  * working toward. The first visible piece of the re-authoring engine (docs/ACTION_PLAN §1A).
  */
+/**
+ * The degree arc, made legible (Phase 2 — the rite of passage). Names the earned degree and the arc
+ * toward the next, so an advancement is anticipated rather than a surprise. Deliberately DISTINCT from
+ * the stone: the stone smooths from tending and never completes (SPEC P0.1); this shows the earned
+ * skill layer beneath it. Invitation, not obligation — "Toward X", never "X to go before you lose…".
+ */
+@Composable
+fun DegreePathCard(degree: com.ashlarprotocol.tools.Degree, progress: Float, towardLabel: String?) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(32.dp))
+            .background(Surface)
+            .border(1.dp, Gold.copy(alpha = 0.2f), RoundedCornerShape(32.dp))
+            .padding(24.dp)
+    ) {
+        Text(
+            text = "THE WORK BENEATH THE STONE",
+            style = MaterialTheme.typography.labelSmall,
+            color = Gold.copy(alpha = 0.5f),
+            letterSpacing = 2.sp
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+        Text(
+            text = degree.display,
+            style = MaterialTheme.typography.bodyLarge,
+            color = LightText
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        if (towardLabel != null) {
+            // A slim, hand-drawn progress line toward the next degree — matches the app's crafted
+            // aesthetic and avoids version-specific Material progress APIs.
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(4.dp)
+                    .clip(RoundedCornerShape(2.dp))
+                    .background(DividerWhite.copy(alpha = 0.10f))
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(progress.coerceIn(0f, 1f))
+                        .height(4.dp)
+                        .clip(RoundedCornerShape(2.dp))
+                        .background(Gold.copy(alpha = 0.6f))
+                )
+            }
+            Spacer(modifier = Modifier.height(10.dp))
+            Text(
+                text = towardLabel,
+                style = MaterialTheme.typography.labelSmall,
+                color = Silver,
+                letterSpacing = 1.sp
+            )
+        } else {
+            Text(
+                text = "The work is now lifelong.",
+                style = MaterialTheme.typography.bodySmall,
+                color = Silver,
+                lineHeight = 20.sp
+            )
+        }
+    }
+}
+
 @Composable
 fun IntentionCard(intention: String) {
     Column(

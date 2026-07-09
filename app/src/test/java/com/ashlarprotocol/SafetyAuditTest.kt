@@ -1,6 +1,8 @@
 package com.ashlarprotocol
 
 import com.ashlarprotocol.tools.DailyWord
+import com.ashlarprotocol.tools.Degree
+import com.ashlarprotocol.tools.Degrees
 import com.ashlarprotocol.tools.GracefulExit
 import com.ashlarprotocol.tools.KindStreak
 import com.ashlarprotocol.tools.PowerUps
@@ -59,7 +61,13 @@ class SafetyAuditTest {
             "Chamber.MEANING_PROMPTS" to MEANING_PROMPTS,
             // The Raising rite (Phase 2). The Master Mason degree is the most mortality-adjacent moment
             // in the source Craft — its copy must stay on becoming, never on death.
-            "Raising.allText" to RaisingCopy.allText()
+            "Raising.allText" to RaisingCopy.allText(),
+            // The degree-path card (Phase 2): the legible arc. Static copy + every degree name + label.
+            "DegreePathCard" to (
+                listOf("THE WORK BENEATH THE STONE", "The work is now lifelong.") +
+                    Degree.values().map { it.display } +
+                    Degree.values().mapNotNull { Degrees.towardNextLabel(it) }
+            )
         )
 
         val violations = SafetyAudit.audit(corpus)

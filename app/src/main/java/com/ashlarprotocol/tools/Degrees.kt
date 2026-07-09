@@ -75,4 +75,10 @@ object Degrees {
         if (span <= 0f) return 1f
         return ((s - cur.threshold).toFloat() / span).coerceIn(0f, 1f)
     }
+
+    /**
+     * A gentle, invitational label for the arc ahead — "Toward Fellowcraft" — or null at the summit.
+     * Invitation, never obligation: it names where the work leads, not what is lost by stopping.
+     */
+    fun towardNextLabel(degree: Degree): String? = next(degree)?.let { "Toward ${it.display}" }
 }
