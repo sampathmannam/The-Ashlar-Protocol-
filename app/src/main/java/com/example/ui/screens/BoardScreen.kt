@@ -186,7 +186,7 @@ fun BoardScreen(viewModel: AshlarAppViewModel) {
         item {
             PracticesCard(
                 practices = practices,
-                onSave = { anchor, action -> viewModel.addPractice(anchor, action) },
+                onSave = { anchor, action, reminder -> viewModel.addPractice(anchor, action, reminder) },
                 onRemove = { viewModel.removePractice(it) }
             )
         }
@@ -303,7 +303,7 @@ fun RestNudgeCard(message: String) {
 @Composable
 fun PracticesCard(
     practices: List<com.example.data.Practice>,
-    onSave: (String, String) -> Unit,
+    onSave: (String, String, Int?) -> Unit,
     onRemove: (String) -> Unit
 ) {
     var show by remember { mutableStateOf(false) }

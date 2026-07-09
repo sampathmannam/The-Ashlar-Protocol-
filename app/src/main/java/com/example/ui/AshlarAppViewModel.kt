@@ -128,21 +128,49 @@ class AshlarAppViewModel(application: Application) : AndroidViewModel(applicatio
         viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList()
     )
 
-    fun addPractice(anchor: String, action: String) {
+    fun addPractice(anchor: String, action: String, reminderMinutesOfDay: Int? = null) {
         if (!com.example.tools.PracticeAuthoring.canSave(anchor, action)) return
         viewModelScope.launch {
             val entry = com.example.data.Practice(
                 id = java.util.UUID.randomUUID().toString(),
                 anchor = anchor.trim(),
                 action = action.trim(),
-                timestamp = System.currentTimeMillis()
+                timestamp = System.currentTimeMillis(),
+                reminderMinutesOfDay = reminderMinutesOfDay
             )
             dataStore.setPractices((listOf(entry) + practices.value).take(30))
+            if (reminderMinutesOfDay != null) schedulePracticeReminder(entry)
         }
     }
 
     fun removePractice(id: String) {
         viewModelScope.launch { dataStore.setPractices(practices.value.filter { it.id != id }) }
+        cancelPracticeReminder(id)
+    }
+
+    /** Schedule a daily cue-anchored reminder for [p] at its chosen time (T1.5). Gentle, opt-in. */
+    private fun schedulePracticeReminder(p: com.example.data.Practice) {
+        val minutes = p.reminderMinutesOfDay ?: return
+        val cal = java.util.Calendar.getInstance()
+        val nowMinuteOfDay = cal.get(java.util.Calendar.HOUR_OF_DAY) * 60 + cal.get(java.util.Calendar.MINUTE)
+        val delayMin = com.example.tools.PracticeReminder.initialDelayMinutes(minutes, nowMinuteOfDay)
+        val data = androidx.work.Data.Builder()
+            .putString(com.example.worker.PracticeReminderWorker.KEY_ID, p.id)
+            .putString(com.example.worker.PracticeReminderWorker.KEY_ANCHOR, p.anchor)
+            .putString(com.example.worker.PracticeReminderWorker.KEY_ACTION, p.action)
+            .build()
+        val request = androidx.work.PeriodicWorkRequestBuilder<com.example.worker.PracticeReminderWorker>(
+            24, java.util.concurrent.TimeUnit.HOURS
+        )
+            .setInitialDelay(delayMin, java.util.concurrent.TimeUnit.MINUTES)
+            .setInputData(data)
+            .build()
+        androidx.work.WorkManager.getInstance(getApplication())
+            .enqueueUniquePeriodicWork("practice_${p.id}", androidx.work.ExistingPeriodicWorkPolicy.UPDATE, request)
+    }
+
+    private fun cancelPracticeReminder(id: String) {
+        androidx.work.WorkManager.getInstance(getApplication()).cancelUniqueWork("practice_$id")
     }
 
     fun addPlumbRecord(thought: String, reflection: String) {
