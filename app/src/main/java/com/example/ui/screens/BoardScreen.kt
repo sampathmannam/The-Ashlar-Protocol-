@@ -62,6 +62,22 @@ fun BoardScreen(viewModel: AshlarAppViewModel) {
         verticalArrangement = Arrangement.spacedBy(16.dp),
         contentPadding = PaddingValues(bottom = 80.dp)
     ) {
+        // The remembered greeting (T1.9): a warm line composed from what the app actually remembers —
+        // the time, the days you've tended, the intention you set. On-device, nothing generated/uploaded.
+        item {
+            val daysTended by viewModel.briefingStreak.collectAsState()
+            val hour = remember { java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY) }
+            Text(
+                text = com.example.tools.Greeting.greeting(
+                    com.example.tools.Greeting.Context(hourOfDay = hour, daysTended = daysTended, intention = intention)
+                ),
+                style = MaterialTheme.typography.bodyMedium,
+                color = LightText.copy(alpha = 0.85f),
+                lineHeight = 22.sp,
+                modifier = Modifier.padding(horizontal = 4.dp)
+            )
+        }
+
         // Anti-harm (T3.2): a caring "it's late, rest" when the pattern looks compulsive rather than
         // helpful — surfaced first, above the gamified UI, so rest wins the moment.
         if (restNudge != null) {
