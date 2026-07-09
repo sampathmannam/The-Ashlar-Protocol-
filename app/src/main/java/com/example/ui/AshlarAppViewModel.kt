@@ -123,6 +123,28 @@ class AshlarAppViewModel(application: Application) : AndroidViewModel(applicatio
         }
     }
 
+    // Self-authored practices — "After [anchor], I will [action]" (T1.4). On-device only, newest first.
+    val practices: StateFlow<List<com.example.data.Practice>> = dataStore.practices.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList()
+    )
+
+    fun addPractice(anchor: String, action: String) {
+        if (!com.example.tools.PracticeAuthoring.canSave(anchor, action)) return
+        viewModelScope.launch {
+            val entry = com.example.data.Practice(
+                id = java.util.UUID.randomUUID().toString(),
+                anchor = anchor.trim(),
+                action = action.trim(),
+                timestamp = System.currentTimeMillis()
+            )
+            dataStore.setPractices((listOf(entry) + practices.value).take(30))
+        }
+    }
+
+    fun removePractice(id: String) {
+        viewModelScope.launch { dataStore.setPractices(practices.value.filter { it.id != id }) }
+    }
+
     fun addPlumbRecord(thought: String, reflection: String) {
         if (thought.isBlank()) return
         viewModelScope.launch {
