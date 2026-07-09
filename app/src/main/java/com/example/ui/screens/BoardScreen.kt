@@ -27,7 +27,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.tools.Strength
 import com.example.tools.Strengths
+import com.example.tools.Readiness
 import com.example.ui.AshlarAppViewModel
+import com.example.ui.DailyWorking
 import com.example.ui.theme.Charcoal
 import com.example.ui.theme.DividerWhite
 import com.example.ui.theme.Gold
@@ -92,6 +94,20 @@ fun BoardScreen(viewModel: AshlarAppViewModel) {
                 isFetching = isFetchingBriefing,
                 streak = briefingStreak,
                 onRefresh = { viewModel.fetchDailyBriefing() }
+            )
+        }
+
+        // The daily Working — the mood-adaptive practice. Check in with how you're arriving and the
+        // day's ask scales: a floor task on a hard day is the point (Behavioral Activation), not a
+        // compromise. Pays more acknowledgment on low days, never "you're behind".
+        item {
+            val working by viewModel.todayWorking.collectAsState()
+            val dial by viewModel.dial.collectAsState()
+            WorkingCard(
+                working = working,
+                dial = dial,
+                onCheckIn = { viewModel.checkInReadiness(it) },
+                onNudge = { viewModel.nudgeDial(it) }
             )
         }
 
@@ -477,6 +493,95 @@ private fun ComebackCard(message: String, onDismiss: () -> Unit) {
             Text(text = "CONTINUE", style = MaterialTheme.typography.labelSmall, color = Gold)
         }
     }
+}
+
+// The daily Working card: a mood check-in that scales the day's ask. Before check-in it asks how
+// you're arriving; after, it acknowledges (warmer on hard days) and offers a lighter/heavier dial.
+@Composable
+private fun WorkingCard(
+    working: DailyWorking?,
+    dial: Int,
+    onCheckIn: (Readiness) -> Unit,
+    onNudge: (Int) -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(32.dp))
+            .background(Surface)
+            .border(1.dp, DividerWhite.copy(alpha = 0.05f), RoundedCornerShape(32.dp))
+            .padding(24.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp)
+    ) {
+        if (working == null) {
+            Text(
+                text = "HOW ARE YOU ARRIVING?",
+                style = MaterialTheme.typography.labelSmall,
+                color = Gold.copy(alpha = 0.4f)
+            )
+            Text(
+                text = "Today's work will match how you feel. There's no wrong answer.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = Silver
+            )
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Readiness.values().forEach { r ->
+                    Text(
+                        text = r.display,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = Charcoal,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .weight(1f)
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(Gold.copy(alpha = 0.85f))
+                            .clickable { onCheckIn(r) }
+                            .padding(vertical = 10.dp)
+                    )
+                }
+            }
+        } else {
+            Text(
+                text = "TODAY'S WORKING",
+                style = MaterialTheme.typography.labelSmall,
+                color = Gold.copy(alpha = 0.4f)
+            )
+            Text(
+                text = working.acknowledgment,
+                style = MaterialTheme.typography.bodyLarge,
+                color = LightText
+            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "${working.effort.display} · one gentle step",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Silver
+                )
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    DialButton("Lighter", enabled = dial > -1) { onNudge(-1) }
+                    DialButton("Heavier", enabled = dial < 1) { onNudge(1) }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun DialButton(label: String, enabled: Boolean, onClick: () -> Unit) {
+    Text(
+        text = label,
+        style = MaterialTheme.typography.labelSmall,
+        color = if (enabled) Gold else Slate,
+        modifier = Modifier
+            .clip(RoundedCornerShape(12.dp))
+            .background(Slate.copy(alpha = 0.25f))
+            .then(if (enabled) Modifier.clickable { onClick() } else Modifier)
+            .padding(horizontal = 12.dp, vertical = 6.dp)
+    )
 }
 
 // The intrinsic-progression card: tap to name your VIA signature strengths (identity, not points),

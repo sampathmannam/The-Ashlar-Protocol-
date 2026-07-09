@@ -45,4 +45,11 @@ object Working {
         Readiness.STEADY -> "Good — steady hands on the stone today."
         Readiness.STRONG -> "Strong day. A little further than usual, if you feel like it."
     }
+
+    /**
+     * The check-in to honor right now: the [stored] readiness only if it was set [today]
+     * (same epoch-day as [storedDay]); otherwise null, so a fresh day gently asks again.
+     */
+    fun readinessForToday(stored: Readiness?, storedDay: Long, today: Long): Readiness? =
+        if (stored != null && storedDay == today) stored else null
 }

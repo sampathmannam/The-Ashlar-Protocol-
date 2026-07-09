@@ -16,9 +16,16 @@ import java.util.TimeZone
 import com.example.tools.KindStreak
 import com.example.tools.Strength
 import com.example.tools.Strengths
+import com.example.tools.Working
+import com.example.tools.Readiness
+import com.example.tools.Effort
 
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
+
+/** Today's Working: how the person arrives, the adapted effort tier, and a warm acknowledgment. */
+data class DailyWorking(val readiness: Readiness, val effort: Effort, val acknowledgment: String)
 
 class AshlarAppViewModel(application: Application) : AndroidViewModel(application) {
     private val dataStore = LocalDataStore(application)
@@ -163,6 +170,33 @@ class AshlarAppViewModel(application: Application) : AndroidViewModel(applicatio
         val today = KindStreak.epochDay(now, TimeZone.getDefault().getOffset(now))
         Strengths.strengthOfTheDay(sig, today)?.let { Strengths.newWayPrompt(it) }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
+    // The daily "Working": today's readiness check-in -> adaptive effort + warm acknowledgment.
+    val dial: StateFlow<Int> = dataStore.dial.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), 0
+    )
+
+    val todayWorking: StateFlow<DailyWorking?> = combine(
+        dataStore.readiness, dataStore.readinessDay, dataStore.dial
+    ) { stored, day, d ->
+        val now = System.currentTimeMillis()
+        val today = KindStreak.epochDay(now, TimeZone.getDefault().getOffset(now))
+        Working.readinessForToday(stored, day, today)?.let { r ->
+            DailyWorking(r, Working.effortFor(r, d), Working.acknowledgment(r))
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
+    fun checkInReadiness(readiness: Readiness) {
+        viewModelScope.launch {
+            val now = System.currentTimeMillis()
+            val today = KindStreak.epochDay(now, TimeZone.getDefault().getOffset(now))
+            dataStore.setReadiness(readiness, today)
+        }
+    }
+
+    fun nudgeDial(delta: Int) {
+        viewModelScope.launch { dataStore.setDial((dial.value + delta).coerceIn(-1, 1)) }
+    }
 
     // Bundled, on-device word rotation — no network, no API key, no cost. Starts on today's word;
     // SYNC advances to the next. Replaces the old paid Gemini call.
