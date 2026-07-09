@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.map
 import com.example.tools.KindStreak
 import com.example.tools.StreakState
 import com.example.tools.Strength
+import com.example.tools.Readiness
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "ashlar_prefs")
 
@@ -123,6 +124,32 @@ class LocalDataStore(private val context: Context) {
         context.dataStore.edit { preferences ->
             preferences[SIGNATURE_STRENGTHS_KEY] = strengths.joinToString(",") { it.name }
         }
+    }
+
+    // Today's "Working" check-in: how the person arrives (Readiness) + the epoch-day it was set +
+    // the persistent difficulty dial. See tools/Working.kt.
+    private val READINESS_KEY =
+        androidx.datastore.preferences.core.stringPreferencesKey("readiness")
+    private val READINESS_DAY_KEY =
+        androidx.datastore.preferences.core.longPreferencesKey("readiness_day")
+    private val DIAL_KEY =
+        androidx.datastore.preferences.core.intPreferencesKey("effort_dial")
+
+    val readiness: Flow<Readiness?> = context.dataStore.data.map { preferences ->
+        preferences[READINESS_KEY]?.let { runCatching { Readiness.valueOf(it) }.getOrNull() }
+    }
+    val readinessDay: Flow<Long> = context.dataStore.data.map { it[READINESS_DAY_KEY] ?: -1L }
+    val dial: Flow<Int> = context.dataStore.data.map { it[DIAL_KEY] ?: 0 }
+
+    suspend fun setReadiness(readiness: Readiness, epochDay: Long) {
+        context.dataStore.edit { preferences ->
+            preferences[READINESS_KEY] = readiness.name
+            preferences[READINESS_DAY_KEY] = epochDay
+        }
+    }
+
+    suspend fun setDial(value: Int) {
+        context.dataStore.edit { preferences -> preferences[DIAL_KEY] = value }
     }
 
     val aarEntries: Flow<List<AarEntry>> = context.dataStore.data.map { preferences ->

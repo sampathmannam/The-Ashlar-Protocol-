@@ -52,4 +52,14 @@ class WorkingTest {
         val low = Working.acknowledgment(Readiness.LOW).lowercase()
         assertTrue("honors showing up on a hard day", low.contains("hard") || low.contains("brave") || low.contains("counts"))
     }
+
+    @Test
+    fun readinessForTodayReturnsTheStoredCheckInOnlyWhenItIsFromToday() {
+        // Checked in today -> use it.
+        assertEquals(Readiness.LOW, Working.readinessForToday(Readiness.LOW, storedDay = 100L, today = 100L))
+        // Yesterday's check-in has expired -> ask again.
+        assertEquals(null, Working.readinessForToday(Readiness.STRONG, storedDay = 99L, today = 100L))
+        // Never checked in -> null.
+        assertEquals(null, Working.readinessForToday(null, storedDay = -1L, today = 100L))
+    }
 }
