@@ -37,6 +37,7 @@ import com.ashlarprotocol.ui.components.LocalCrisisController
 import com.ashlarprotocol.ui.components.PowerUpsController
 import com.ashlarprotocol.ui.components.LocalPowerUpsController
 import com.ashlarprotocol.ui.components.PowerUpsSheet
+import com.ashlarprotocol.ui.components.AdvancementCeremony
 import com.ashlarprotocol.ui.screens.BoardScreen
 import com.ashlarprotocol.ui.screens.ChamberScreen
 import com.ashlarprotocol.ui.screens.InitiationScreen
@@ -146,6 +147,14 @@ fun TracingBoardApp(
         // Power-Ups — always-available quick steadying, never gated (SPEC P0.6 / T2.4). Rendered
         // above the app, but BELOW crisis: safety always wins the top layer.
         PowerUpsSheet(controller = powerUpsController)
+
+        // The Raising — marks an advancement into a new degree (Phase 2, the rite of passage).
+        // Rendered above the app content but BELOW crisis, so a risk signal always wins the top
+        // layer over any celebratory UI (SPEC P0.8 / T3.3). Fires once per degree, then is persisted.
+        val pendingAdvancement by viewModel.pendingAdvancement.collectAsState()
+        pendingAdvancement?.let { degree ->
+            AdvancementCeremony(degree = degree) { viewModel.acknowledgeAdvancement() }
+        }
 
         // Crisis support surface — rendered LAST so it sits above everything, including the film
         // grain, the nav, and the Power-Ups sheet. The §9 gate takes precedence over ALL gamified

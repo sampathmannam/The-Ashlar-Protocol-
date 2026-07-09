@@ -11,6 +11,7 @@ import com.ashlarprotocol.tools.SafetyAudit
 import com.ashlarprotocol.tools.Square
 import com.ashlarprotocol.tools.Trowel
 import com.ashlarprotocol.tools.Working
+import com.ashlarprotocol.ui.components.RaisingCopy
 import com.ashlarprotocol.ui.screens.MEANING_PROMPTS
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -55,7 +56,10 @@ class SafetyAuditTest {
             "KindStreak.comeback" to listOf(KindStreak.comebackMessage()),
             "Working" to (Readiness.values().map { Working.acknowledgment(it) } + Readiness.values().map { it.display }),
             // The Chamber is the mortality-sensitive surface (§10) — it must lean to meaning, never death.
-            "Chamber.MEANING_PROMPTS" to MEANING_PROMPTS
+            "Chamber.MEANING_PROMPTS" to MEANING_PROMPTS,
+            // The Raising rite (Phase 2). The Master Mason degree is the most mortality-adjacent moment
+            // in the source Craft — its copy must stay on becoming, never on death.
+            "Raising.allText" to RaisingCopy.allText()
         )
 
         val violations = SafetyAudit.audit(corpus)
