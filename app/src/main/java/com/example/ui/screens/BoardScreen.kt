@@ -69,6 +69,8 @@ fun BoardScreen(viewModel: AshlarAppViewModel) {
             val plumb by viewModel.plumbSessions.collectAsState()
             val gauge by viewModel.gaugeDaysComplete.collectAsState()
             val recall by viewModel.recallSessions.collectAsState()
+            // A real completed action bumps this — the stone catches the light on it (T2.3).
+            val actionPulse by viewModel.actionPulse.collectAsState()
             // The degree still names the skill layer beneath the stone (its progression is Phase 2).
             val degree = com.example.tools.Degrees.current(
                 com.example.tools.Degrees.score(
@@ -78,7 +80,8 @@ fun BoardScreen(viewModel: AshlarAppViewModel) {
             TracingBoardVisual(
                 progress = com.example.tools.KindStreak.stoneProgress(daysTended),
                 degreeName = degree.display,
-                daysTended = daysTended
+                daysTended = daysTended,
+                pulse = actionPulse
             )
         }
 
@@ -218,7 +221,8 @@ fun GracefulExitCard() {
 fun TracingBoardVisual(
     progress: Float,
     degreeName: String,
-    daysTended: Int
+    daysTended: Int,
+    pulse: Int = 0
 ) {
     val animatedProgress by animateFloatAsState(
         targetValue = progress,
@@ -247,6 +251,7 @@ fun TracingBoardVisual(
 
         AshlarStone(
             progress = animatedProgress,
+            pulse = pulse,
             modifier = Modifier.size(190.dp)
         )
 
@@ -292,7 +297,7 @@ fun TracingBoardVisual(
  * Pure Canvas + 3D math — no assets.
  */
 @Composable
-fun AshlarStone(progress: Float, modifier: Modifier = Modifier) {
+fun AshlarStone(progress: Float, pulse: Int = 0, modifier: Modifier = Modifier) {
     val rotation by rememberInfiniteTransition(label = "ashlar").animateFloat(
         initialValue = 0f,
         targetValue = 360f,
@@ -302,15 +307,25 @@ fun AshlarStone(progress: Float, modifier: Modifier = Modifier) {
         ),
         label = "rotation"
     )
+    // Micro-feedback (SPEC P0.4 / T2.3): a brief light-catch when a REAL action lands. [pulse] is
+    // bumped only on genuine completions (a practice, the Working check-in) — never a timer or a
+    // login — so the flash is always an honest mirror of something the person just did.
+    val flash = remember { Animatable(0f) }
+    LaunchedEffect(pulse) {
+        if (pulse > 0) {
+            flash.snapTo(1f)
+            flash.animateTo(0f, animationSpec = tween(700, easing = FastOutSlowInEasing))
+        }
+    }
     Canvas(modifier = modifier) {
-        drawAshlar(rotationDeg = rotation, progress = progress)
+        drawAshlar(rotationDeg = rotation, progress = progress, flash = flash.value)
     }
 }
 
-private fun DrawScope.drawAshlar(rotationDeg: Float, progress: Float) {
+private fun DrawScope.drawAshlar(rotationDeg: Float, progress: Float, flash: Float = 0f) {
     val cx = size.width / 2f
     val cy = size.height / 2f
-    val unit = size.minDimension * 0.23f
+    val unit = size.minDimension * 0.23f * (1f + flash * 0.04f) // a subtle pop as the chisel strikes
 
     val a = Math.toRadians(rotationDeg.toDouble())
     val tilt = Math.toRadians(24.0)
@@ -359,6 +374,7 @@ private fun DrawScope.drawAshlar(rotationDeg: Float, progress: Float) {
     val stoneLit = lerp(Color(0xFF6E5A3C), Gold, (progress * 0.55f).coerceIn(0f, 1f))
     val edgeColor = lerp(Color(0xFF3A2E1E), Gold, progress)
     val roughness = 1f - progress
+    val brightGold = Color(0xFFF6E6B4) // the light the stone catches the instant it's worked
 
     val visible = faces
         .map { (idx, n) ->
@@ -372,7 +388,8 @@ private fun DrawScope.drawAshlar(rotationDeg: Float, progress: Float) {
     for ((idx, rn, _) in visible) {
         val nl = (rn[0] * lx + rn[1] * ly + rn[2] * lz).coerceIn(0f, 1f)
         val shade = 0.30f + 0.70f * nl
-        val faceColor = lerp(stoneDark, stoneLit, shade)
+        val baseFace = lerp(stoneDark, stoneLit, shade)
+        val faceColor = if (flash > 0f) lerp(baseFace, brightGold, flash * 0.5f) else baseFace
 
         val path = Path().apply {
             moveTo(screen[idx[0]].x, screen[idx[0]].y)
@@ -397,8 +414,9 @@ private fun DrawScope.drawAshlar(rotationDeg: Float, progress: Float) {
 
         drawPath(
             path,
-            color = edgeColor.copy(alpha = 0.45f + 0.55f * progress),
-            style = Stroke(width = 1.5f + roughness * 1.5f)
+            color = (if (flash > 0f) lerp(edgeColor, brightGold, flash) else edgeColor)
+                .copy(alpha = (0.45f + 0.55f * progress + flash * 0.4f).coerceIn(0f, 1f)),
+            style = Stroke(width = 1.5f + roughness * 1.5f + flash * 1.5f)
         )
     }
 }
