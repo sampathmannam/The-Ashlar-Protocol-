@@ -42,6 +42,7 @@ import com.example.ui.theme.Surface
 fun BoardScreen(viewModel: AshlarAppViewModel) {
     val intention by viewModel.intention.collectAsState()
     val plumbRecords by viewModel.plumbRecords.collectAsState()
+    val todayWorking by viewModel.todayWorking.collectAsState()
     androidx.compose.foundation.lazy.LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -171,6 +172,45 @@ fun BoardScreen(viewModel: AshlarAppViewModel) {
             )
         }
 
+        // The graceful exit — once you've done today's Working, a gentle "enough for today" that
+        // gives permission to stop instead of pulling you back in (SPEC P0.7 / T2.5). No FOMO.
+        if (todayWorking != null) {
+            item { GracefulExitCard() }
+        }
+
+    }
+}
+
+/**
+ * Shown once the day's Working is done: explicit permission to stop. The opposite of a dark pattern —
+ * no streak threat, no FOMO, no interstitial in the way of closing the app. Rest as part of the work.
+ */
+@Composable
+fun GracefulExitCard() {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(32.dp))
+            .background(Surface)
+            .border(1.dp, DividerWhite.copy(alpha = 0.05f), RoundedCornerShape(32.dp))
+            .padding(24.dp)
+    ) {
+        Text(
+            text = "ENOUGH FOR TODAY",
+            style = MaterialTheme.typography.labelSmall,
+            color = Gold.copy(alpha = 0.4f),
+            letterSpacing = 2.sp
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        com.example.tools.GracefulExit.LINES.forEachIndexed { i, line ->
+            if (i > 0) Spacer(modifier = Modifier.height(10.dp))
+            Text(
+                text = line,
+                style = MaterialTheme.typography.bodyMedium,
+                color = if (i == 0) LightText else Silver,
+                lineHeight = 22.sp
+            )
+        }
     }
 }
 
