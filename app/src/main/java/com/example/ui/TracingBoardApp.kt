@@ -34,6 +34,9 @@ import androidx.navigation.compose.rememberNavController
 import com.example.ui.components.CrisisController
 import com.example.ui.components.CrisisSupportDialog
 import com.example.ui.components.LocalCrisisController
+import com.example.ui.components.PowerUpsController
+import com.example.ui.components.LocalPowerUpsController
+import com.example.ui.components.PowerUpsSheet
 import com.example.ui.screens.BoardScreen
 import com.example.ui.screens.ChamberScreen
 import com.example.ui.screens.InitiationScreen
@@ -53,9 +56,13 @@ fun TracingBoardApp(
 ) {
     val navController = rememberNavController()
     val crisisController = remember { CrisisController() }
+    val powerUpsController = remember { PowerUpsController() }
     val initiated by viewModel.initiated.collectAsState()
 
-    CompositionLocalProvider(LocalCrisisController provides crisisController) {
+    CompositionLocalProvider(
+        LocalCrisisController provides crisisController,
+        LocalPowerUpsController provides powerUpsController
+    ) {
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
             containerColor = Charcoal,
@@ -66,7 +73,10 @@ fun TracingBoardApp(
                     .fillMaxSize()
                     .padding(innerPadding)
             ) {
-                Header(onNeedHelp = { crisisController.openManual() })
+                Header(
+                    onNeedHelp = { crisisController.openManual() },
+                    onSteady = { powerUpsController.open() }
+                )
 
                 when (initiated) {
                     // First run: the initiation rite. Help stays reachable via the header above.
@@ -136,6 +146,10 @@ fun TracingBoardApp(
         // Crisis support surface — rendered last so it sits above everything, including the
         // film grain and nav. Unconditional, tappable human help. See docs/VISION.md §8.
         CrisisSupportDialog(controller = crisisController)
+
+        // Power-Ups — always-available quick steadying, never gated (SPEC P0.6 / T2.4). Rendered
+        // above everything too; distinct from crisis, which always takes precedence.
+        PowerUpsSheet(controller = powerUpsController)
     }
     }
 }
@@ -166,7 +180,7 @@ fun FilmGrainOverlay() {
 }
 
 @Composable
-fun Header(onNeedHelp: () -> Unit = {}) {
+fun Header(onNeedHelp: () -> Unit = {}, onSteady: () -> Unit = {}) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -192,21 +206,40 @@ fun Header(onNeedHelp: () -> Unit = {}) {
                     modifier = Modifier.padding(top = 4.dp)
                 )
             }
-            // Always-available path to human help. Reachable from every screen.
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(20.dp))
-                    .background(RedAlert.copy(alpha = 0.12f))
-                    .border(1.dp, RedAlert.copy(alpha = 0.45f), RoundedCornerShape(20.dp))
-                    .clickable { onNeedHelp() }
-                    .padding(horizontal = 14.dp, vertical = 8.dp)
-            ) {
-                Text(
-                    text = "NEED HELP?",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = RedAlert,
-                    letterSpacing = 1.sp
-                )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                // Quick steadying — always available, never gated. Calm (gold), not alarm (SPEC P0.6).
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(Gold.copy(alpha = 0.10f))
+                        .border(1.dp, Gold.copy(alpha = 0.40f), RoundedCornerShape(20.dp))
+                        .clickable { onSteady() }
+                        .padding(horizontal = 14.dp, vertical = 8.dp)
+                ) {
+                    Text(
+                        text = "STEADY",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Gold,
+                        letterSpacing = 1.sp
+                    )
+                }
+                Spacer(modifier = Modifier.width(8.dp))
+                // Always-available path to human help. Reachable from every screen.
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(RedAlert.copy(alpha = 0.12f))
+                        .border(1.dp, RedAlert.copy(alpha = 0.45f), RoundedCornerShape(20.dp))
+                        .clickable { onNeedHelp() }
+                        .padding(horizontal = 14.dp, vertical = 8.dp)
+                ) {
+                    Text(
+                        text = "NEED HELP?",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = RedAlert,
+                        letterSpacing = 1.sp
+                    )
+                }
             }
         }
         HorizontalDivider(color = Slate.copy(alpha = 0.5f), modifier = Modifier.padding(top = 16.dp))
