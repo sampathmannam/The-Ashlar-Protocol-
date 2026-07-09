@@ -1,0 +1,9 @@
+# Netlify config for the Ashlar Protocol petition landing page.
+# Publishes ONLY the petition/ folder as the site root, so the page serves at "/"
+# and Netlify Forms auto-detects the <form data-netlify="true" name="petition">.
+# No build step — it is static HTML. Submissions appear under Forms in the Netlify dashboard.
+[build]
+  publish = "petition"
+
+# Fastest alternative (no repo connection needed): drag the petition/ folder onto
+# https://app.netlify.com/drop — the form is detected the same way.
