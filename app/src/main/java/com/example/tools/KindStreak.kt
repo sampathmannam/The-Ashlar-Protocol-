@@ -130,4 +130,16 @@ object KindStreak {
             graceRemaining = MAX_GRACE,
             lastTendedDay = lastTendedDay
         )
+
+    /**
+     * How refined the central stone is, from cumulative tending. Asymptotic — always advancing with
+     * each day tended, but never reaching "complete": the work is lifelong (anti-perfectionism, SPEC
+     * P0.1). Monotonic in [daysTended] (which itself only ever grows), so a missed day never regresses
+     * the stone. Early days each move it a visible step; later days refine ever more finely.
+     */
+    fun stoneProgress(daysTended: Int): Float {
+        val d = daysTended.coerceAtLeast(0).toFloat()
+        val k = 25f // days at which the stone is ~half-refined; tuned so early days feel visible
+        return d / (d + k)
+    }
 }

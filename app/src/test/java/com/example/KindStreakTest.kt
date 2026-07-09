@@ -127,4 +127,29 @@ class KindStreakTest {
         assertEquals(StreakState(), KindStreak.seedFromLegacy(legacyStreak = 0, lastTendedDay = 0L))
         assertEquals(StreakState(), KindStreak.seedFromLegacy(legacyStreak = -3, lastTendedDay = 50L))
     }
+
+    @Test
+    fun stoneProgressStartsAtZeroAndClampsNegatives() {
+        assertEquals(0f, KindStreak.stoneProgress(0), 0.0001f)
+        assertEquals(0f, KindStreak.stoneProgress(-5), 0.0001f) // a stray negative never regresses below 0
+    }
+
+    @Test
+    fun stoneProgressIsMonotonicAndNeverComplete() {
+        // Each further day tended refines the stone a little more — always rising, never "complete".
+        var prev = KindStreak.stoneProgress(0)
+        for (d in 1..500) {
+            val p = KindStreak.stoneProgress(d)
+            assertTrue("day $d must not regress", p > prev)
+            assertTrue("the stone is never 'complete'", p < 1f)
+            prev = p
+        }
+        assertTrue("asymptotes below 1 — the work is lifelong", KindStreak.stoneProgress(1_000_000) < 1f)
+    }
+
+    @Test
+    fun stoneProgressGivesVisibleEarlyMovement() {
+        // The first day of tending must move the stone off zero by something a person can see.
+        assertTrue(KindStreak.stoneProgress(1) > 0.02f)
+    }
 }
