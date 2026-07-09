@@ -58,24 +58,26 @@ fun BoardScreen(viewModel: AshlarAppViewModel) {
             }
         }
 
-        // The Path — the home's center of gravity. One hero: the rough→perfect ashlar (driven by
-        // real journey progress, not a manual slider) fused with the current degree and what's next.
+        // The Path — the home's center of gravity. The rough→perfect ashlar now smooths from real
+        // tending (the kind streak's cumulative daysTended), not the degree score: it advances with
+        // the days you show up and never regresses on a miss (SPEC P0.1; KindStreak feeds the stone).
         item {
-            val streak by viewModel.briefingStreak.collectAsState()
+            // `briefingStreak` is the kind-streak's cumulative daysTended — the stone's true fuel.
+            val daysTended by viewModel.briefingStreak.collectAsState()
             val entries by viewModel.aarEntries.collectAsState()
             val plumb by viewModel.plumbSessions.collectAsState()
             val gauge by viewModel.gaugeDaysComplete.collectAsState()
             val recall by viewModel.recallSessions.collectAsState()
-            val score = com.example.tools.Degrees.score(
-                com.example.tools.WorkStats(streak, entries.size, plumb, gauge, recall)
+            // The degree still names the skill layer beneath the stone (its progression is Phase 2).
+            val degree = com.example.tools.Degrees.current(
+                com.example.tools.Degrees.score(
+                    com.example.tools.WorkStats(daysTended, entries.size, plumb, gauge, recall)
+                )
             )
-            val degree = com.example.tools.Degrees.current(score)
-            val next = com.example.tools.Degrees.next(degree)
             TracingBoardVisual(
-                progress = com.example.tools.Degrees.journeyProgress(score),
+                progress = com.example.tools.KindStreak.stoneProgress(daysTended),
                 degreeName = degree.display,
-                nextName = next?.display,
-                progressToNext = com.example.tools.Degrees.progressToNext(score)
+                daysTended = daysTended
             )
         }
 
@@ -176,8 +178,7 @@ fun BoardScreen(viewModel: AshlarAppViewModel) {
 fun TracingBoardVisual(
     progress: Float,
     degreeName: String,
-    nextName: String?,
-    progressToNext: Float
+    daysTended: Int
 ) {
     val animatedProgress by animateFloatAsState(
         targetValue = progress,
@@ -211,8 +212,9 @@ fun TracingBoardVisual(
 
         Spacer(modifier = Modifier.height(24.dp))
 
+        // Never a "complete"/"perfect achieved" state — the work is lifelong (SPEC P0.1).
         Text(
-            text = if (animatedProgress >= 0.99f) "PERFECT ASHLAR ACHIEVED" else "THE ROUGH ASHLAR, IN THE WORKING",
+            text = "THE STONE, IN THE WORKING",
             style = MaterialTheme.typography.labelSmall,
             color = Gold,
             textAlign = TextAlign.Center
@@ -229,31 +231,15 @@ fun TracingBoardVisual(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Progress toward the next degree
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(6.dp)
-                .clip(RoundedCornerShape(3.dp))
-                .background(Slate.copy(alpha = 0.4f))
-        ) {
-            if (progressToNext > 0f) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth(progressToNext)
-                        .height(6.dp)
-                        .clip(RoundedCornerShape(3.dp))
-                        .background(Gold)
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
+        // The primary continuity signal — total days tended, which only ever grows (SPEC P0.3). Kept
+        // quiet beneath the stone: no scoreboard, no deadline, no "streak at risk". The stone itself
+        // (visual closure) is the reward; this line just names what fed it.
         Text(
-            text = if (nextName != null) "${(progressToNext * 100).toInt()}% TOWARD ${nextName.uppercase()}" else "MASTER OF THE CRAFT",
+            text = if (daysTended <= 0) "the work begins the first day you tend the stone"
+                   else "$daysTended ${if (daysTended == 1) "DAY" else "DAYS"} TENDED · THE WORK IS LIFELONG",
             style = MaterialTheme.typography.labelSmall,
             color = Silver.copy(alpha = 0.6f),
+            letterSpacing = 1.sp,
             textAlign = TextAlign.Center
         )
     }
