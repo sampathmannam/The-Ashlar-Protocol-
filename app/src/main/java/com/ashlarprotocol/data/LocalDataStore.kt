@@ -30,6 +30,9 @@ class LocalDataStore(private val context: Context) {
     private val PLUMB_SESSIONS_KEY = androidx.datastore.preferences.core.intPreferencesKey("plumb_sessions")
     private val GAUGE_DAYS_KEY = androidx.datastore.preferences.core.intPreferencesKey("gauge_days_complete")
     private val RECALL_SESSIONS_KEY = androidx.datastore.preferences.core.intPreferencesKey("recall_sessions")
+    // The highest degree the member has been ceremonially raised into (ordinal). Drives the rite
+    // so an advancement is marked exactly once (see tools/Advancement.kt). Local only.
+    private val ACK_DEGREE_KEY = androidx.datastore.preferences.core.intPreferencesKey("acknowledged_degree_ordinal")
     // The initiation rite (first-run). Stored locally only, like everything else.
     private val INITIATED_KEY = androidx.datastore.preferences.core.booleanPreferencesKey("initiated")
     private val INTENTION_KEY = androidx.datastore.preferences.core.stringPreferencesKey("intention")
@@ -191,6 +194,7 @@ class LocalDataStore(private val context: Context) {
     val plumbSessions: Flow<Int> = context.dataStore.data.map { it[PLUMB_SESSIONS_KEY] ?: 0 }
     val gaugeDaysComplete: Flow<Int> = context.dataStore.data.map { it[GAUGE_DAYS_KEY] ?: 0 }
     val recallSessions: Flow<Int> = context.dataStore.data.map { it[RECALL_SESSIONS_KEY] ?: 0 }
+    val acknowledgedDegreeOrdinal: Flow<Int> = context.dataStore.data.map { it[ACK_DEGREE_KEY] ?: 0 }
 
     suspend fun incrementPlumbSessions() {
         context.dataStore.edit { it[PLUMB_SESSIONS_KEY] = (it[PLUMB_SESSIONS_KEY] ?: 0) + 1 }
@@ -202,6 +206,10 @@ class LocalDataStore(private val context: Context) {
 
     suspend fun incrementRecallSessions() {
         context.dataStore.edit { it[RECALL_SESSIONS_KEY] = (it[RECALL_SESSIONS_KEY] ?: 0) + 1 }
+    }
+
+    suspend fun setAcknowledgedDegreeOrdinal(ordinal: Int) {
+        context.dataStore.edit { it[ACK_DEGREE_KEY] = ordinal.coerceAtLeast(0) }
     }
 
     val initiated: Flow<Boolean> = context.dataStore.data.map { it[INITIATED_KEY] ?: false }

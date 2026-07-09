@@ -75,4 +75,11 @@ class DegreesTest {
         assertEquals(1f, Degrees.progressToNext(40), 0.0001f)    // Master Mason: nothing above
         assertEquals(1f, Degrees.progressToNext(1000), 0.0001f)
     }
+
+    @Test
+    fun towardNextLabelNamesTheNextDegreeOrNullAtSummit() {
+        assertEquals("Toward Fellowcraft", Degrees.towardNextLabel(Degree.ENTERED_APPRENTICE))
+        assertEquals("Toward Master Mason", Degrees.towardNextLabel(Degree.FELLOWCRAFT))
+        assertNull(Degrees.towardNextLabel(Degree.MASTER_MASON))   // the work is now lifelong
+    }
 }

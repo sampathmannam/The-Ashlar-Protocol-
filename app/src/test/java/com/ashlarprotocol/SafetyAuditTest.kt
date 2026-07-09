@@ -1,6 +1,8 @@
 package com.ashlarprotocol
 
 import com.ashlarprotocol.tools.DailyWord
+import com.ashlarprotocol.tools.Degree
+import com.ashlarprotocol.tools.Degrees
 import com.ashlarprotocol.tools.GracefulExit
 import com.ashlarprotocol.tools.KindStreak
 import com.ashlarprotocol.tools.PowerUps
@@ -11,6 +13,7 @@ import com.ashlarprotocol.tools.SafetyAudit
 import com.ashlarprotocol.tools.Square
 import com.ashlarprotocol.tools.Trowel
 import com.ashlarprotocol.tools.Working
+import com.ashlarprotocol.ui.components.RaisingCopy
 import com.ashlarprotocol.ui.screens.MEANING_PROMPTS
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -55,7 +58,16 @@ class SafetyAuditTest {
             "KindStreak.comeback" to listOf(KindStreak.comebackMessage()),
             "Working" to (Readiness.values().map { Working.acknowledgment(it) } + Readiness.values().map { it.display }),
             // The Chamber is the mortality-sensitive surface (§10) — it must lean to meaning, never death.
-            "Chamber.MEANING_PROMPTS" to MEANING_PROMPTS
+            "Chamber.MEANING_PROMPTS" to MEANING_PROMPTS,
+            // The Raising rite (Phase 2). The Master Mason degree is the most mortality-adjacent moment
+            // in the source Craft — its copy must stay on becoming, never on death.
+            "Raising.allText" to RaisingCopy.allText(),
+            // The degree-path card (Phase 2): the legible arc. Static copy + every degree name + label.
+            "DegreePathCard" to (
+                listOf("THE WORK BENEATH THE STONE", "The work is now lifelong.") +
+                    Degree.values().map { it.display } +
+                    Degree.values().mapNotNull { Degrees.towardNextLabel(it) }
+            )
         )
 
         val violations = SafetyAudit.audit(corpus)

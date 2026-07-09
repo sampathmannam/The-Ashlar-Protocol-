@@ -105,17 +105,34 @@ fun BoardScreen(viewModel: AshlarAppViewModel) {
             val recall by viewModel.recallSessions.collectAsState()
             // A real completed action bumps this — the stone catches the light on it (T2.3).
             val actionPulse by viewModel.actionPulse.collectAsState()
-            // The degree still names the skill layer beneath the stone (its progression is Phase 2).
-            val degree = com.ashlarprotocol.tools.Degrees.current(
-                com.ashlarprotocol.tools.Degrees.score(
-                    com.ashlarprotocol.tools.WorkStats(daysTended, entries.size, plumb, gauge, recall)
-                )
+            // The stone's six faces are the six VIA virtues (tools/StoneFacets); the ones you've claimed
+            // as signature strengths refine a little faster. Empty signature => an even, coherent stone.
+            val signature by viewModel.signatureStrengths.collectAsState()
+            val score = com.ashlarprotocol.tools.Degrees.score(
+                com.ashlarprotocol.tools.WorkStats(daysTended, entries.size, plumb, gauge, recall)
             )
+            // The degree names the skill layer beneath the stone (Phase 2, the rite of passage).
+            val degree = com.ashlarprotocol.tools.Degrees.current(score)
             TracingBoardVisual(
                 progress = com.ashlarprotocol.tools.KindStreak.stoneProgress(daysTended),
                 degreeName = degree.display,
                 daysTended = daysTended,
-                pulse = actionPulse
+                pulse = actionPulse,
+                facets = com.ashlarprotocol.tools.StoneFacets.orderedFacets(signature, score)
+            )
+        }
+
+        // The rite of passage made legible (Phase 2): the earned degree and the arc toward the next,
+        // shown as "the work beneath the stone" — distinct from the stone itself, which is tending-
+        // driven and never completes. The degree advances by deliberate work (plumb/gauge/recall), so
+        // an advancement (the Raising) is anticipated, not a surprise.
+        item {
+            val degree by viewModel.currentDegree.collectAsState()
+            val degreeProgress by viewModel.degreeProgress.collectAsState()
+            DegreePathCard(
+                degree = degree,
+                progress = degreeProgress,
+                towardLabel = com.ashlarprotocol.tools.Degrees.towardNextLabel(degree)
             )
         }
 
@@ -446,7 +463,8 @@ fun TracingBoardVisual(
     progress: Float,
     degreeName: String,
     daysTended: Int,
-    pulse: Int = 0
+    pulse: Int = 0,
+    facets: FloatArray? = null
 ) {
     val animatedProgress by animateFloatAsState(
         targetValue = progress,
@@ -476,6 +494,7 @@ fun TracingBoardVisual(
         AshlarStone(
             progress = animatedProgress,
             pulse = pulse,
+            facets = facets,
             modifier = Modifier.size(190.dp)
         )
 
@@ -521,7 +540,7 @@ fun TracingBoardVisual(
  * Pure Canvas + 3D math — no assets.
  */
 @Composable
-fun AshlarStone(progress: Float, pulse: Int = 0, modifier: Modifier = Modifier) {
+fun AshlarStone(progress: Float, pulse: Int = 0, facets: FloatArray? = null, modifier: Modifier = Modifier) {
     val rotation by rememberInfiniteTransition(label = "ashlar").animateFloat(
         initialValue = 0f,
         targetValue = 360f,
@@ -542,11 +561,14 @@ fun AshlarStone(progress: Float, pulse: Int = 0, modifier: Modifier = Modifier) 
         }
     }
     Canvas(modifier = modifier) {
-        drawAshlar(rotationDeg = rotation, progress = progress, flash = flash.value)
+        drawAshlar(rotationDeg = rotation, progress = progress, flash = flash.value, facets = facets)
     }
 }
 
-private fun DrawScope.drawAshlar(rotationDeg: Float, progress: Float, flash: Float = 0f) {
+/** A cube face carried through depth-sorting, keeping its ordinal so it maps to a virtue facet. */
+private class VisibleFace(val faceOrdinal: Int, val idx: IntArray, val rn: FloatArray, val depth: Float)
+
+private fun DrawScope.drawAshlar(rotationDeg: Float, progress: Float, flash: Float = 0f, facets: FloatArray? = null) {
     val cx = size.width / 2f
     val cy = size.height / 2f
     val unit = size.minDimension * 0.23f * (1f + flash * 0.04f) // a subtle pop as the chisel strikes
@@ -595,24 +617,34 @@ private fun DrawScope.drawAshlar(rotationDeg: Float, progress: Float, flash: Flo
 
     val lx = -0.4f; val ly = 0.72f; val lz = 0.56f
     val stoneDark = Color(0xFF221A12)
-    val stoneLit = lerp(Color(0xFF6E5A3C), Gold, (progress * 0.55f).coerceIn(0f, 1f))
     val edgeColor = lerp(Color(0xFF3A2E1E), Gold, progress)
-    val roughness = 1f - progress
     val brightGold = Color(0xFFF6E6B4) // the light the stone catches the instant it's worked
 
     val visible = faces
-        .map { (idx, n) ->
+        .mapIndexed { faceOrdinal, pair ->
+            val (idx, n) = pair
             val rn = rot(n)
             val depth = idx.map { rotated[it][2] }.average().toFloat()
-            Triple(idx, rn, depth)
+            VisibleFace(faceOrdinal, idx, rn, depth)
         }
-        .filter { it.second[2] > 0.02f }
-        .sortedBy { it.third }
+        .filter { it.rn[2] > 0.02f }
+        .sortedBy { it.depth }
 
-    for ((idx, rn, _) in visible) {
+    for (face in visible) {
+        val idx = face.idx
+        val rn = face.rn
+        // Each of the six faces is a VIA virtue's facet (tools/StoneFacets). Its own refinement gently
+        // nudges this face's smoothness and light — bounded (≤28%) so the stone reads as one coherent
+        // whole, never patchy. Null facets => every face uses the global progress (unchanged look).
+        val faceProgress = facets?.getOrNull(face.faceOrdinal)
+            ?.let { (progress * 0.72f + it * 0.28f).coerceIn(0f, 1f) }
+            ?: progress
+        val stoneLitFace = lerp(Color(0xFF6E5A3C), Gold, (faceProgress * 0.55f).coerceIn(0f, 1f))
+        val roughnessFace = 1f - faceProgress
+
         val nl = (rn[0] * lx + rn[1] * ly + rn[2] * lz).coerceIn(0f, 1f)
         val shade = 0.30f + 0.70f * nl
-        val baseFace = lerp(stoneDark, stoneLit, shade)
+        val baseFace = lerp(stoneDark, stoneLitFace, shade)
         val faceColor = if (flash > 0f) lerp(baseFace, brightGold, flash * 0.5f) else baseFace
 
         val path = Path().apply {
@@ -624,11 +656,11 @@ private fun DrawScope.drawAshlar(rotationDeg: Float, progress: Float, flash: Flo
         }
         drawPath(path, color = faceColor)
 
-        if (roughness > 0.02f) {
+        if (roughnessFace > 0.02f) {
             val p0 = screen[idx[0]]; val p1 = screen[idx[1]]; val p2 = screen[idx[2]]; val p3 = screen[idx[3]]
             for (f in listOf(0.32f, 0.5f, 0.68f)) {
                 drawLine(
-                    color = Color(0xFF120D08).copy(alpha = roughness * 0.30f),
+                    color = Color(0xFF120D08).copy(alpha = roughnessFace * 0.30f),
                     start = Offset(p0.x + (p3.x - p0.x) * f, p0.y + (p3.y - p0.y) * f),
                     end = Offset(p1.x + (p2.x - p1.x) * f, p1.y + (p2.y - p1.y) * f),
                     strokeWidth = 1f
@@ -639,8 +671,8 @@ private fun DrawScope.drawAshlar(rotationDeg: Float, progress: Float, flash: Flo
         drawPath(
             path,
             color = (if (flash > 0f) lerp(edgeColor, brightGold, flash) else edgeColor)
-                .copy(alpha = (0.45f + 0.55f * progress + flash * 0.4f).coerceIn(0f, 1f)),
-            style = Stroke(width = 1.5f + roughness * 1.5f + flash * 1.5f)
+                .copy(alpha = (0.45f + 0.55f * faceProgress + flash * 0.4f).coerceIn(0f, 1f)),
+            style = Stroke(width = 1.5f + roughnessFace * 1.5f + flash * 1.5f)
         )
     }
 }
@@ -649,6 +681,71 @@ private fun DrawScope.drawAshlar(rotationDeg: Float, progress: Float, flash: Flo
  * The user's stated intention from initiation, surfaced so the app never forgets what they're
  * working toward. The first visible piece of the re-authoring engine (docs/ACTION_PLAN §1A).
  */
+/**
+ * The degree arc, made legible (Phase 2 — the rite of passage). Names the earned degree and the arc
+ * toward the next, so an advancement is anticipated rather than a surprise. Deliberately DISTINCT from
+ * the stone: the stone smooths from tending and never completes (SPEC P0.1); this shows the earned
+ * skill layer beneath it. Invitation, not obligation — "Toward X", never "X to go before you lose…".
+ */
+@Composable
+fun DegreePathCard(degree: com.ashlarprotocol.tools.Degree, progress: Float, towardLabel: String?) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(32.dp))
+            .background(Surface)
+            .border(1.dp, Gold.copy(alpha = 0.2f), RoundedCornerShape(32.dp))
+            .padding(24.dp)
+    ) {
+        Text(
+            text = "THE WORK BENEATH THE STONE",
+            style = MaterialTheme.typography.labelSmall,
+            color = Gold.copy(alpha = 0.5f),
+            letterSpacing = 2.sp
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+        Text(
+            text = degree.display,
+            style = MaterialTheme.typography.bodyLarge,
+            color = LightText
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        if (towardLabel != null) {
+            // A slim, hand-drawn progress line toward the next degree — matches the app's crafted
+            // aesthetic and avoids version-specific Material progress APIs.
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(4.dp)
+                    .clip(RoundedCornerShape(2.dp))
+                    .background(DividerWhite.copy(alpha = 0.10f))
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(progress.coerceIn(0f, 1f))
+                        .height(4.dp)
+                        .clip(RoundedCornerShape(2.dp))
+                        .background(Gold.copy(alpha = 0.6f))
+                )
+            }
+            Spacer(modifier = Modifier.height(10.dp))
+            Text(
+                text = towardLabel,
+                style = MaterialTheme.typography.labelSmall,
+                color = Silver,
+                letterSpacing = 1.sp
+            )
+        } else {
+            Text(
+                text = "The work is now lifelong.",
+                style = MaterialTheme.typography.bodySmall,
+                color = Silver,
+                lineHeight = 20.sp
+            )
+        }
+    }
+}
+
 @Composable
 fun IntentionCard(intention: String) {
     Column(
