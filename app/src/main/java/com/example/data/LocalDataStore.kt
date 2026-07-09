@@ -16,8 +16,6 @@ import com.example.tools.Readiness
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "ashlar_prefs")
 
 class LocalDataStore(private val context: Context) {
-    private val PROGRESS_KEY = floatPreferencesKey("work_progress")
-    private val VOLUME_KEY = floatPreferencesKey("weekly_volume")
     private val STREAK_KEY = androidx.datastore.preferences.core.intPreferencesKey("briefing_streak")
     private val LAST_DATE_KEY = androidx.datastore.preferences.core.longPreferencesKey("last_briefing_date")
     private val AAR_ENTRIES_KEY = androidx.datastore.preferences.core.stringPreferencesKey("aar_entries")
@@ -38,26 +36,6 @@ class LocalDataStore(private val context: Context) {
     private val CURRENT_RUN_KEY = androidx.datastore.preferences.core.intPreferencesKey("current_run")
     private val GRACE_KEY = androidx.datastore.preferences.core.intPreferencesKey("grace_remaining")
     private val LAST_TENDED_DAY_KEY = androidx.datastore.preferences.core.longPreferencesKey("last_tended_day")
-
-    val workProgress: Flow<Float> = context.dataStore.data.map { preferences ->
-        preferences[PROGRESS_KEY] ?: 0.1f
-    }
-
-    suspend fun setWorkProgress(progress: Float) {
-        context.dataStore.edit { preferences ->
-            preferences[PROGRESS_KEY] = progress
-        }
-    }
-
-    val weeklyVolume: Flow<Float> = context.dataStore.data.map { preferences ->
-        preferences[VOLUME_KEY] ?: 18.5f
-    }
-
-    suspend fun setWeeklyVolume(volume: Float) {
-        context.dataStore.edit { preferences ->
-            preferences[VOLUME_KEY] = volume
-        }
-    }
 
     val briefingStreak: Flow<Int> = context.dataStore.data.map { preferences ->
         preferences[STREAK_KEY] ?: 0

@@ -2,7 +2,7 @@ package com.example.ui.components
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
+import androidx.core.net.toUri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -235,13 +235,13 @@ private fun CrisisResourceRow(resource: CrisisResource, onAct: () -> Unit) {
 private fun act(context: Context, resource: CrisisResource) {
     val intent = when (resource.kind) {
         CrisisResource.Kind.PHONE ->
-            Intent(Intent.ACTION_DIAL, Uri.parse("tel:${resource.target}"))
+            Intent(Intent.ACTION_DIAL, "tel:${resource.target}".toUri())
         CrisisResource.Kind.SMS ->
-            Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:${resource.target}")).apply {
+            Intent(Intent.ACTION_SENDTO, "smsto:${resource.target}".toUri()).apply {
                 resource.smsBody?.let { putExtra("sms_body", it) }
             }
         CrisisResource.Kind.WEB ->
-            Intent(Intent.ACTION_VIEW, Uri.parse(resource.target))
+            Intent(Intent.ACTION_VIEW, resource.target.toUri())
     }.apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) }
 
     try {

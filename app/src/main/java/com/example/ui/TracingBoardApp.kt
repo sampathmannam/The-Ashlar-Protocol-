@@ -23,7 +23,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.ImageShader
 import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.TileMode
-import android.graphics.Bitmap
+import androidx.core.graphics.createBitmap
 import androidx.compose.foundation.border
 import java.util.Random
 import androidx.navigation.NavHostController
@@ -144,7 +144,7 @@ fun FilmGrainOverlay() {
     val brush = remember {
         val width = 256
         val height = 256
-        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val bitmap = createBitmap(width, height)
         val pixels = IntArray(width * height)
         val random = Random(42)
         for (i in pixels.indices) {

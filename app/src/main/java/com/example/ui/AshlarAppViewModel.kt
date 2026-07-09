@@ -30,18 +30,6 @@ data class DailyWorking(val readiness: Readiness, val effort: Effort, val acknow
 class AshlarAppViewModel(application: Application) : AndroidViewModel(application) {
     private val dataStore = LocalDataStore(application)
 
-    val workProgress: StateFlow<Float> = dataStore.workProgress.stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(5000),
-        0.1f
-    )
-
-    val weeklyVolume: StateFlow<Float> = dataStore.weeklyVolume.stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(5000),
-        18.5f
-    )
-
     // Backed by the CUMULATIVE days-tended count (KindStreak) — monotonic, so a missed day never
     // drags the degree score or the stone backward. Name kept for the Board/Degrees consumers.
     val briefingStreak: StateFlow<Int> = dataStore.daysTended.stateIn(
@@ -223,18 +211,6 @@ class AshlarAppViewModel(application: Application) : AndroidViewModel(applicatio
         dataStore.saveStreakState(outcome.state)
         if (outcome.isComeback) {
             _streakComeback.value = KindStreak.comebackMessage()
-        }
-    }
-
-    fun setWorkProgress(progress: Float) {
-        viewModelScope.launch {
-            dataStore.setWorkProgress(progress)
-        }
-    }
-
-    fun setWeeklyVolume(volume: Float) {
-        viewModelScope.launch {
-            dataStore.setWeeklyVolume(volume)
         }
     }
 
