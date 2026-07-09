@@ -43,6 +43,11 @@ fun BoardScreen(viewModel: AshlarAppViewModel) {
     val intention by viewModel.intention.collectAsState()
     val plumbRecords by viewModel.plumbRecords.collectAsState()
     val todayWorking by viewModel.todayWorking.collectAsState()
+    val whoFiveResults by viewModel.whoFiveResults.collectAsState()
+    // The WHO-5 wellbeing check is offered at baseline, then gently ~every two weeks (T3.1).
+    val whoFiveDue = remember(whoFiveResults) {
+        com.example.tools.WhoFive.isDue(whoFiveResults.firstOrNull()?.timestamp, System.currentTimeMillis())
+    }
     androidx.compose.foundation.lazy.LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -157,6 +162,12 @@ fun BoardScreen(viewModel: AshlarAppViewModel) {
             item { PlumbRecordsCard(records = plumbRecords) }
         }
 
+        // The WHO-5 wellbeing check — the plan's primary outcome metric (T3.1). Offered at baseline
+        // then gently every ~2 weeks; always skippable. Stored on-device only.
+        if (whoFiveDue) {
+            item { WhoFiveCard(onComplete = { viewModel.addWhoFiveResult(it) }) }
+        }
+
         // After Action Report
         item {
             val aarEntries by viewModel.aarEntries.collectAsState()
@@ -214,6 +225,54 @@ fun GracefulExitCard() {
                 lineHeight = 22.sp
             )
         }
+    }
+}
+
+/**
+ * The WHO-5 card — a gentle invitation to the wellbeing check when it's due (SPEC T3.1). Opens the
+ * five-question dialog; the score is stored on-device only. The card just invites — always skippable.
+ */
+@Composable
+fun WhoFiveCard(onComplete: (Int) -> Unit) {
+    var show by remember { mutableStateOf(false) }
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(32.dp))
+            .background(Surface)
+            .border(1.dp, DividerWhite.copy(alpha = 0.05f), RoundedCornerShape(32.dp))
+            .padding(24.dp)
+    ) {
+        Text(
+            text = "YOUR WELLBEING",
+            style = MaterialTheme.typography.labelSmall,
+            color = Gold.copy(alpha = 0.4f),
+            letterSpacing = 2.sp
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+        Text(
+            text = "A gentle two-minute check on how the last two weeks have actually felt — five short questions, just for you.",
+            style = MaterialTheme.typography.bodyMedium,
+            color = Silver,
+            lineHeight = 22.sp
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = "TAKE THE CHECK  →",
+            style = MaterialTheme.typography.labelSmall,
+            color = Gold.copy(alpha = 0.7f),
+            letterSpacing = 1.sp,
+            modifier = Modifier
+                .clip(RoundedCornerShape(8.dp))
+                .clickable { show = true }
+                .padding(vertical = 6.dp)
+        )
+    }
+    if (show) {
+        com.example.ui.components.WhoFiveDialog(
+            onDismiss = { show = false },
+            onComplete = onComplete
+        )
     }
 }
 

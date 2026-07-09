@@ -107,6 +107,22 @@ class AshlarAppViewModel(application: Application) : AndroidViewModel(applicatio
         viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList()
     )
 
+    // WHO-5 wellbeing checks — the primary outcome metric (SPEC T3.1). On-device only, newest first.
+    val whoFiveResults: StateFlow<List<com.example.data.WhoFiveResult>> = dataStore.whoFiveResults.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList()
+    )
+
+    fun addWhoFiveResult(score: Int) {
+        viewModelScope.launch {
+            val entry = com.example.data.WhoFiveResult(
+                id = java.util.UUID.randomUUID().toString(),
+                score = score.coerceIn(0, 100),
+                timestamp = System.currentTimeMillis()
+            )
+            dataStore.setWhoFiveResults((listOf(entry) + whoFiveResults.value).take(60))
+        }
+    }
+
     fun addPlumbRecord(thought: String, reflection: String) {
         if (thought.isBlank()) return
         viewModelScope.launch {
