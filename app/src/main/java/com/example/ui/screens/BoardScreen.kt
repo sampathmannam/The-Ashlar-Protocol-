@@ -48,6 +48,12 @@ fun BoardScreen(viewModel: AshlarAppViewModel) {
     val whoFiveDue = remember(whoFiveResults) {
         com.example.tools.WhoFive.isDue(whoFiveResults.firstOrNull()?.timestamp, System.currentTimeMillis())
     }
+    // Anti-harm (T3.2): if it's late night and today's work is already done, gently answer a
+    // compulsive pattern with rest — on-device care, no tracking (reuses todayWorking + the clock).
+    val restNudge = remember(todayWorking) {
+        val hour = java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY)
+        com.example.tools.AntiHarm.restNudge(hour, didTodaysWork = todayWorking != null)
+    }
     androidx.compose.foundation.lazy.LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -55,6 +61,12 @@ fun BoardScreen(viewModel: AshlarAppViewModel) {
         verticalArrangement = Arrangement.spacedBy(16.dp),
         contentPadding = PaddingValues(bottom = 80.dp)
     ) {
+        // Anti-harm (T3.2): a caring "it's late, rest" when the pattern looks compulsive rather than
+        // helpful — surfaced first, above the gamified UI, so rest wins the moment.
+        if (restNudge != null) {
+            item { RestNudgeCard(message = restNudge) }
+        }
+
         // A warm welcome back after a lapse — surfaced only when returning, never loss-framed
         // (see tools/KindStreak.comebackMessage). Dismissed on tap.
         item {
@@ -225,6 +237,50 @@ fun GracefulExitCard() {
                 lineHeight = 22.sp
             )
         }
+    }
+}
+
+/**
+ * Anti-harm's gentle "rest" card (SPEC T3.2). Shown when the pattern looks compulsive rather than
+ * helpful — late at night, today's work already done — and answers it with rest, never a streak
+ * nudge or FOMO. Dismissible; it never blocks anything. On-device care, nothing measured or sent.
+ */
+@Composable
+fun RestNudgeCard(message: String) {
+    var shown by remember { mutableStateOf(true) }
+    if (!shown) return
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(32.dp))
+            .background(Surface)
+            .border(1.dp, Gold.copy(alpha = 0.22f), RoundedCornerShape(32.dp))
+            .padding(24.dp)
+    ) {
+        Text(
+            text = "A GENTLE WORD",
+            style = MaterialTheme.typography.labelSmall,
+            color = Gold.copy(alpha = 0.5f),
+            letterSpacing = 2.sp
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+        Text(
+            text = message,
+            style = MaterialTheme.typography.bodyMedium,
+            color = LightText,
+            lineHeight = 22.sp
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = "REST WELL",
+            style = MaterialTheme.typography.labelSmall,
+            color = Gold.copy(alpha = 0.6f),
+            letterSpacing = 1.sp,
+            modifier = Modifier
+                .clip(RoundedCornerShape(8.dp))
+                .clickable { shown = false }
+                .padding(vertical = 6.dp)
+        )
     }
 }
 
