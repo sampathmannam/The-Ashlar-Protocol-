@@ -44,6 +44,7 @@ fun BoardScreen(viewModel: AshlarAppViewModel) {
     val plumbRecords by viewModel.plumbRecords.collectAsState()
     val todayWorking by viewModel.todayWorking.collectAsState()
     val whoFiveResults by viewModel.whoFiveResults.collectAsState()
+    val practices by viewModel.practices.collectAsState()
     // The WHO-5 wellbeing check is offered at baseline, then gently ~every two weeks (T3.1).
     val whoFiveDue = remember(whoFiveResults) {
         com.example.tools.WhoFive.isDue(whoFiveResults.firstOrNull()?.timestamp, System.currentTimeMillis())
@@ -180,6 +181,16 @@ fun BoardScreen(viewModel: AshlarAppViewModel) {
             item { WhoFiveCard(onComplete = { viewModel.addWhoFiveResult(it) }) }
         }
 
+        // Your practices — self-authored, anchored, approach-framed (T1.4). The autonomy heart of the
+        // Working: write your own "After [anchor], I will [action]" and it's yours to keep.
+        item {
+            PracticesCard(
+                practices = practices,
+                onSave = { anchor, action -> viewModel.addPractice(anchor, action) },
+                onRemove = { viewModel.removePractice(it) }
+            )
+        }
+
         // After Action Report
         item {
             val aarEntries by viewModel.aarEntries.collectAsState()
@@ -281,6 +292,88 @@ fun RestNudgeCard(message: String) {
                 .clickable { shown = false }
                 .padding(vertical = 6.dp)
         )
+    }
+}
+
+/**
+ * Your practices (SPEC T1.4) — the self-authored, anchored, approach-framed actions you're building.
+ * Lists what you've set (as "After …, I will …") and opens the authoring dialog; each is removable.
+ * The empty state invites the first one. Autonomy: they're yours, in your words.
+ */
+@Composable
+fun PracticesCard(
+    practices: List<com.example.data.Practice>,
+    onSave: (String, String) -> Unit,
+    onRemove: (String) -> Unit
+) {
+    var show by remember { mutableStateOf(false) }
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(32.dp))
+            .background(Surface)
+            .border(1.dp, DividerWhite.copy(alpha = 0.05f), RoundedCornerShape(32.dp))
+            .padding(24.dp)
+    ) {
+        Text(
+            text = "YOUR PRACTICES",
+            style = MaterialTheme.typography.labelSmall,
+            color = Gold.copy(alpha = 0.4f),
+            letterSpacing = 2.sp
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+        if (practices.isEmpty()) {
+            Text(
+                text = "Small actions, anchored to your day. Set one — in your own words — and it's yours.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = Silver,
+                lineHeight = 22.sp
+            )
+        } else {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                practices.take(5).forEach { p ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(Slate.copy(alpha = 0.2f))
+                            .border(1.dp, DividerWhite.copy(alpha = 0.05f), RoundedCornerShape(16.dp))
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "“${com.example.tools.PracticeAuthoring.composePlan(p.anchor, p.action)}”",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = LightText,
+                            lineHeight = 22.sp,
+                            modifier = Modifier.weight(1f)
+                        )
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Text(
+                            text = "REMOVE",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Silver.copy(alpha = 0.5f),
+                            fontSize = 9.sp,
+                            modifier = Modifier.clickable { onRemove(p.id) }
+                        )
+                    }
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = "SET A PRACTICE  →",
+            style = MaterialTheme.typography.labelSmall,
+            color = Gold.copy(alpha = 0.7f),
+            letterSpacing = 1.sp,
+            modifier = Modifier
+                .clip(RoundedCornerShape(8.dp))
+                .clickable { show = true }
+                .padding(vertical = 6.dp)
+        )
+    }
+    if (show) {
+        com.example.ui.components.PracticeDialog(onDismiss = { show = false }, onSave = onSave)
     }
 }
 

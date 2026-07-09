@@ -24,6 +24,8 @@ class LocalDataStore(private val context: Context) {
     private val PLUMB_RECORDS_KEY = androidx.datastore.preferences.core.stringPreferencesKey("plumb_records")
     // WHO-5 wellbeing checks (score + timestamp). The primary outcome metric; on-device only. See tools/WhoFive.
     private val WHO5_KEY = androidx.datastore.preferences.core.stringPreferencesKey("who5_results")
+    // Self-authored practices ("After [anchor], I will [action]"). On-device only. See tools/PracticeAuthoring.
+    private val PRACTICES_KEY = androidx.datastore.preferences.core.stringPreferencesKey("practices")
     // Counts of deliberate practice, feeding the degree progression (see tools/Degrees.kt).
     private val PLUMB_SESSIONS_KEY = androidx.datastore.preferences.core.intPreferencesKey("plumb_sessions")
     private val GAUGE_DAYS_KEY = androidx.datastore.preferences.core.intPreferencesKey("gauge_days_complete")
@@ -163,6 +165,24 @@ class LocalDataStore(private val context: Context) {
         context.dataStore.edit { preferences ->
             preferences[WHO5_KEY] = kotlinx.serialization.json.Json.encodeToString(
                 kotlinx.serialization.builtins.ListSerializer(WhoFiveResult.serializer()),
+                entries
+            )
+        }
+    }
+
+    val practices: Flow<List<Practice>> = context.dataStore.data.map { preferences ->
+        val jsonString = preferences[PRACTICES_KEY] ?: "[]"
+        try {
+            kotlinx.serialization.json.Json.decodeFromString(jsonString)
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
+
+    suspend fun setPractices(entries: List<Practice>) {
+        context.dataStore.edit { preferences ->
+            preferences[PRACTICES_KEY] = kotlinx.serialization.json.Json.encodeToString(
+                kotlinx.serialization.builtins.ListSerializer(Practice.serializer()),
                 entries
             )
         }
