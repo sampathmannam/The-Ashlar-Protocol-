@@ -25,6 +25,8 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.tools.Strength
+import com.example.tools.Strengths
 import com.example.ui.AshlarAppViewModel
 import com.example.ui.theme.Charcoal
 import com.example.ui.theme.DividerWhite
@@ -44,6 +46,15 @@ fun BoardScreen(viewModel: AshlarAppViewModel) {
         verticalArrangement = Arrangement.spacedBy(16.dp),
         contentPadding = PaddingValues(bottom = 80.dp)
     ) {
+        // A warm welcome back after a lapse — surfaced only when returning, never loss-framed
+        // (see tools/KindStreak.comebackMessage). Dismissed on tap.
+        item {
+            val comeback by viewModel.streakComeback.collectAsState()
+            comeback?.let { message ->
+                ComebackCard(message = message, onDismiss = { viewModel.clearStreakComeback() })
+            }
+        }
+
         // The Path — the home's center of gravity. One hero: the rough→perfect ashlar (driven by
         // real journey progress, not a manual slider) fused with the current degree and what's next.
         item {
@@ -81,6 +92,22 @@ fun BoardScreen(viewModel: AshlarAppViewModel) {
                 isFetching = isFetchingBriefing,
                 streak = briefingStreak,
                 onRefresh = { viewModel.fetchDailyBriefing() }
+            )
+        }
+
+        // Strengths — the intrinsic progression (identity, not points): name your VIA signature
+        // strengths, then each day get one to use "in a new way" (Seligman 2005). On-device.
+        item {
+            val signature by viewModel.signatureStrengths.collectAsState()
+            val todayPrompt by viewModel.todayStrengthPrompt.collectAsState()
+            StrengthsCard(
+                signature = signature,
+                todayPrompt = todayPrompt,
+                onToggle = { s ->
+                    viewModel.setSignatureStrengths(
+                        if (signature.contains(s)) signature - s else signature + s
+                    )
+                }
             )
         }
 
@@ -385,7 +412,7 @@ fun WorkSoFarCard(
         )
         Spacer(modifier = Modifier.height(16.dp))
 
-        WorkRow("Days tended in a row", streak)
+        WorkRow("Days tended", streak)
         WorkRow("Notes in the journal", journalEntries)
         WorkRow("Thoughts set to the plumb", thoughtRecords)
         WorkRow("Days fully divided by the gauge", gaugeDays)
@@ -419,6 +446,93 @@ private fun WorkRow(label: String, count: Int) {
     }
 }
 
+// Shown when the user returns after a lapse: a warm, self-forgiving welcome (KindStreak), never a
+// "you lost your streak". The cumulative count never dropped, so this reassures rather than scolds.
+@Composable
+private fun ComebackCard(message: String, onDismiss: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(32.dp))
+            .background(Surface)
+            .border(1.dp, Gold.copy(alpha = 0.15f), RoundedCornerShape(32.dp))
+            .padding(24.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Text(
+            text = "WELCOME BACK",
+            style = MaterialTheme.typography.labelSmall,
+            color = Gold.copy(alpha = 0.5f)
+        )
+        Text(
+            text = message,
+            style = MaterialTheme.typography.bodyMedium,
+            color = LightText
+        )
+        TextButton(
+            onClick = onDismiss,
+            contentPadding = PaddingValues(0.dp),
+            modifier = Modifier.height(24.dp)
+        ) {
+            Text(text = "CONTINUE", style = MaterialTheme.typography.labelSmall, color = Gold)
+        }
+    }
+}
+
+// The intrinsic-progression card: tap to name your VIA signature strengths (identity, not points),
+// then each day get one to use "in a new way" (Seligman 2005). Read-and-set, entirely on-device.
+@OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
+@Composable
+private fun StrengthsCard(
+    signature: List<Strength>,
+    todayPrompt: String?,
+    onToggle: (Strength) -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(32.dp))
+            .background(Surface)
+            .border(1.dp, DividerWhite.copy(alpha = 0.05f), RoundedCornerShape(32.dp))
+            .padding(24.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp)
+    ) {
+        Text(
+            text = if (todayPrompt != null) "STRENGTH FOR TODAY" else "NAME YOUR STRENGTHS",
+            style = MaterialTheme.typography.labelSmall,
+            color = Gold.copy(alpha = 0.4f)
+        )
+        if (todayPrompt != null) {
+            Text(text = todayPrompt, style = MaterialTheme.typography.bodyLarge, color = LightText)
+        } else {
+            Text(
+                text = "Choose the character strengths you most want to grow. Each day you'll get " +
+                    "one to use in a new way.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = Silver
+            )
+        }
+        androidx.compose.foundation.layout.FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Strengths.all().forEach { s ->
+                val selected = signature.contains(s)
+                Text(
+                    text = s.display,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = if (selected) Charcoal else Silver,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(if (selected) Gold else Slate.copy(alpha = 0.3f))
+                        .clickable { onToggle(s) }
+                        .padding(horizontal = 12.dp, vertical = 6.dp)
+                )
+            }
+        }
+    }
+}
+
 @Composable
 fun CognitiveBriefingCard(
     briefing: String?,
@@ -447,7 +561,7 @@ fun CognitiveBriefingCard(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 if (streak > 0) {
                     Text(
-                        text = "STREAK: $streak",
+                        text = "TENDED: $streak",
                         style = MaterialTheme.typography.labelSmall,
                         color = Gold,
                         fontSize = 10.sp,

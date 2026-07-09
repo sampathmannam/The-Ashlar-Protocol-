@@ -95,4 +95,36 @@ class KindStreakTest {
             msg.contains("back") || msg.contains("welcome") || msg.contains("okay") || msg.contains("again")
         )
     }
+
+    // --- pure helpers for the ViewModel/DataStore boundary ---
+
+    @Test
+    fun epochDayCountsWholeDaysFromTheEpochInLocalTime() {
+        assertEquals(0L, KindStreak.epochDay(0L, 0))
+        assertEquals(1L, KindStreak.epochDay(86_400_000L, 0))
+        assertEquals(0L, KindStreak.epochDay(86_400_000L - 1L, 0))
+    }
+
+    @Test
+    fun epochDayUsesTheTimezoneOffsetSoLocalMidnightWins() {
+        // One second before UTC midnight, but a +2s local offset pushes it into the next local day.
+        assertEquals(1L, KindStreak.epochDay(86_400_000L - 1_000L, 2_000))
+        // Just after the UTC epoch, a negative offset pulls it back into the previous local day.
+        assertEquals(-1L, KindStreak.epochDay(1_000L, -2_000))
+    }
+
+    @Test
+    fun seedFromLegacyPreservesAnExistingStreakSoNoOneLosesProgress() {
+        val seeded = KindStreak.seedFromLegacy(legacyStreak = 5, lastTendedDay = 100L)
+        assertEquals("existing progress becomes the cumulative total", 5, seeded.daysTended)
+        assertEquals(5, seeded.currentRun)
+        assertEquals(KindStreak.MAX_GRACE, seeded.graceRemaining)
+        assertEquals(100L, seeded.lastTendedDay)
+    }
+
+    @Test
+    fun seedFromLegacyReturnsAFreshStateWhenThereIsNoPriorStreak() {
+        assertEquals(StreakState(), KindStreak.seedFromLegacy(legacyStreak = 0, lastTendedDay = 0L))
+        assertEquals(StreakState(), KindStreak.seedFromLegacy(legacyStreak = -3, lastTendedDay = 50L))
+    }
 }

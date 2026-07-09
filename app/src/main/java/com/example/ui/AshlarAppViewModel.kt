@@ -12,8 +12,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.util.Calendar
+import java.util.TimeZone
+import com.example.tools.KindStreak
+import com.example.tools.Strength
+import com.example.tools.Strengths
 
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 
 class AshlarAppViewModel(application: Application) : AndroidViewModel(application) {
     private val dataStore = LocalDataStore(application)
@@ -30,7 +35,9 @@ class AshlarAppViewModel(application: Application) : AndroidViewModel(applicatio
         18.5f
     )
 
-    val briefingStreak: StateFlow<Int> = dataStore.briefingStreak.stateIn(
+    // Backed by the CUMULATIVE days-tended count (KindStreak) — monotonic, so a missed day never
+    // drags the degree score or the stone backward. Name kept for the Board/Degrees consumers.
+    val briefingStreak: StateFlow<Int> = dataStore.daysTended.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000),
         0
@@ -137,6 +144,26 @@ class AshlarAppViewModel(application: Application) : AndroidViewModel(applicatio
     private val _isFetchingBriefing = MutableStateFlow(false)
     val isFetchingBriefing: StateFlow<Boolean> = _isFetchingBriefing.asStateFlow()
 
+    // A warm, self-forgiving message surfaced when the user returns after a lapse (see KindStreak).
+    private val _streakComeback = MutableStateFlow<String?>(null)
+    val streakComeback: StateFlow<String?> = _streakComeback.asStateFlow()
+    fun clearStreakComeback() { _streakComeback.value = null }
+
+    // VIA signature strengths (intrinsic progression) + today's "use it in a new way" prompt.
+    val signatureStrengths: StateFlow<List<Strength>> = dataStore.signatureStrengths.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList()
+    )
+
+    fun setSignatureStrengths(strengths: List<Strength>) {
+        viewModelScope.launch { dataStore.setSignatureStrengths(strengths) }
+    }
+
+    val todayStrengthPrompt: StateFlow<String?> = dataStore.signatureStrengths.map { sig ->
+        val now = System.currentTimeMillis()
+        val today = KindStreak.epochDay(now, TimeZone.getDefault().getOffset(now))
+        Strengths.strengthOfTheDay(sig, today)?.let { Strengths.newWayPrompt(it) }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
     // Bundled, on-device word rotation — no network, no API key, no cost. Starts on today's word;
     // SYNC advances to the next. Replaces the old paid Gemini call.
     private var wordIndex: Int = Calendar.getInstance().get(Calendar.DAY_OF_YEAR)
@@ -153,27 +180,15 @@ class AshlarAppViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
     private suspend fun updateStreak() {
-        val currentStreak = dataStore.briefingStreak.first()
-        val lastDate = dataStore.lastBriefingDate.first()
-        
+        // Tend the stone: a cumulative total that only grows, softened by grace days, with a warm
+        // comeback after a lapse — never the old reset-to-1. See tools/KindStreak.kt.
+        val state = dataStore.streakState.first()
         val now = System.currentTimeMillis()
-        val calendarNow = Calendar.getInstance().apply { timeInMillis = now }
-        val calendarLast = Calendar.getInstance().apply { timeInMillis = lastDate }
-
-        if (lastDate > 0 && 
-            calendarNow.get(Calendar.YEAR) == calendarLast.get(Calendar.YEAR) && 
-            calendarNow.get(Calendar.DAY_OF_YEAR) == calendarLast.get(Calendar.DAY_OF_YEAR)) {
-            dataStore.updateBriefingStreak(currentStreak, now)
-            return
-        }
-
-        calendarLast.add(Calendar.DAY_OF_YEAR, 1)
-        if (lastDate > 0 && 
-            calendarNow.get(Calendar.YEAR) == calendarLast.get(Calendar.YEAR) && 
-            calendarNow.get(Calendar.DAY_OF_YEAR) == calendarLast.get(Calendar.DAY_OF_YEAR)) {
-            dataStore.updateBriefingStreak(currentStreak + 1, now)
-        } else {
-            dataStore.updateBriefingStreak(1, now)
+        val today = KindStreak.epochDay(now, TimeZone.getDefault().getOffset(now))
+        val outcome = KindStreak.tend(state, today)
+        dataStore.saveStreakState(outcome.state)
+        if (outcome.isComeback) {
+            _streakComeback.value = KindStreak.comebackMessage()
         }
     }
 
