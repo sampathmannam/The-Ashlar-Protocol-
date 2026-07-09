@@ -11,5 +11,7 @@ data class Practice(
     val id: String,
     val anchor: String,
     val action: String,
-    val timestamp: Long
+    val timestamp: Long,
+    /** Optional cue-anchored reminder time (minutes of day, e.g. 19*60 = 7pm); null = no reminder. */
+    val reminderMinutesOfDay: Int? = null
 )
