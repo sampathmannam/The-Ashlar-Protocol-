@@ -18,6 +18,10 @@ import com.ashlarprotocol.tools.Strength
 import com.ashlarprotocol.tools.Strengths
 import com.ashlarprotocol.tools.Working
 import com.ashlarprotocol.tools.Readiness
+import com.ashlarprotocol.tools.Degree
+import com.ashlarprotocol.tools.Degrees
+import com.ashlarprotocol.tools.WorkStats
+import com.ashlarprotocol.tools.Advancement
 import com.ashlarprotocol.tools.Effort
 
 import kotlinx.coroutines.flow.first
@@ -60,6 +64,38 @@ class AshlarAppViewModel(application: Application) : AndroidViewModel(applicatio
     val recallSessions: StateFlow<Int> = dataStore.recallSessions.stateIn(
         viewModelScope, SharingStarted.WhileSubscribed(5000), 0
     )
+
+    // ── The rite of passage (Phase 2) ──────────────────────────────────────────
+    // The same WorkStats the Board builds → the earned degree score.
+    private val degreeScore: StateFlow<Int> = combine(
+        briefingStreak, aarEntries, plumbSessions, gaugeDaysComplete, recallSessions
+    ) { streak, entries, plumb, gauge, recall ->
+        Degrees.score(WorkStats(streak, entries.size, plumb, gauge, recall))
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
+
+    /** The degree earned by the work done so far. Names the layer beneath the stone. */
+    val currentDegree: StateFlow<Degree> = degreeScore
+        .map { Degrees.current(it) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), Degree.ENTERED_APPRENTICE)
+
+    /** Progress across the current degree toward the next (0f..1f); 1f at the summit. */
+    val degreeProgress: StateFlow<Float> = degreeScore
+        .map { Degrees.progressToNext(it) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0f)
+
+    private val ackDegreeOrdinal: StateFlow<Int> = dataStore.acknowledgedDegreeOrdinal
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
+
+    /** Non-null when a newly-earned degree awaits its raising rite (see tools/Advancement.kt). */
+    val pendingAdvancement: StateFlow<Degree?> = combine(ackDegreeOrdinal, degreeScore) { ack, score ->
+        Advancement.pending(ack, score)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
+    /** Mark the pending raising as received, so the rite fires exactly once per degree. */
+    fun acknowledgeAdvancement() {
+        val d = pendingAdvancement.value ?: return
+        viewModelScope.launch { dataStore.setAcknowledgedDegreeOrdinal(d.ordinal) }
+    }
 
     fun recordPlumbSession() {
         viewModelScope.launch { dataStore.incrementPlumbSessions() }
