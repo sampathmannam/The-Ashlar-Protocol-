@@ -63,15 +63,25 @@ class AshlarAppViewModel(application: Application) : AndroidViewModel(applicatio
 
     fun recordPlumbSession() {
         viewModelScope.launch { dataStore.incrementPlumbSessions() }
+        bumpActionPulse()
     }
 
     fun recordGaugeDayComplete() {
         viewModelScope.launch { dataStore.incrementGaugeDaysComplete() }
+        bumpActionPulse()
     }
 
     fun recordRecallSession() {
         viewModelScope.launch { dataStore.incrementRecallSessions() }
+        bumpActionPulse()
     }
+
+    // Micro-feedback pulse (SPEC P0.4 / ticket T2.3): bumped ONLY on a genuine completed action —
+    // a practice or the Working check-in — never on launch or a timer, so the stone's light-catch
+    // is always an honest mirror of something the person just did, never a decoupled reward.
+    private val _actionPulse = MutableStateFlow(0)
+    val actionPulse: StateFlow<Int> = _actionPulse.asStateFlow()
+    private fun bumpActionPulse() { _actionPulse.value++ }
 
     // First-run initiation rite. null = still loading (avoids flashing the wrong screen on cold start).
     val initiated: StateFlow<Boolean?> = dataStore.initiated.stateIn(
@@ -180,6 +190,7 @@ class AshlarAppViewModel(application: Application) : AndroidViewModel(applicatio
             val today = KindStreak.epochDay(now, TimeZone.getDefault().getOffset(now))
             dataStore.setReadiness(readiness, today)
         }
+        bumpActionPulse()
     }
 
     fun nudgeDial(delta: Int) {
