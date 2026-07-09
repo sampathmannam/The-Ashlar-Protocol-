@@ -22,6 +22,8 @@ class LocalDataStore(private val context: Context) {
     private val AAR_DRAFT_KEY = androidx.datastore.preferences.core.stringPreferencesKey("aar_draft")
     private val REFLECTIONS_KEY = androidx.datastore.preferences.core.stringPreferencesKey("chamber_reflections")
     private val PLUMB_RECORDS_KEY = androidx.datastore.preferences.core.stringPreferencesKey("plumb_records")
+    // WHO-5 wellbeing checks (score + timestamp). The primary outcome metric; on-device only. See tools/WhoFive.
+    private val WHO5_KEY = androidx.datastore.preferences.core.stringPreferencesKey("who5_results")
     // Counts of deliberate practice, feeding the degree progression (see tools/Degrees.kt).
     private val PLUMB_SESSIONS_KEY = androidx.datastore.preferences.core.intPreferencesKey("plumb_sessions")
     private val GAUGE_DAYS_KEY = androidx.datastore.preferences.core.intPreferencesKey("gauge_days_complete")
@@ -143,6 +145,24 @@ class LocalDataStore(private val context: Context) {
         context.dataStore.edit { preferences ->
             preferences[AAR_ENTRIES_KEY] = kotlinx.serialization.json.Json.encodeToString(
                 kotlinx.serialization.builtins.ListSerializer(AarEntry.serializer()),
+                entries
+            )
+        }
+    }
+
+    val whoFiveResults: Flow<List<WhoFiveResult>> = context.dataStore.data.map { preferences ->
+        val jsonString = preferences[WHO5_KEY] ?: "[]"
+        try {
+            kotlinx.serialization.json.Json.decodeFromString(jsonString)
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
+
+    suspend fun setWhoFiveResults(entries: List<WhoFiveResult>) {
+        context.dataStore.edit { preferences ->
+            preferences[WHO5_KEY] = kotlinx.serialization.json.Json.encodeToString(
+                kotlinx.serialization.builtins.ListSerializer(WhoFiveResult.serializer()),
                 entries
             )
         }
