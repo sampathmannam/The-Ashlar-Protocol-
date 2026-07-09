@@ -143,13 +143,14 @@ fun TracingBoardApp(
             }
         }
 
-        // Crisis support surface — rendered last so it sits above everything, including the
-        // film grain and nav. Unconditional, tappable human help. See docs/VISION.md §8.
-        CrisisSupportDialog(controller = crisisController)
-
         // Power-Ups — always-available quick steadying, never gated (SPEC P0.6 / T2.4). Rendered
-        // above everything too; distinct from crisis, which always takes precedence.
+        // above the app, but BELOW crisis: safety always wins the top layer.
         PowerUpsSheet(controller = powerUpsController)
+
+        // Crisis support surface — rendered LAST so it sits above everything, including the film
+        // grain, the nav, and the Power-Ups sheet. The §9 gate takes precedence over ALL gamified
+        // UI (SPEC P0.8 / T3.3): a risk signal routes to support, on top of whatever is open.
+        CrisisSupportDialog(controller = crisisController)
     }
     }
 }
