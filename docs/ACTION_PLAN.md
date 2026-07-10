@@ -5,6 +5,17 @@
 > guardrails from the research. Grounded in [`RESEARCH_BASIS.md`](RESEARCH_BASIS.md).
 > **Last updated:** 2026-07-05.
 
+## ⚠️ STATUS RECONCILIATION (2026-07-10) — read this first
+
+This plan predates the build-out; its phase statuses below are stale. Current reality (all on `origin/main`, native Android, on-device, tested + device-verified):
+
+- **Phase 0 (foundation & safety)** and **Phase 1 (the honest core)** — **built.**
+- **Phase 3 (the Lodge / connection)** — **built** as the zero-infra **West Gate** (doorways to your own people + real community + free peer resources) + reach-out + the Well.
+- **Phase 2 (presence & personalization / mentor-voice)** and **Phase 4 (adaptive timing / JITAI)** — **not built.** Both depend on an on-device model the app doesn't ship, and the discipline research (see [`RESEARCH_INTEGRATION.md`](RESEARCH_INTEGRATION.md)) says to prove the static protocol first — so they are intentionally deferred, not overdue.
+- **Beyond this plan:** an 8-feature discipline-engine build (F1–F8) from a deep research pass shipped as Phases 4/4b (environment design, implementation-intentions, forgiving reserves, honesty gate, automaticity, rhythm, fresh-start, and an anti-addiction "Rough-Edge" track). And the **society pivot** ([`superpowers/specs/2026-07-09-society-pivot-design.md`](superpowers/specs/2026-07-09-society-pivot-design.md)) reframes the whole roadmap — its validation-first petition is the current next step, with backend/payments held behind the signal.
+
+Trust this banner over the stale statuses below.
+
 ## How to read this
 - **Operating principle:** *clinical-grade safety, consumer-grade engagement, honest claims.*
 - Confidence tags: **Strong** / **Moderate** / **Metaphor** (design language, not a health claim) / **Built** (already in the app).
