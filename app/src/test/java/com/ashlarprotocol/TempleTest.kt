@@ -21,6 +21,20 @@ class TempleTest {
         Temple.COURSES.forEachIndexed { i, c -> assertEquals(i + 1, c.index) }
     }
 
+    @Test fun masterMasonTrancheCompletesTheFiftyCourseJourney() {
+        assertEquals("all 50 courses authored", Temple.PLANNED_COURSES, Temple.COURSES.size)
+        val mm = Temple.COURSES.filter { it.degree == Degree.MASTER_MASON }
+        assertTrue("Master Mason tranche authored", mm.size >= 15)
+        // The ladder spans all three degrees.
+        assertTrue(Temple.COURSES.any { it.degree == Degree.ENTERED_APPRENTICE })
+        assertTrue(Temple.COURSES.any { it.degree == Degree.FELLOWCRAFT })
+        assertTrue(Temple.COURSES.any { it.degree == Degree.MASTER_MASON })
+        // Course 50 is the summit; nothing lies past it.
+        assertEquals(50, Temple.courseAt(50)!!.index)
+        assertNull(Temple.nextCourse(Temple.COURSES.size))
+        mm.forEach { assertTrue("cited: ${it.index}", it.basis.isNotBlank()); assertTrue(it.cost >= 13) }
+    }
+
     @Test fun apprenticeTrancheIsRealAndSequential() {
         val courses = Temple.COURSES
         assertTrue("MVP authors at least the Apprentice tranche", courses.size >= 10)

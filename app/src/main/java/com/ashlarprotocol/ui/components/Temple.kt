@@ -77,7 +77,7 @@ fun TempleCard(
         Spacer(Modifier.height(16.dp))
         val standing = when {
             coursesRaised <= 0 -> "The ground is level. Lay your first stone."
-            nextCourse == null -> "This tranche of the Temple stands — $coursesRaised courses raised."
+            nextCourse == null -> "The Temple stands — all $coursesRaised courses raised. The work goes on."
             else -> "Course $coursesRaised of ${Temple.PLANNED_COURSES}" + (standingDegree?.let { " · $it" } ?: "")
         }
         Text(standing, style = MaterialTheme.typography.bodyMedium, color = LightText, lineHeight = 22.sp)
