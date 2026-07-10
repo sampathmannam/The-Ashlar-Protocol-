@@ -6,6 +6,21 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class TempleTest {
+    @Test fun fellowcraftTrancheIsRealAndCited() {
+        val fc = Temple.COURSES.filter { it.degree == Degree.FELLOWCRAFT }
+        assertTrue("the Fellowcraft tranche is authored", fc.size >= 15)
+        // The ladder now spans two degrees, and every FC course is a real, cited practice.
+        assertTrue(Temple.COURSES.any { it.degree == Degree.ENTERED_APPRENTICE })
+        fc.forEach {
+            assertTrue("named: ${it.index}", it.name.isNotBlank())
+            assertTrue("unlocks: ${it.index}", it.unlocks.isNotBlank())
+            assertTrue("cited: ${it.index}", it.basis.isNotBlank())
+            assertTrue("costs more than the opening Apprentice courses: ${it.index}", it.cost >= 8)
+        }
+        // Indices stay contiguous 1..N across the join.
+        Temple.COURSES.forEachIndexed { i, c -> assertEquals(i + 1, c.index) }
+    }
+
     @Test fun apprenticeTrancheIsRealAndSequential() {
         val courses = Temple.COURSES
         assertTrue("MVP authors at least the Apprentice tranche", courses.size >= 10)
