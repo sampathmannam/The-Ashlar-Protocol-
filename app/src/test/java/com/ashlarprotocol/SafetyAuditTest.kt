@@ -11,8 +11,10 @@ import com.ashlarprotocol.tools.Readiness
 import com.ashlarprotocol.tools.Relief
 import com.ashlarprotocol.tools.SafetyAudit
 import com.ashlarprotocol.tools.Square
+import com.ashlarprotocol.data.RhythmAnchor
 import com.ashlarprotocol.tools.Automaticity
 import com.ashlarprotocol.tools.Cornerstone
+import com.ashlarprotocol.tools.Rhythm
 import com.ashlarprotocol.tools.Trowel
 import com.ashlarprotocol.tools.WestGate
 import com.ashlarprotocol.tools.Working
@@ -82,6 +84,12 @@ class SafetyAuditTest {
             // Automaticity (Phase 4b / F4): the prompt, the level labels, and the reflections.
             "Automaticity" to (
                 listOf(Automaticity.PROMPT) + Automaticity.LEVELS.map { it.label } + (0..2).map { Automaticity.reflection(it) }
+            ),
+            // Rhythm anchor (Phase 4b / F6): card copy + an associational reflection.
+            "Rhythm" to listOf(
+                "YOUR RHYTHM",
+                "A steady rise and a wind-down. It's the regularity that's linked to steadier days — not the hours, and no perfect night required.",
+                Rhythm.reflection(RhythmAnchor(7 * 60, 22 * 60))
             )
         )
 

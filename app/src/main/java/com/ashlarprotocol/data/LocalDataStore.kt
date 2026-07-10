@@ -41,6 +41,8 @@ class LocalDataStore(private val context: Context) {
     private val INTENTION_KEY = androidx.datastore.preferences.core.stringPreferencesKey("intention")
     // One self-directed environment change (Phase 4, F1). JSON of a CornerstoneEntry, or blank.
     private val CORNERSTONE_KEY = androidx.datastore.preferences.core.stringPreferencesKey("cornerstone")
+    // The rhythm anchor (F6): JSON of a RhythmAnchor (wake + wind-down minutes-of-day), or blank.
+    private val RHYTHM_KEY = androidx.datastore.preferences.core.stringPreferencesKey("rhythm_anchor")
     private val BASELINE_KEY = floatPreferencesKey("baseline_weight")
     // The kind streak ("tending the stone", tools/KindStreak.kt): a cumulative total that never
     // decreases, plus a grace-softened current run. Supersedes the old resettable briefing_streak.
@@ -255,6 +257,22 @@ class LocalDataStore(private val context: Context) {
     suspend fun setCornerstone(entry: CornerstoneEntry) {
         context.dataStore.edit {
             it[CORNERSTONE_KEY] = kotlinx.serialization.json.Json.encodeToString(CornerstoneEntry.serializer(), entry)
+        }
+    }
+
+    val rhythm: Flow<RhythmAnchor?> = context.dataStore.data.map { prefs ->
+        prefs[RHYTHM_KEY]?.takeIf { it.isNotBlank() }?.let {
+            try {
+                kotlinx.serialization.json.Json.decodeFromString(RhythmAnchor.serializer(), it)
+            } catch (e: Exception) {
+                null
+            }
+        }
+    }
+
+    suspend fun setRhythm(anchor: RhythmAnchor) {
+        context.dataStore.edit {
+            it[RHYTHM_KEY] = kotlinx.serialization.json.Json.encodeToString(RhythmAnchor.serializer(), anchor)
         }
     }
 

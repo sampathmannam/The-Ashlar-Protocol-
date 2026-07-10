@@ -65,6 +65,16 @@ class AshlarAppViewModel(application: Application) : AndroidViewModel(applicatio
         viewModelScope.launch { dataStore.setAutomaticity(value, today) }
     }
 
+    // The rhythm anchor (F6) — a steady rise + wind-down. Associational, never an alarm.
+    val rhythm: StateFlow<com.ashlarprotocol.data.RhythmAnchor?> = dataStore.rhythm
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
+    fun setRhythm(wakeMinutesOfDay: Int, windDownMinutesOfDay: Int) {
+        viewModelScope.launch {
+            dataStore.setRhythm(com.ashlarprotocol.data.RhythmAnchor(wakeMinutesOfDay, windDownMinutesOfDay))
+        }
+    }
+
     val aarEntries: StateFlow<List<com.ashlarprotocol.data.AarEntry>> = dataStore.aarEntries.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000),
