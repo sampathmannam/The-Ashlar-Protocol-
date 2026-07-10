@@ -33,6 +33,9 @@ class LocalDataStore(private val context: Context) {
     // The highest degree the member has been ceremonially raised into (ordinal). Drives the rite
     // so an advancement is marked exactly once (see tools/Advancement.kt). Local only.
     private val ACK_DEGREE_KEY = androidx.datastore.preferences.core.intPreferencesKey("acknowledged_degree_ordinal")
+    // Automaticity — the honest progress signal (F4): the last self-report + the epoch-day it was asked.
+    private val AUTO_LEVEL_KEY = androidx.datastore.preferences.core.intPreferencesKey("automaticity_level")
+    private val AUTO_DAY_KEY = androidx.datastore.preferences.core.intPreferencesKey("automaticity_day")
     // The initiation rite (first-run). Stored locally only, like everything else.
     private val INITIATED_KEY = androidx.datastore.preferences.core.booleanPreferencesKey("initiated")
     private val INTENTION_KEY = androidx.datastore.preferences.core.stringPreferencesKey("intention")
@@ -197,6 +200,8 @@ class LocalDataStore(private val context: Context) {
     val gaugeDaysComplete: Flow<Int> = context.dataStore.data.map { it[GAUGE_DAYS_KEY] ?: 0 }
     val recallSessions: Flow<Int> = context.dataStore.data.map { it[RECALL_SESSIONS_KEY] ?: 0 }
     val acknowledgedDegreeOrdinal: Flow<Int> = context.dataStore.data.map { it[ACK_DEGREE_KEY] ?: 0 }
+    /** The epoch-day the automaticity question was last asked, or -1 if never (F4). */
+    val automaticityDay: Flow<Int> = context.dataStore.data.map { it[AUTO_DAY_KEY] ?: -1 }
 
     suspend fun incrementPlumbSessions() {
         context.dataStore.edit { it[PLUMB_SESSIONS_KEY] = (it[PLUMB_SESSIONS_KEY] ?: 0) + 1 }
@@ -208,6 +213,10 @@ class LocalDataStore(private val context: Context) {
 
     suspend fun incrementRecallSessions() {
         context.dataStore.edit { it[RECALL_SESSIONS_KEY] = (it[RECALL_SESSIONS_KEY] ?: 0) + 1 }
+    }
+
+    suspend fun setAutomaticity(value: Int, epochDay: Int) {
+        context.dataStore.edit { it[AUTO_LEVEL_KEY] = value; it[AUTO_DAY_KEY] = epochDay }
     }
 
     suspend fun setAcknowledgedDegreeOrdinal(ordinal: Int) {

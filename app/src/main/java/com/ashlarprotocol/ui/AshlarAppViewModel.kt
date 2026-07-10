@@ -55,6 +55,16 @@ class AshlarAppViewModel(application: Application) : AndroidViewModel(applicatio
         viewModelScope.launch { dataStore.setCornerstone(entry) }
     }
 
+    // Automaticity — the honest progress signal (F4). The epoch-day last asked; -1 = never.
+    val automaticityDay: StateFlow<Int> = dataStore.automaticityDay
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), -1)
+
+    fun recordAutomaticity(value: Int) {
+        val now = System.currentTimeMillis()
+        val today = KindStreak.epochDay(now, TimeZone.getDefault().getOffset(now)).toInt()
+        viewModelScope.launch { dataStore.setAutomaticity(value, today) }
+    }
+
     val aarEntries: StateFlow<List<com.ashlarprotocol.data.AarEntry>> = dataStore.aarEntries.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000),

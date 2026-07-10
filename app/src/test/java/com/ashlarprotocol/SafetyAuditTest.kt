@@ -11,6 +11,7 @@ import com.ashlarprotocol.tools.Readiness
 import com.ashlarprotocol.tools.Relief
 import com.ashlarprotocol.tools.SafetyAudit
 import com.ashlarprotocol.tools.Square
+import com.ashlarprotocol.tools.Automaticity
 import com.ashlarprotocol.tools.Cornerstone
 import com.ashlarprotocol.tools.Trowel
 import com.ashlarprotocol.tools.WestGate
@@ -77,7 +78,11 @@ class SafetyAuditTest {
                 KindStreak.graceMessage(1)!!
             ),
             // The Cornerstone (Phase 4 / F1): cue kinds + friction moves.
-            "Cornerstone" to Cornerstone.allText()
+            "Cornerstone" to Cornerstone.allText(),
+            // Automaticity (Phase 4b / F4): the prompt, the level labels, and the reflections.
+            "Automaticity" to (
+                listOf(Automaticity.PROMPT) + Automaticity.LEVELS.map { it.label } + (0..2).map { Automaticity.reflection(it) }
+            )
         )
 
     @Test

@@ -217,6 +217,20 @@ fun BoardScreen(viewModel: AshlarAppViewModel) {
             item { WhoFiveCard(onComplete = { viewModel.addWhoFiveResult(it) }) }
         }
 
+        // Automaticity (F4): a gentle, ~weekly "is it becoming automatic?" — the honest progress signal
+        // (a habit is context-cued automaticity, not a streak count). Noticing, not grading; skippable.
+        item {
+            val autoDay by viewModel.automaticityDay.collectAsState()
+            val tendedForAuto by viewModel.briefingStreak.collectAsState()
+            val today = com.ashlarprotocol.tools.KindStreak.epochDay(
+                System.currentTimeMillis(),
+                java.util.TimeZone.getDefault().getOffset(System.currentTimeMillis())
+            ).toInt()
+            if (tendedForAuto > 0 && com.ashlarprotocol.tools.Automaticity.isDue(autoDay.toLong(), today.toLong())) {
+                AutomaticityCard(onRecord = { viewModel.recordAutomaticity(it) })
+            }
+        }
+
         // Your practices — self-authored, anchored, approach-framed (T1.4). The autonomy heart of the
         // Working: write your own "After [anchor], I will [action]" and it's yours to keep.
         item {
@@ -412,6 +426,54 @@ fun PracticesCard(
     }
     if (show) {
         com.ashlarprotocol.ui.components.PracticeDialog(intention = intention, onDismiss = { show = false }, onSave = onSave)
+    }
+}
+
+/**
+ * The automaticity card (F4) — a gentle, occasional "is the work becoming automatic?" A habit IS
+ * context-cued automaticity, not a streak count, so this is the honest progress signal. Noticing,
+ * not grading: it names what automaticity means and never scores the person. Always skippable.
+ */
+@Composable
+fun AutomaticityCard(onRecord: (Int) -> Unit) {
+    var recorded by remember { mutableStateOf<Int?>(null) }
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(32.dp))
+            .background(Surface)
+            .border(1.dp, Gold.copy(alpha = 0.2f), RoundedCornerShape(32.dp))
+            .padding(24.dp)
+    ) {
+        Text("A MOMENT TO NOTICE", style = MaterialTheme.typography.labelSmall, color = Gold.copy(alpha = 0.5f), letterSpacing = 2.sp)
+        Spacer(modifier = Modifier.height(12.dp))
+        Text(
+            text = com.ashlarprotocol.tools.Automaticity.PROMPT,
+            style = MaterialTheme.typography.bodyLarge, color = LightText, lineHeight = 26.sp
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        val chosen = recorded
+        if (chosen == null) {
+            com.ashlarprotocol.tools.Automaticity.LEVELS.forEach { lvl ->
+                Text(
+                    text = lvl.label,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Silver,
+                    modifier = Modifier
+                        .fillMaxWidth().padding(top = 8.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(Slate.copy(alpha = 0.18f))
+                        .border(1.dp, Slate.copy(alpha = 0.6f), RoundedCornerShape(12.dp))
+                        .clickable { recorded = lvl.value; onRecord(lvl.value) }
+                        .padding(horizontal = 14.dp, vertical = 12.dp)
+                )
+            }
+        } else {
+            Text(
+                text = com.ashlarprotocol.tools.Automaticity.reflection(chosen),
+                style = MaterialTheme.typography.bodyMedium, color = Silver, lineHeight = 22.sp
+            )
+        }
     }
 }
 
