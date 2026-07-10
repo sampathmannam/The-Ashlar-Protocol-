@@ -177,7 +177,7 @@ class AshlarAppViewModel(application: Application) : AndroidViewModel(applicatio
         viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList()
     )
 
-    fun addPractice(anchor: String, action: String, reminderMinutesOfDay: Int? = null) {
+    fun addPractice(anchor: String, action: String, reminderMinutesOfDay: Int? = null, cueKind: String? = null) {
         if (!com.ashlarprotocol.tools.PracticeAuthoring.canSave(anchor, action)) return
         viewModelScope.launch {
             val entry = com.ashlarprotocol.data.Practice(
@@ -185,7 +185,8 @@ class AshlarAppViewModel(application: Application) : AndroidViewModel(applicatio
                 anchor = anchor.trim(),
                 action = action.trim(),
                 timestamp = System.currentTimeMillis(),
-                reminderMinutesOfDay = reminderMinutesOfDay
+                reminderMinutesOfDay = reminderMinutesOfDay,
+                cueKind = cueKind
             )
             dataStore.setPractices((listOf(entry) + practices.value).take(30))
             if (reminderMinutesOfDay != null) schedulePracticeReminder(entry)

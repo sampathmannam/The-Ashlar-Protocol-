@@ -222,7 +222,8 @@ fun BoardScreen(viewModel: AshlarAppViewModel) {
         item {
             PracticesCard(
                 practices = practices,
-                onSave = { anchor, action, reminder -> viewModel.addPractice(anchor, action, reminder) },
+                intention = intention,
+                onSave = { anchor, action, reminder, cueKind -> viewModel.addPractice(anchor, action, reminder, cueKind) },
                 onRemove = { viewModel.removePractice(it) }
             )
         }
@@ -339,7 +340,8 @@ fun RestNudgeCard(message: String) {
 @Composable
 fun PracticesCard(
     practices: List<com.ashlarprotocol.data.Practice>,
-    onSave: (String, String, Int?) -> Unit,
+    intention: String,
+    onSave: (String, String, Int?, String?) -> Unit,
     onRemove: (String) -> Unit
 ) {
     var show by remember { mutableStateOf(false) }
@@ -409,7 +411,7 @@ fun PracticesCard(
         )
     }
     if (show) {
-        com.ashlarprotocol.ui.components.PracticeDialog(onDismiss = { show = false }, onSave = onSave)
+        com.ashlarprotocol.ui.components.PracticeDialog(intention = intention, onDismiss = { show = false }, onSave = onSave)
     }
 }
 

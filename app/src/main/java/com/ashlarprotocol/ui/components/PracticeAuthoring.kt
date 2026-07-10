@@ -41,10 +41,16 @@ import com.ashlarprotocol.ui.theme.Surface
  */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
-fun PracticeDialog(onDismiss: () -> Unit, onSave: (anchor: String, action: String, reminderMinutesOfDay: Int?) -> Unit) {
+fun PracticeDialog(
+    intention: String,
+    onDismiss: () -> Unit,
+    onSave: (anchor: String, action: String, reminderMinutesOfDay: Int?, cueKind: String?) -> Unit
+) {
     var anchor by remember { mutableStateOf("") }
     var action by remember { mutableStateOf("") }
     var reminderMinutes by remember { mutableStateOf<Int?>(null) }
+    var cueKind by remember { mutableStateOf<com.ashlarprotocol.tools.Cornerstone.CueKind?>(null) }
+    val needsIntention = PracticeAuthoring.requiresIntentionFirst(intention)
     val avoidance = action.isNotBlank() && PracticeAuthoring.isAvoidanceFramed(action)
     val plan = PracticeAuthoring.composePlan(anchor, action)
     val canSave = PracticeAuthoring.canSave(anchor, action)
@@ -69,6 +75,23 @@ fun PracticeDialog(onDismiss: () -> Unit, onSave: (anchor: String, action: Strin
                 lineHeight = 22.sp
             )
             Spacer(modifier = Modifier.height(20.dp))
+
+            // Commitment before if-then (F2): implementation intentions amplify a committed goal, they
+            // don't create one (Gollwitzer & Sheeran). Autonomy-supportive — a gentle route, not a block.
+            if (needsIntention) {
+                Column(
+                    modifier = Modifier.fillMaxWidth()
+                        .clip(RoundedCornerShape(16.dp)).background(Slate.copy(alpha = 0.3f))
+                        .border(1.dp, Gold.copy(alpha = 0.3f), RoundedCornerShape(16.dp)).padding(16.dp)
+                ) {
+                    Text(
+                        text = "First, name what you're working toward — set an intention with The Square. " +
+                            "A practice holds best in service of something you actually care about.",
+                        style = MaterialTheme.typography.bodyMedium, color = Gold.copy(alpha = 0.85f), lineHeight = 22.sp
+                    )
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+            }
 
             Text("AFTER…", style = MaterialTheme.typography.labelSmall, color = Gold.copy(alpha = 0.5f), letterSpacing = 1.sp)
             Spacer(modifier = Modifier.height(8.dp))
@@ -124,6 +147,16 @@ fun PracticeDialog(onDismiss: () -> Unit, onSave: (anchor: String, action: Strin
                 }
             }
 
+            // The explicit cue behind the anchor (F2) — makes the if-then plan cue-anchored. Optional.
+            Spacer(modifier = Modifier.height(16.dp))
+            Text("WHAT KIND OF CUE?  (OPTIONAL)", style = MaterialTheme.typography.labelSmall, color = Gold.copy(alpha = 0.5f), letterSpacing = 1.sp)
+            Spacer(modifier = Modifier.height(8.dp))
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                com.ashlarprotocol.tools.Cornerstone.CueKind.values().forEach { ck ->
+                    ReminderPill(ck.display, cueKind == ck) { cueKind = if (cueKind == ck) null else ck }
+                }
+            }
+
             Spacer(modifier = Modifier.height(20.dp))
             Text(
                 text = "KEEP THIS PRACTICE",
@@ -135,7 +168,7 @@ fun PracticeDialog(onDismiss: () -> Unit, onSave: (anchor: String, action: Strin
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(14.dp))
                     .border(1.dp, (if (canSave) Gold else Silver).copy(alpha = 0.4f), RoundedCornerShape(14.dp))
-                    .then(if (canSave) Modifier.clickable { onSave(anchor, action, reminderMinutes); onDismiss() } else Modifier)
+                    .then(if (canSave) Modifier.clickable { onSave(anchor, action, reminderMinutes, cueKind?.name); onDismiss() } else Modifier)
                     .padding(vertical = 14.dp)
             )
             Spacer(modifier = Modifier.height(8.dp))
