@@ -120,6 +120,51 @@ class AshlarAppViewModel(application: Application) : AndroidViewModel(applicatio
     suspend fun reflect(): List<com.ashlarprotocol.tools.Reflection> =
         com.ashlarprotocol.tools.Reflections.reflect(buildReflectionInput())
 
+    // ── The Temple (progression) ────────────────────────────────────────────────────────────
+    val totalWagesEarned: StateFlow<Int> = dataStore.totalWagesEarned
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
+    val coursesRaised: StateFlow<Int> = dataStore.coursesRaised
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
+    val challengeCompletions: StateFlow<List<com.ashlarprotocol.data.ChallengeCompletion>> =
+        dataStore.challengeCompletions.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+    /** Wages in hand = earned − laid into courses. Floors at 0 (never a scarcity debt). */
+    val wageBalance: StateFlow<Int> =
+        kotlinx.coroutines.flow.combine(dataStore.totalWagesEarned, dataStore.coursesRaised) { earned, raised ->
+            com.ashlarprotocol.tools.Temple.balance(earned, raised)
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
+
+    /** The period a challenge is idempotent within: epoch-day for DAILY, epoch-week for WEEKLY. */
+    private fun periodKey(cadence: com.ashlarprotocol.tools.Cadence, today: Long): Long =
+        if (cadence == com.ashlarprotocol.tools.Cadence.WEEKLY) Math.floorDiv(today, 7L) else today
+
+    /** Complete a challenge: pays wages ONCE per period, records it, tends the stone. A no-op if
+     *  already done this period. Missing a challenge is never modelled — it simply never calls this. */
+    fun completeChallenge(challenge: com.ashlarprotocol.tools.Challenge) {
+        viewModelScope.launch {
+            val now = System.currentTimeMillis()
+            val today = KindStreak.epochDay(now, TimeZone.getDefault().getOffset(now))
+            val key = periodKey(challenge.cadence, today)
+            val done = dataStore.challengeCompletions.first()
+            if (done.any { it.challengeId == challenge.id && it.periodKey == key }) return@launch
+            dataStore.setChallengeCompletions(
+                done + com.ashlarprotocol.data.ChallengeCompletion(challenge.id, challenge.cadence.name, key, now)
+            )
+            dataStore.addWages(com.ashlarprotocol.tools.Challenges.wageFor(challenge.cadence))
+            updateStreak()
+        }
+    }
+
+    /** Lay wages to raise the next course — only if affordable. Reads persisted truth; never punitive. */
+    fun raiseCourse() {
+        viewModelScope.launch {
+            val earned = dataStore.totalWagesEarned.first()
+            val raised = dataStore.coursesRaised.first()
+            if (com.ashlarprotocol.tools.Temple.canRaiseNext(earned, raised)) {
+                dataStore.setCoursesRaised(raised + 1)
+            }
+        }
+    }
+
     fun recordAutomaticity(value: Int) {
         val now = System.currentTimeMillis()
         val today = KindStreak.epochDay(now, TimeZone.getDefault().getOffset(now)).toInt()
