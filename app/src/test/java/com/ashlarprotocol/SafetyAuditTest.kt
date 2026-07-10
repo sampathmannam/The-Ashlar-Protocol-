@@ -1,6 +1,7 @@
 package com.ashlarprotocol
 
 import com.ashlarprotocol.tools.DailyWord
+import com.ashlarprotocol.tools.Gavel
 import com.ashlarprotocol.tools.Degree
 import com.ashlarprotocol.tools.Degrees
 import com.ashlarprotocol.tools.GracefulExit
@@ -97,7 +98,9 @@ class SafetyAuditTest {
             "RoughEdge" to listOf(
                 RoughEdge.lapseResponse(), RoughEdge.SAFETY_NOTE, RoughEdge.INTRO,
                 "Don't wrestle it — ride it. Pull \"Ride the urge\" from STEADY and let the wave pass."
-            )
+            ),
+            // The Gavel (Phase 4c): rough-corner examples + a sample composed competing-response.
+            "Gavel" to Gavel.allText()
         )
 
     @Test

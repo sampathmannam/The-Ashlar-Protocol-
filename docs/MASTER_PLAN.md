@@ -7,6 +7,30 @@
 
 ---
 
+## ⚠️ STATUS RECONCILIATION (2026-07-10) — read this first
+
+This document was written on 2026-07-04, **before the build-out**, and its per-phase ✅/⏳/⬜ markers below are now stale (they still say things like "package rename / Phase 3 connection — not started" that shipped weeks ago). The authoritative current state:
+
+**Shipped and on `origin/main`** (native Android, `com.ashlarprotocol`, fully on-device, compiled + device-verified + tested — this doc's "written but not compiled" caveat no longer applies):
+
+- **Phase 1** — the honest core: the tending stone (never zero-reset), the daily Working, the tools, WHO-5, and the §9 safety + mortality-audit layer.
+- **Phase 2 — the Rite of Passage** — initiation, the **Degrees** engine driving tool-unlocking + a legible arc, and the **Raising** advancement ceremony.
+- **Phase 3 — the Lodge (connection)** — the **West Gate** (zero-infra doorways to real people/community) + reach-out + the Well.
+- **Package rename** (`com.example` → `com.ashlarprotocol`), and the **2C tool polish** (the Level's ~6-breaths/min resonance pacer; the Chamber's keep-or-release meaning mode; and the Gavel now a real "catch-and-square a rough corner" micro-practice, replacing the old placeholder drill).
+- **Phase 4 / 4b — the discipline engine + faces** — an 8-feature build (F1–F8) integrating a deep research pass (the Cornerstone/environment design, elevated implementation-intentions, visible grace reserves, an honesty language-gate, automaticity signal, sleep-rhythm anchor, fresh-start ramp, and the Rough-Edge anti-addiction track). See [`RESEARCH_INTEGRATION.md`](RESEARCH_INTEGRATION.md) and the plans in `docs/superpowers/plans/`.
+
+**The roadmap has been reframed** by the society pivot — see [`superpowers/specs/2026-07-09-society-pivot-design.md`](superpowers/specs/2026-07-09-society-pivot-design.md). Read that for current direction.
+
+**Genuinely remaining** (nothing else in the phases below is unbuilt):
+1. **The validation-first society petition** — deploy + measure demand (built, `feat/society-petition`; held pending a go-live decision).
+2. **The society Phase 0 backend + payments** (accounts, sync, initiation fee + dues) — *deliberately deferred* behind the petition signal; it costs money and reverses the on-device model.
+3. **On-device intelligence / personalization** (Phase 4 below) — genuinely unbuilt; needs a model the app doesn't ship and should wait until the static protocol proves out.
+4. **Release signing / distribution** — the app is debug-signed only; a real signed release hasn't been cut.
+
+Everything below is retained for historical context; trust this banner over its stale markers.
+
+---
+
 ## Build status (2026-07-04)
 
 Written in code, **not yet compiled or device-verified** (no JVM/SDK in the authoring environment; nothing committed — the working copy is a snapshot). Real red→green + the device pass live in [`VERIFICATION.md`](VERIFICATION.md).
