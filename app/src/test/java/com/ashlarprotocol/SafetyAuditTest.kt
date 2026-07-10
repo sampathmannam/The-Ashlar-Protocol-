@@ -43,9 +43,8 @@ class SafetyAuditTest {
         assertEquals(listOf("scythe"), result["bad"])
     }
 
-    @Test
-    fun everyPhase1CopySurfaceIsFreeOfMortalitySymbolism() {
-        val corpus: Map<String, List<String>> = mapOf(
+    /** Every user-facing copy surface across Phases 1–4 — swept by BOTH safety gates below. */
+    private fun copyCorpus(): Map<String, List<String>> = mapOf(
             "Relief.WORDS" to Relief.WORDS,
             "GracefulExit.LINES" to GracefulExit.LINES,
             "Square.VALUES" to Square.VALUES,
@@ -81,11 +80,30 @@ class SafetyAuditTest {
             "Cornerstone" to Cornerstone.allText()
         )
 
-        val violations = SafetyAudit.audit(corpus)
+    @Test
+    fun everyCopySurfaceIsFreeOfMortalitySymbolism() {
+        val violations = SafetyAudit.audit(copyCorpus())
+        assertTrue("mortality-symbolism gate FAILED — death imagery found: $violations", violations.isEmpty())
+    }
+
+    @Test
+    fun languageGateFlagsGritAndWillpower_notInnocentWords() {
         assertTrue(
-            "Phase-1 mortality-symbolism gate FAILED — death imagery found: $violations",
-            violations.isEmpty()
+            SafetyAudit.languageViolations("Toughen up and push through — no excuses")
+                .containsAll(listOf("toughen", "push through", "no excuses"))
         )
+        assertTrue(SafetyAudit.languageViolations("willpower is a muscle").contains("willpower"))
+        // Whole-word: must NOT flag innocent words that merely contain a forbidden term.
+        assertTrue(SafetyAudit.languageViolations("act with integrity; keep learning").isEmpty())
+        assertTrue(SafetyAudit.languageViolations("Tend the stone, gently.").isEmpty())
+    }
+
+    @Test
+    fun everyCopySurfaceIsFreeOfWillpowerAndGritFraming() {
+        val hits = copyCorpus().mapValues { (_, lines) ->
+            lines.flatMap { SafetyAudit.languageViolations(it) }.distinct()
+        }.filterValues { it.isNotEmpty() }
+        assertTrue("F7 language gate FAILED — willpower/grit/coercion framing found: $hits", hits.isEmpty())
     }
 
     /**

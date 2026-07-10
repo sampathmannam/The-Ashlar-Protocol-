@@ -30,6 +30,31 @@ object SafetyAudit {
     }
 
     /**
+     * Forbidden FRAMING (Phase 4 / F7): the willpower/grit/coercion/reward language the research says
+     * to design *against* — discipline is not white-knuckle effort (ego depletion is dead; Galla &
+     * Duckworth 2015), guilt/pressure predicts dropout (SDT; Teixeira 2012), and extrinsic rewards
+     * corrode intrinsic motivation (overjustification; Deci/Koestner/Ryan 1999). We sell consistency,
+     * not grit. See docs/RESEARCH_INTEGRATION.md §1.4/F7.
+     */
+    val FORBIDDEN_LANGUAGE: List<String> = listOf(
+        "grit", "toughen", "willpower", "hustle", // whole-word (avoid flagging "integrity" etc.)
+        "push through", "no excuses", "discipline yourself", "unlock reward", "don't break",
+        "suck it up", "man up", "grind harder", "earn your", "streak at risk"
+    )
+
+    /**
+     * The forbidden framing terms found in [text]. Single words match whole-word (so "grit" never
+     * flags "integrity", nor "earn" flag "learn"); phrases match as substrings. Empty = clean.
+     */
+    fun languageViolations(text: String): List<String> {
+        val t = text.lowercase()
+        return FORBIDDEN_LANGUAGE.filter { term ->
+            if (term.contains(' ')) t.contains(term)
+            else Regex("\\b${Regex.escape(term)}\\b").containsMatchIn(t)
+        }
+    }
+
+    /**
      * Audit a corpus keyed by source name. Returns only the sources that have violations, mapped to
      * the distinct forbidden terms found — so a red test names exactly what slipped in, and where.
      */
