@@ -41,15 +41,7 @@ import com.ashlarprotocol.tools.Square
 import com.ashlarprotocol.tools.Trowel
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-
-data class TamilChallenge(val question: String, val answer: String)
-
-val TAMIL_CHALLENGES = listOf(
-    TamilChallenge("க் + ஆ =", "கா"),
-    TamilChallenge("ச் + இ =", "சி"),
-    TamilChallenge("ட் + உ =", "டு"),
-    TamilChallenge("ந் + ஏ =", "நே")
-)
+import com.ashlarprotocol.tools.Gavel
 
 @Composable
 fun ToolsScreen(
@@ -201,66 +193,81 @@ private fun LockedToolCard(title: String, required: Degree) {
 
 @Composable
 fun TheGavel() {
-    var taskIndex by remember { mutableStateOf(0) }
-    var active by remember { mutableStateOf(false) }
+    var reaction by remember { mutableStateOf("") }
+    var trigger by remember { mutableStateOf("") }
+    var response by remember { mutableStateOf("") }
+    var squared by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .clip(androidx.compose.foundation.shape.RoundedCornerShape(32.dp))
-            .background(com.ashlarprotocol.ui.theme.Surface.copy(alpha = 0.8f))
+            .background(com.ashlarprotocol.ui.theme.Surface)
             .border(1.dp, com.ashlarprotocol.ui.theme.DividerWhite.copy(alpha = 0.05f), androidx.compose.foundation.shape.RoundedCornerShape(32.dp))
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(24.dp)
     ) {
         Text("THE GAVEL", style = MaterialTheme.typography.titleLarge, color = Gold)
-        Spacer(modifier = Modifier.height(24.dp))
+        Text("KNOCK A ROUGH CORNER OFF THE STONE.", style = MaterialTheme.typography.labelSmall, color = Gold.copy(alpha = 0.5f))
+        Spacer(modifier = Modifier.height(16.dp))
 
-        if (!active) {
-            Button(
-                onClick = { active = true },
-                modifier = Modifier.fillMaxWidth().height(56.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Gold.copy(alpha = 0.1f), contentColor = Gold),
-                shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
-                border = androidx.compose.foundation.BorderStroke(1.dp, Gold.copy(alpha = 0.5f))
-            ) {
-                Text("BEGIN THE DRILL", style = MaterialTheme.typography.labelSmall)
-            }
-        } else {
+        if (!squared) {
             Text(
-                text = TAMIL_CHALLENGES[taskIndex].question,
-                style = MaterialTheme.typography.titleLarge,
-                color = Silver,
-                fontSize = 48.dp.value.sp
+                "Catch one pattern that keeps catching you, and set down the truer move before it rises again.",
+                style = MaterialTheme.typography.bodyMedium, color = Silver, lineHeight = 22.sp
             )
-            Spacer(modifier = Modifier.height(32.dp))
-
-            val options = listOf("கா", "சி", "டு", "நே")
-            
+            Spacer(modifier = Modifier.height(16.dp))
+            Text("A ROUGH CORNER — PICK ONE, OR NAME YOUR OWN", style = MaterialTheme.typography.labelSmall, color = Gold.copy(alpha = 0.4f), letterSpacing = 1.sp)
+            Spacer(modifier = Modifier.height(8.dp))
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                    GavelOption(options[0], modifier = Modifier.weight(1f)) { taskIndex = (taskIndex + 1) % 4 }
-                    GavelOption(options[1], modifier = Modifier.weight(1f)) { taskIndex = (taskIndex + 1) % 4 }
-                }
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                    GavelOption(options[2], modifier = Modifier.weight(1f)) { taskIndex = (taskIndex + 1) % 4 }
-                    GavelOption(options[3], modifier = Modifier.weight(1f)) { taskIndex = (taskIndex + 1) % 4 }
+                Gavel.ROUGH_CORNERS.forEach { rc ->
+                    val selected = reaction == rc
+                    Text(
+                        rc,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = if (selected) Gold else Silver,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(androidx.compose.foundation.shape.RoundedCornerShape(12.dp))
+                            .background(if (selected) Gold.copy(alpha = 0.15f) else Slate.copy(alpha = 0.2f))
+                            .border(1.dp, if (selected) Gold.copy(alpha = 0.5f) else Slate, androidx.compose.foundation.shape.RoundedCornerShape(12.dp))
+                            .clickable { reaction = rc }
+                            .padding(12.dp)
+                    )
                 }
             }
+            Spacer(modifier = Modifier.height(12.dp))
+            PlumbField(reaction, { reaction = it }, "…or the reaction you want to catch")
+            Spacer(modifier = Modifier.height(12.dp))
+            Text("ITS TRIGGER (OPTIONAL)", style = MaterialTheme.typography.labelSmall, color = Gold.copy(alpha = 0.4f), letterSpacing = 1.sp)
+            Spacer(modifier = Modifier.height(8.dp))
+            PlumbField(trigger, { trigger = it }, "when or where it usually rises")
+            Spacer(modifier = Modifier.height(12.dp))
+            Text("THE TRUER MOVE", style = MaterialTheme.typography.labelSmall, color = Gold.copy(alpha = 0.4f), letterSpacing = 1.sp)
+            Spacer(modifier = Modifier.height(8.dp))
+            PlumbField(response, { response = it }, "what you'll do instead — one small, doable thing")
+            Spacer(modifier = Modifier.height(16.dp))
+            PlumbPrimary("SQUARE IT", enabled = Gavel.canSquare(reaction, response)) { squared = true }
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
+                    .background(Slate.copy(alpha = 0.4f))
+                    .border(1.dp, Gold.copy(alpha = 0.2f), androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
+                    .padding(16.dp)
+            ) {
+                Text("THE CORNER, KNOCKED OFF", style = MaterialTheme.typography.labelSmall, color = Gold, letterSpacing = 2.sp)
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(Gavel.compose(reaction, trigger, response), style = MaterialTheme.typography.bodyLarge, color = Silver, lineHeight = 26.sp)
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                "SQUARE ANOTHER",
+                style = MaterialTheme.typography.labelSmall,
+                color = Gold.copy(alpha = 0.6f),
+                modifier = Modifier.clickable { reaction = ""; trigger = ""; response = ""; squared = false }
+            )
         }
-    }
-}
-
-@Composable
-fun GavelOption(text: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
-    Box(
-        modifier = modifier
-            .background(Slate)
-            .clickable { onClick() }
-            .padding(16.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(text, style = MaterialTheme.typography.titleLarge, color = Gold)
     }
 }
 
