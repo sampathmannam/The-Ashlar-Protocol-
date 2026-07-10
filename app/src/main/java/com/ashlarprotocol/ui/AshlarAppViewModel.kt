@@ -47,6 +47,11 @@ class AshlarAppViewModel(application: Application) : AndroidViewModel(applicatio
         .map { it.graceRemaining }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), com.ashlarprotocol.tools.KindStreak.MAX_GRACE)
 
+    // The current consecutive run — for the mirror ("What the Stone Remembers").
+    val currentRun: StateFlow<Int> = dataStore.streakState
+        .map { it.currentRun }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
+
     // The Cornerstone — the person's one self-directed environment change (F1).
     val cornerstone: StateFlow<com.ashlarprotocol.data.CornerstoneEntry?> = dataStore.cornerstone
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
@@ -58,6 +63,46 @@ class AshlarAppViewModel(application: Application) : AndroidViewModel(applicatio
     // Automaticity — the honest progress signal (F4). The epoch-day last asked; -1 = never.
     val automaticityDay: StateFlow<Int> = dataStore.automaticityDay
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), -1)
+
+    val automaticityLevel: StateFlow<Int> = dataStore.automaticityLevel
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), -1)
+
+    // ── What the Stone Remembers (the mirror) — a deterministic scribe over the on-device data ──
+    /** A snapshot for the reflection engine; precomputes epoch-days/spans so the engine stays pure. */
+    fun buildReflectionInput(): com.ashlarprotocol.tools.ReflectionInput {
+        val now = System.currentTimeMillis()
+        val today = KindStreak.epochDay(now, TimeZone.getDefault().getOffset(now))
+        val who = whoFiveResults.value.sortedBy { it.timestamp }
+        val whoSpanDays = if (who.size >= 2) ((who.last().timestamp - who.first().timestamp) / 86_400_000L).toInt() else 0
+        val re = roughEdge.value
+        val lapseDays = re?.lapses?.map { KindStreak.epochDay(it, TimeZone.getDefault().getOffset(it)) } ?: emptyList()
+        val rh = rhythm.value
+        return com.ashlarprotocol.tools.ReflectionInput(
+            daysTended = briefingStreak.value,
+            currentRun = currentRun.value,
+            degreeDisplay = currentDegree.value.display,
+            intention = intention.value,
+            practicesCount = practices.value.size,
+            journalCount = aarEntries.value.size,
+            plumbCount = plumbSessions.value,
+            gaugeDays = gaugeDaysComplete.value,
+            recallCount = recallSessions.value,
+            keptReflectionsCount = reflections.value.size,
+            signatureStrengths = signatureStrengths.value.map { it.display },
+            automaticityLevel = automaticityLevel.value,
+            rhythmWake = rh?.let { com.ashlarprotocol.tools.Rhythm.formatTime(it.wakeMinutesOfDay) },
+            rhythmWindDown = rh?.let { com.ashlarprotocol.tools.Rhythm.formatTime(it.windDownMinutesOfDay) },
+            roughEdgeName = re?.name,
+            roughEdgeLapseDays = lapseDays,
+            todayEpochDay = today,
+            whoFiveScores = who.map { it.score },
+            whoFiveSpanDays = whoSpanDays
+        )
+    }
+
+    /** The reflections for "What the Stone Remembers" — computed on demand (pull-only, snapshot on open). */
+    fun reflect(): List<com.ashlarprotocol.tools.Reflection> =
+        com.ashlarprotocol.tools.Reflections.reflect(buildReflectionInput())
 
     fun recordAutomaticity(value: Int) {
         val now = System.currentTimeMillis()
