@@ -42,6 +42,19 @@ class AshlarAppViewModel(application: Application) : AndroidViewModel(applicatio
         0
     )
 
+    // The grace reserve — surfaced (F3) so it can be protected, not a silent buffer (Sharif & Shu).
+    val graceRemaining: StateFlow<Int> = dataStore.streakState
+        .map { it.graceRemaining }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), com.ashlarprotocol.tools.KindStreak.MAX_GRACE)
+
+    // The Cornerstone — the person's one self-directed environment change (F1).
+    val cornerstone: StateFlow<com.ashlarprotocol.data.CornerstoneEntry?> = dataStore.cornerstone
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
+    fun setCornerstone(entry: com.ashlarprotocol.data.CornerstoneEntry) {
+        viewModelScope.launch { dataStore.setCornerstone(entry) }
+    }
+
     val aarEntries: StateFlow<List<com.ashlarprotocol.data.AarEntry>> = dataStore.aarEntries.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000),
@@ -164,7 +177,7 @@ class AshlarAppViewModel(application: Application) : AndroidViewModel(applicatio
         viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList()
     )
 
-    fun addPractice(anchor: String, action: String, reminderMinutesOfDay: Int? = null) {
+    fun addPractice(anchor: String, action: String, reminderMinutesOfDay: Int? = null, cueKind: String? = null) {
         if (!com.ashlarprotocol.tools.PracticeAuthoring.canSave(anchor, action)) return
         viewModelScope.launch {
             val entry = com.ashlarprotocol.data.Practice(
@@ -172,7 +185,8 @@ class AshlarAppViewModel(application: Application) : AndroidViewModel(applicatio
                 anchor = anchor.trim(),
                 action = action.trim(),
                 timestamp = System.currentTimeMillis(),
-                reminderMinutesOfDay = reminderMinutesOfDay
+                reminderMinutesOfDay = reminderMinutesOfDay,
+                cueKind = cueKind
             )
             dataStore.setPractices((listOf(entry) + practices.value).take(30))
             if (reminderMinutesOfDay != null) schedulePracticeReminder(entry)

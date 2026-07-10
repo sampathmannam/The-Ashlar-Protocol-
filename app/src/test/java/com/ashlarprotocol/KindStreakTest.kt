@@ -4,6 +4,7 @@ import com.ashlarprotocol.tools.KindStreak
 import com.ashlarprotocol.tools.StreakState
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -151,5 +152,27 @@ class KindStreakTest {
     fun stoneProgressGivesVisibleEarlyMovement() {
         // The first day of tending must move the stone off zero by something a person can see.
         assertTrue(KindStreak.stoneProgress(1) > 0.02f)
+    }
+
+    @Test
+    fun graceLabelReflectsReserve() {
+        assertEquals("2 grace held", KindStreak.graceLabel(2))
+        assertEquals("1 grace held", KindStreak.graceLabel(1))
+        assertEquals("grace spent — the stone still holds", KindStreak.graceLabel(0))
+        // Clamped — never shows more than the cap or a negative.
+        assertEquals("2 grace held", KindStreak.graceLabel(99))
+        assertEquals("grace spent — the stone still holds", KindStreak.graceLabel(-3))
+    }
+
+    @Test
+    fun graceMessageOnlyWhenSpent_andNeverGuilts() {
+        assertNull(KindStreak.graceMessage(0))
+        assertNull(KindStreak.graceMessage(-1))
+        val m = KindStreak.graceMessage(1)!!
+        assertTrue(m.isNotBlank())
+        // No loss/guilt framing — a spent grace day is the stone holding for you, not a failure.
+        listOf("lost", "broke", "fail", "should", "behind").forEach {
+            assertFalse("grace message must not guilt ($it)", m.lowercase().contains(it))
+        }
     }
 }

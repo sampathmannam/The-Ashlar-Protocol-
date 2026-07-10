@@ -13,5 +13,7 @@ data class Practice(
     val action: String,
     val timestamp: Long,
     /** Optional cue-anchored reminder time (minutes of day, e.g. 19*60 = 7pm); null = no reminder. */
-    val reminderMinutesOfDay: Int? = null
+    val reminderMinutesOfDay: Int? = null,
+    /** Optional explicit cue kind behind the anchor — a `Cornerstone.CueKind` name (F2); null = unset. */
+    val cueKind: String? = null
 )

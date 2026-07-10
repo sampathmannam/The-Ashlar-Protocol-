@@ -45,4 +45,12 @@ object PracticeAuthoring {
     /** A practice is ready to save only with an anchor, an approach action, and no avoidance framing. */
     fun canSave(anchor: String, action: String): Boolean =
         anchor.trim().isNotEmpty() && action.trim().isNotEmpty() && !isAvoidanceFramed(action)
+
+    /**
+     * Whether the person should name a committed intention (a value they're working toward) BEFORE
+     * authoring a practice. Implementation intentions only *amplify* an already-committed goal — they
+     * don't manufacture motivation (Gollwitzer & Sheeran 2006 boundary condition; F2). So with no
+     * intention set, route them to set one first, then the if-then plan has something to serve.
+     */
+    fun requiresIntentionFirst(intention: String): Boolean = intention.isBlank()
 }

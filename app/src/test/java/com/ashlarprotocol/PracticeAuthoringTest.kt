@@ -53,4 +53,12 @@ class PracticeAuthoringTest {
         assertFalse("needs an action", PracticeAuthoring.canSave("dinner", ""))
         assertFalse("avoidance is blocked", PracticeAuthoring.canSave("dinner", "stop scrolling"))
     }
+
+    @Test
+    fun requiresIntentionFirstWhenNoCommittedIntention() {
+        // If-then plans amplify a committed goal — with no intention set, name one first (F2).
+        assertTrue(PracticeAuthoring.requiresIntentionFirst(""))
+        assertTrue(PracticeAuthoring.requiresIntentionFirst("   "))
+        assertFalse(PracticeAuthoring.requiresIntentionFirst("steadier days"))
+    }
 }

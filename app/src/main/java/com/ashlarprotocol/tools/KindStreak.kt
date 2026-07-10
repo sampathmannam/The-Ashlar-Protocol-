@@ -142,4 +142,26 @@ object KindStreak {
         val k = 25f // days at which the stone is ~half-refined; tuned so early days feel visible
         return d / (d + k)
     }
+
+    /**
+     * A short, protectable label for the grace reserve. Surfacing the reserve as *scarce* (rather than
+     * a silent auto-buffer) raises post-miss persistence, because a limited, named reserve carries a
+     * small psychological cost so people protect it (Sharif & Shu, 2017/2019). Never a warning.
+     */
+    fun graceLabel(graceRemaining: Int): String {
+        val g = graceRemaining.coerceIn(0, MAX_GRACE)
+        return when (g) {
+            0 -> "grace spent — the stone still holds"
+            1 -> "1 grace held"
+            else -> "$g grace held"
+        }
+    }
+
+    /**
+     * Warm, non-guilting note when a tending spent grace to keep the run alive; null when none spent.
+     * A spent grace day is framed as the stone holding *for* you, never as a failure (anti-AVE / Wohl).
+     */
+    fun graceMessage(graceUsed: Int): String? =
+        if (graceUsed <= 0) null
+        else "The stone held for you — a day of grace kept the run. They replenish as you return."
 }

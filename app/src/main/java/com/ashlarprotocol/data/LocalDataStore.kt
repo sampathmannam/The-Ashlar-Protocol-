@@ -36,6 +36,8 @@ class LocalDataStore(private val context: Context) {
     // The initiation rite (first-run). Stored locally only, like everything else.
     private val INITIATED_KEY = androidx.datastore.preferences.core.booleanPreferencesKey("initiated")
     private val INTENTION_KEY = androidx.datastore.preferences.core.stringPreferencesKey("intention")
+    // One self-directed environment change (Phase 4, F1). JSON of a CornerstoneEntry, or blank.
+    private val CORNERSTONE_KEY = androidx.datastore.preferences.core.stringPreferencesKey("cornerstone")
     private val BASELINE_KEY = floatPreferencesKey("baseline_weight")
     // The kind streak ("tending the stone", tools/KindStreak.kt): a cumulative total that never
     // decreases, plus a grace-softened current run. Supersedes the old resettable briefing_streak.
@@ -228,6 +230,23 @@ class LocalDataStore(private val context: Context) {
     /** Update just the intention (e.g. from the Square rite), without re-running initiation. */
     suspend fun setIntention(text: String) {
         context.dataStore.edit { it[INTENTION_KEY] = text }
+    }
+
+    /** The person's current cornerstone (self-directed environment change), or null if none set. */
+    val cornerstone: Flow<CornerstoneEntry?> = context.dataStore.data.map { prefs ->
+        prefs[CORNERSTONE_KEY]?.takeIf { it.isNotBlank() }?.let {
+            try {
+                kotlinx.serialization.json.Json.decodeFromString(CornerstoneEntry.serializer(), it)
+            } catch (e: Exception) {
+                null
+            }
+        }
+    }
+
+    suspend fun setCornerstone(entry: CornerstoneEntry) {
+        context.dataStore.edit {
+            it[CORNERSTONE_KEY] = kotlinx.serialization.json.Json.encodeToString(CornerstoneEntry.serializer(), entry)
+        }
     }
 
     val reflections: Flow<List<Reflection>> = context.dataStore.data.map { preferences ->

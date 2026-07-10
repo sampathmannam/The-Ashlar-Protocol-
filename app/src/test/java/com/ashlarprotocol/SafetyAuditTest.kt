@@ -11,6 +11,7 @@ import com.ashlarprotocol.tools.Readiness
 import com.ashlarprotocol.tools.Relief
 import com.ashlarprotocol.tools.SafetyAudit
 import com.ashlarprotocol.tools.Square
+import com.ashlarprotocol.tools.Cornerstone
 import com.ashlarprotocol.tools.Trowel
 import com.ashlarprotocol.tools.WestGate
 import com.ashlarprotocol.tools.Working
@@ -42,9 +43,8 @@ class SafetyAuditTest {
         assertEquals(listOf("scythe"), result["bad"])
     }
 
-    @Test
-    fun everyPhase1CopySurfaceIsFreeOfMortalitySymbolism() {
-        val corpus: Map<String, List<String>> = mapOf(
+    /** Every user-facing copy surface across Phases 1–4 — swept by BOTH safety gates below. */
+    private fun copyCorpus(): Map<String, List<String>> = mapOf(
             "Relief.WORDS" to Relief.WORDS,
             "GracefulExit.LINES" to GracefulExit.LINES,
             "Square.VALUES" to Square.VALUES,
@@ -70,14 +70,40 @@ class SafetyAuditTest {
                     Degree.values().mapNotNull { Degrees.towardNextLabel(it) }
             ),
             // The West Gate (Phase 3): doorways to real connection — must stay on belonging, never death.
-            "WestGate" to WestGate.allText()
+            "WestGate" to WestGate.allText(),
+            // The grace reserve copy (Phase 4 / F3): the visible reserve + the "held for you" note.
+            "KindStreak.grace" to listOf(
+                KindStreak.graceLabel(0), KindStreak.graceLabel(1), KindStreak.graceLabel(2),
+                KindStreak.graceMessage(1)!!
+            ),
+            // The Cornerstone (Phase 4 / F1): cue kinds + friction moves.
+            "Cornerstone" to Cornerstone.allText()
         )
 
-        val violations = SafetyAudit.audit(corpus)
+    @Test
+    fun everyCopySurfaceIsFreeOfMortalitySymbolism() {
+        val violations = SafetyAudit.audit(copyCorpus())
+        assertTrue("mortality-symbolism gate FAILED — death imagery found: $violations", violations.isEmpty())
+    }
+
+    @Test
+    fun languageGateFlagsGritAndWillpower_notInnocentWords() {
         assertTrue(
-            "Phase-1 mortality-symbolism gate FAILED — death imagery found: $violations",
-            violations.isEmpty()
+            SafetyAudit.languageViolations("Toughen up and push through — no excuses")
+                .containsAll(listOf("toughen", "push through", "no excuses"))
         )
+        assertTrue(SafetyAudit.languageViolations("willpower is a muscle").contains("willpower"))
+        // Whole-word: must NOT flag innocent words that merely contain a forbidden term.
+        assertTrue(SafetyAudit.languageViolations("act with integrity; keep learning").isEmpty())
+        assertTrue(SafetyAudit.languageViolations("Tend the stone, gently.").isEmpty())
+    }
+
+    @Test
+    fun everyCopySurfaceIsFreeOfWillpowerAndGritFraming() {
+        val hits = copyCorpus().mapValues { (_, lines) ->
+            lines.flatMap { SafetyAudit.languageViolations(it) }.distinct()
+        }.filterValues { it.isNotEmpty() }
+        assertTrue("F7 language gate FAILED — willpower/grit/coercion framing found: $hits", hits.isEmpty())
     }
 
     /**
