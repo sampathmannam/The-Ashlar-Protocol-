@@ -6,6 +6,7 @@ import android.os.Vibrator
 import android.os.VibratorManager
 import android.content.Context
 import android.content.Intent
+import androidx.core.net.toUri
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -27,12 +28,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ashlarprotocol.tools.ReachOut
 import com.ashlarprotocol.tools.Relief
+import com.ashlarprotocol.tools.WestGate
 import com.ashlarprotocol.ui.AshlarAppViewModel
 import com.ashlarprotocol.ui.theme.Charcoal
 import com.ashlarprotocol.ui.theme.Gold
 import com.ashlarprotocol.ui.theme.RedAlert
 import com.ashlarprotocol.ui.theme.Silver
 import com.ashlarprotocol.ui.theme.Slate
+import com.ashlarprotocol.ui.theme.LightText
+import com.ashlarprotocol.ui.theme.DividerWhite
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -320,21 +324,85 @@ fun ChamberScreen(viewModel: AshlarAppViewModel) {
             }
         }
 
-        // Reach Out — the affordable turn-outward (Phase 3, the Lodge). Always available, never gated
-        // (turning to a real person is help, not advanced curriculum). Opens the phone's own messaging
-        // apps with an editable opener; the app hosts no relationship and sends nothing itself.
+        // The West Gate — the turn outward (Phase 3, the Lodge). Always available, never gated (turning
+        // to a real person is help, not advanced curriculum). Doorways to the user's OWN people (a share
+        // sheet), free listening/peer resources (the browser), and real-world rooms (an invitation). The
+        // app hosts no relationship, sees no contacts, and sends nothing itself. Crisis stays separate.
         if (!purging) {
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(24.dp))
+            WestGateSection(
+                onReachOwn = { reachOut(context, ReachOut.openerAt(reachIndex)); reachIndex++ },
+                onOpenWeb = { url -> openWeb(context, url) }
+            )
+        }
+    }
+}
+
+/**
+ * The West Gate — a calm, static list of doorways to real connection (Phase 3). Never a feed; nothing
+ * loads, nothing updates, nothing is public. Each doorway hands off to the phone's own apps.
+ */
+@Composable
+private fun WestGateSection(onReachOwn: () -> Unit, onOpenWeb: (String) -> Unit) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = "THE WEST GATE",
+            style = MaterialTheme.typography.labelSmall,
+            color = Gold.copy(alpha = 0.7f),
+            letterSpacing = 2.sp
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = "The app can't be your lodge — but it can point you to the door.",
+            style = MaterialTheme.typography.bodySmall,
+            color = Silver,
+            lineHeight = 18.sp
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        WestGate.DOORWAYS.forEach { doorway ->
+            WestGateDoorwayCard(doorway = doorway, onReachOwn = onReachOwn, onOpenWeb = onOpenWeb)
+            Spacer(modifier = Modifier.height(12.dp))
+        }
+    }
+}
+
+@Composable
+private fun WestGateDoorwayCard(
+    doorway: WestGate.Doorway,
+    onReachOwn: () -> Unit,
+    onOpenWeb: (String) -> Unit
+) {
+    val tappable = doorway.kind != WestGate.Kind.PLACE
+    var base = Modifier
+        .fillMaxWidth()
+        .clip(androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
+        .background(Slate.copy(alpha = 0.2f))
+        .border(1.dp, DividerWhite.copy(alpha = 0.05f), androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
+    if (tappable) {
+        base = base.clickable {
+            when (doorway.kind) {
+                WestGate.Kind.OWN_PEOPLE -> onReachOwn()
+                WestGate.Kind.WEB -> doorway.url?.let { onOpenWeb(it) }
+                WestGate.Kind.PLACE -> {}
+            }
+        }
+    }
+    Column(modifier = base.padding(16.dp)) {
+        Text(text = doorway.title, style = MaterialTheme.typography.bodyMedium, color = LightText)
+        Spacer(modifier = Modifier.height(6.dp))
+        Text(
+            text = doorway.body,
+            style = MaterialTheme.typography.bodySmall,
+            color = Silver,
+            lineHeight = 19.sp
+        )
+        doorway.action?.let { action ->
+            Spacer(modifier = Modifier.height(10.dp))
             Text(
-                text = "You don't have to carry this alone — reach someone you trust",
+                text = action,
                 style = MaterialTheme.typography.labelSmall,
-                color = Gold.copy(alpha = 0.6f),
-                textAlign = TextAlign.Center,
-                lineHeight = 16.sp,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { reachOut(context, ReachOut.openerAt(reachIndex)); reachIndex++ }
-                    .padding(vertical = 8.dp)
+                color = Gold,
+                letterSpacing = 1.sp
             )
         }
     }
@@ -356,6 +424,19 @@ private fun reachOut(context: Context, message: String) {
         context.startActivity(chooser)
     } catch (e: Exception) {
         // No app available to share text — fail quietly.
+    }
+}
+
+/**
+ * Opens a West Gate WEB doorway in the phone's own browser. The app makes no request itself — it just
+ * hands the user a door (ACTION_VIEW). Wrapped so a missing browser never crashes the Chamber.
+ */
+private fun openWeb(context: Context, url: String) {
+    val intent = Intent(Intent.ACTION_VIEW, url.toUri()).apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) }
+    try {
+        context.startActivity(intent)
+    } catch (e: Exception) {
+        // No browser available — fail quietly.
     }
 }
 
