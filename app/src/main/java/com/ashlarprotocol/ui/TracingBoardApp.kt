@@ -124,7 +124,10 @@ fun TracingBoardApp(
                             onSquareSetIntention = { viewModel.setIntention(it) },
                             onTrowelKeep = { viewModel.addReflection(it) },
                             existingCornerstone = viewModel.cornerstone.collectAsState().value,
-                            onCornerstoneSave = { viewModel.setCornerstone(it) }
+                            onCornerstoneSave = { viewModel.setCornerstone(it) },
+                            existingRoughEdge = viewModel.roughEdge.collectAsState().value,
+                            onRoughEdgeSet = { n, c, m, r -> viewModel.setRoughEdge(n, c, m, r) },
+                            onRoughEdgeLapse = { viewModel.recordLapse() }
                         )
                     }
                 }

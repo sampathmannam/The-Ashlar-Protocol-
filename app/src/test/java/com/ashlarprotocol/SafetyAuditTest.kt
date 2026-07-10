@@ -15,6 +15,7 @@ import com.ashlarprotocol.data.RhythmAnchor
 import com.ashlarprotocol.tools.Automaticity
 import com.ashlarprotocol.tools.Cornerstone
 import com.ashlarprotocol.tools.Rhythm
+import com.ashlarprotocol.tools.RoughEdge
 import com.ashlarprotocol.tools.Trowel
 import com.ashlarprotocol.tools.WestGate
 import com.ashlarprotocol.tools.Working
@@ -90,6 +91,12 @@ class SafetyAuditTest {
                 "YOUR RHYTHM",
                 "A steady rise and a wind-down. It's the regularity that's linked to steadier days — not the hours, and no perfect night required.",
                 Rhythm.reflection(RhythmAnchor(7 * 60, 22 * 60))
+            ),
+            // The Rough-Edge track (Phase 4b / F5) — the addiction face. A slip must never be catastrophized;
+            // the handoff must never shame. This is the most safety-sensitive copy in the app after §9.
+            "RoughEdge" to listOf(
+                RoughEdge.lapseResponse(), RoughEdge.SAFETY_NOTE, RoughEdge.INTRO,
+                "Don't wrestle it — ride it. Pull \"Ride the urge\" from STEADY and let the wave pass."
             )
         )
 

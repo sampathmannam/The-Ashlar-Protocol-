@@ -43,6 +43,8 @@ class LocalDataStore(private val context: Context) {
     private val CORNERSTONE_KEY = androidx.datastore.preferences.core.stringPreferencesKey("cornerstone")
     // The rhythm anchor (F6): JSON of a RhythmAnchor (wake + wind-down minutes-of-day), or blank.
     private val RHYTHM_KEY = androidx.datastore.preferences.core.stringPreferencesKey("rhythm_anchor")
+    // The rough edge (F5): JSON of a RoughEdgeEntry (one bad habit + its plan + lapse ledger), or blank.
+    private val ROUGH_EDGE_KEY = androidx.datastore.preferences.core.stringPreferencesKey("rough_edge")
     private val BASELINE_KEY = floatPreferencesKey("baseline_weight")
     // The kind streak ("tending the stone", tools/KindStreak.kt): a cumulative total that never
     // decreases, plus a grace-softened current run. Supersedes the old resettable briefing_streak.
@@ -273,6 +275,22 @@ class LocalDataStore(private val context: Context) {
     suspend fun setRhythm(anchor: RhythmAnchor) {
         context.dataStore.edit {
             it[RHYTHM_KEY] = kotlinx.serialization.json.Json.encodeToString(RhythmAnchor.serializer(), anchor)
+        }
+    }
+
+    val roughEdge: Flow<RoughEdgeEntry?> = context.dataStore.data.map { prefs ->
+        prefs[ROUGH_EDGE_KEY]?.takeIf { it.isNotBlank() }?.let {
+            try {
+                kotlinx.serialization.json.Json.decodeFromString(RoughEdgeEntry.serializer(), it)
+            } catch (e: Exception) {
+                null
+            }
+        }
+    }
+
+    suspend fun setRoughEdge(entry: RoughEdgeEntry) {
+        context.dataStore.edit {
+            it[ROUGH_EDGE_KEY] = kotlinx.serialization.json.Json.encodeToString(RoughEdgeEntry.serializer(), entry)
         }
     }
 

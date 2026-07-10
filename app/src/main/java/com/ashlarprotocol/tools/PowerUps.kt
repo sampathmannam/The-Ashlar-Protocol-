@@ -82,6 +82,17 @@ object PowerUps {
                 "Tell them. One honest line: \"I was just thinking of when you… thank you.\"",
                 "Sending it is the whole practice — through the West Gate, or your own way."
             )
+        ),
+        PowerUp(
+            id = "urge",
+            title = "Ride the urge",
+            invite = "A craving is a wave — it crests and passes if you let it.",
+            steps = listOf(
+                "Name it: \"a wave of wanting is here.\" You don't have to act on it — or fight it.",
+                "Find where it sits in your body. Watch it like weather: curious, not at war.",
+                "Breathe with it. Waves rise, peak, and fall — this one will too, usually within minutes.",
+                "Notice it easing. You rode it out; and each time you do, the next wave comes a little smaller."
+            )
         )
     )
 

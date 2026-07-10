@@ -75,6 +75,28 @@ class AshlarAppViewModel(application: Application) : AndroidViewModel(applicatio
         }
     }
 
+    // The Rough Edge (F5) — one bad habit worked on the anti-AVE spine; the lapse ledger only ever grows.
+    val roughEdge: StateFlow<com.ashlarprotocol.data.RoughEdgeEntry?> = dataStore.roughEdge
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
+    fun setRoughEdge(name: String, cue: String, environmentMove: String, replacement: String) {
+        viewModelScope.launch {
+            dataStore.setRoughEdge(
+                com.ashlarprotocol.data.RoughEdgeEntry(
+                    name = name.trim(), cue = cue.trim(),
+                    environmentMove = environmentMove.trim(), replacement = replacement.trim(),
+                    lapses = roughEdge.value?.lapses ?: emptyList() // preserve the ledger; never reset
+                )
+            )
+        }
+    }
+
+    /** Log a slip — appended to the ledger, never a streak to break (anti-AVE). */
+    fun recordLapse() {
+        val current = roughEdge.value ?: return
+        viewModelScope.launch { dataStore.setRoughEdge(current.copy(lapses = current.lapses + System.currentTimeMillis())) }
+    }
+
     val aarEntries: StateFlow<List<com.ashlarprotocol.data.AarEntry>> = dataStore.aarEntries.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000),
