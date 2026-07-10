@@ -45,6 +45,10 @@ class LocalDataStore(private val context: Context) {
     private val RHYTHM_KEY = androidx.datastore.preferences.core.stringPreferencesKey("rhythm_anchor")
     // The rough edge (F5): JSON of a RoughEdgeEntry (one bad habit + its plan + lapse ledger), or blank.
     private val ROUGH_EDGE_KEY = androidx.datastore.preferences.core.stringPreferencesKey("rough_edge")
+    // The Temple (progression): wages earned + courses raised only ever increase; completions append-only.
+    private val TOTAL_WAGES_KEY = androidx.datastore.preferences.core.intPreferencesKey("total_wages_earned")
+    private val COURSES_RAISED_KEY = androidx.datastore.preferences.core.intPreferencesKey("courses_raised")
+    private val CHALLENGE_COMPLETIONS_KEY = androidx.datastore.preferences.core.stringPreferencesKey("challenge_completions")
     private val BASELINE_KEY = floatPreferencesKey("baseline_weight")
     // The kind streak ("tending the stone", tools/KindStreak.kt): a cumulative total that never
     // decreases, plus a grace-softened current run. Supersedes the old resettable briefing_streak.
@@ -293,6 +297,38 @@ class LocalDataStore(private val context: Context) {
     suspend fun setRoughEdge(entry: RoughEdgeEntry) {
         context.dataStore.edit {
             it[ROUGH_EDGE_KEY] = kotlinx.serialization.json.Json.encodeToString(RoughEdgeEntry.serializer(), entry)
+        }
+    }
+
+    // ── The Temple (progression) ────────────────────────────────────────────────────────────
+    val totalWagesEarned: Flow<Int> = context.dataStore.data.map { it[TOTAL_WAGES_KEY] ?: 0 }
+    val coursesRaised: Flow<Int> = context.dataStore.data.map { it[COURSES_RAISED_KEY] ?: 0 }
+    val challengeCompletions: Flow<List<com.ashlarprotocol.data.ChallengeCompletion>> =
+        context.dataStore.data.map { prefs ->
+            prefs[CHALLENGE_COMPLETIONS_KEY]?.takeIf { it.isNotBlank() }?.let {
+                try {
+                    kotlinx.serialization.json.Json.decodeFromString(
+                        kotlinx.serialization.builtins.ListSerializer(com.ashlarprotocol.data.ChallengeCompletion.serializer()), it
+                    )
+                } catch (e: Exception) { emptyList() }
+            } ?: emptyList()
+        }
+
+    /** Wages only ever accrue — the fruit of work, never deducted or decayed. */
+    suspend fun addWages(n: Int) {
+        if (n <= 0) return
+        context.dataStore.edit { it[TOTAL_WAGES_KEY] = (it[TOTAL_WAGES_KEY] ?: 0) + n }
+    }
+
+    suspend fun setCoursesRaised(n: Int) {
+        context.dataStore.edit { it[COURSES_RAISED_KEY] = n }
+    }
+
+    suspend fun setChallengeCompletions(list: List<com.ashlarprotocol.data.ChallengeCompletion>) {
+        context.dataStore.edit {
+            it[CHALLENGE_COMPLETIONS_KEY] = kotlinx.serialization.json.Json.encodeToString(
+                kotlinx.serialization.builtins.ListSerializer(com.ashlarprotocol.data.ChallengeCompletion.serializer()), list
+            )
         }
     }
 

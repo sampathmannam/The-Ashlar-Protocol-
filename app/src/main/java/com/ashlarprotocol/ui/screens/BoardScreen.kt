@@ -156,6 +156,35 @@ fun BoardScreen(viewModel: AshlarAppViewModel) {
             )
         }
 
+        // The day's work — research-designed challenges that pay wages (The Temple).
+        item {
+            val completions by viewModel.challengeCompletions.collectAsState()
+            val now = remember { System.currentTimeMillis() }
+            val today = remember { com.ashlarprotocol.tools.KindStreak.epochDay(now, java.util.TimeZone.getDefault().getOffset(now)) }
+            val week = java.lang.Math.floorDiv(today, 7L)
+            val daily = remember(today) { com.ashlarprotocol.tools.Challenges.dailyMenu(today) }
+            val weekly = remember(week) { com.ashlarprotocol.tools.Challenges.weeklyChallenge(today) }
+            val doneIds = completions
+                .filter { (it.cadence == "WEEKLY" && it.periodKey == week) || (it.cadence == "DAILY" && it.periodKey == today) }
+                .map { it.challengeId }.toSet()
+            com.ashlarprotocol.ui.components.ChallengesCard(
+                daily = daily, weekly = weekly, doneIds = doneIds,
+                onComplete = { viewModel.completeChallenge(it) }
+            )
+        }
+
+        // The Temple — lay wages to raise the next course.
+        item {
+            val raised by viewModel.coursesRaised.collectAsState()
+            val balance by viewModel.wageBalance.collectAsState()
+            val next = com.ashlarprotocol.tools.Temple.nextCourse(raised)
+            com.ashlarprotocol.ui.components.TempleCard(
+                coursesRaised = raised, nextCourse = next, balance = balance,
+                canRaise = next != null && balance >= next.cost,
+                onRaise = { viewModel.raiseCourse() }
+            )
+        }
+
         // Your intention — the app remembers what you said you're working toward (the re-authoring
         // engine; docs/ACTION_PLAN §1A). Shown only once it's been set at initiation.
         if (intention.isNotBlank()) {

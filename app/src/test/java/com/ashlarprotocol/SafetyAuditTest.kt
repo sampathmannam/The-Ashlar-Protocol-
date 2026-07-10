@@ -16,7 +16,9 @@ import com.ashlarprotocol.data.RhythmAnchor
 import com.ashlarprotocol.tools.Automaticity
 import com.ashlarprotocol.tools.Cornerstone
 import com.ashlarprotocol.tools.Rhythm
+import com.ashlarprotocol.tools.Challenges
 import com.ashlarprotocol.tools.Reflections
+import com.ashlarprotocol.tools.Temple
 import com.ashlarprotocol.tools.RoughEdge
 import com.ashlarprotocol.tools.Trowel
 import com.ashlarprotocol.tools.WestGate
@@ -106,6 +108,14 @@ class SafetyAuditTest {
             "Reflections" to (Reflections.allSampleText() + listOf(
                 "The stone is still learning your shape — tend it a while, and it will remember.",
                 "Patterns from your own days — held lightly, never proof."
+            )),
+            // The Temple (progression): course names/unlocks + challenge titles/invites + card copy.
+            "Temple" to (Temple.allText() + Challenges.allText() + listOf(
+                "THE DAY'S WORK", "Small, real, and yours to take or leave. Each one done pays a wage.",
+                "THIS WEEK", "TODAY", "✓ tended", "tend",
+                "THE TEMPLE", "The ground is level. Lay your first stone.",
+                "This tranche of the Temple stands.", "in wages — corn, wine, and oil — in hand.",
+                "Lay the next course", "wages to raise."
             ))
         )
 
