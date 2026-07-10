@@ -144,9 +144,14 @@ fun BoardScreen(viewModel: AshlarAppViewModel) {
         // What the Stone Remembers (the mirror) — pull-only: tap to expand and see your own data
         // reflected back (facts + hedged noticings). Computed on demand; a snapshot at open.
         item {
+            // reflect() reads the DataStore (suspend), so compute it off the composition thread and
+            // re-run whenever the card opens; collapsed → empty. Snapshot on open, pull-only.
+            val reflections by produceState(
+                initialValue = emptyList<com.ashlarprotocol.tools.Reflection>(), showRemembers
+            ) { value = if (showRemembers) viewModel.reflect() else emptyList() }
             com.ashlarprotocol.ui.components.StoneRemembersCard(
                 expanded = showRemembers,
-                reflections = if (showRemembers) viewModel.reflect() else emptyList(),
+                reflections = reflections,
                 onToggle = { showRemembers = !showRemembers }
             )
         }

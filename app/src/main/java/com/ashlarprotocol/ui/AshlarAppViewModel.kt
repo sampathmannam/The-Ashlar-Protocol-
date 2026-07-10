@@ -69,27 +69,43 @@ class AshlarAppViewModel(application: Application) : AndroidViewModel(applicatio
 
     // ── What the Stone Remembers (the mirror) — a deterministic scribe over the on-device data ──
     /** A snapshot for the reflection engine; precomputes epoch-days/spans so the engine stays pure. */
-    fun buildReflectionInput(): com.ashlarprotocol.tools.ReflectionInput {
+    /**
+     * A snapshot of the mirror's inputs, read straight from the DataStore source of truth.
+     *
+     * This deliberately does NOT read the VM's StateFlow `.value`s: those are `WhileSubscribed`, so a
+     * flow that isn't being collected by whatever screen is on top reads its cold initial value — and
+     * the mirror would silently forget real data (e.g. the rough edge, only observed on the Tools
+     * screen). A faithful scribe must read what's persisted, not what a screen happens to be watching,
+     * so every field comes from `dataStore.*.first()`. Suspends; called on card-open only.
+     */
+    suspend fun buildReflectionInput(): com.ashlarprotocol.tools.ReflectionInput {
         val now = System.currentTimeMillis()
         val today = KindStreak.epochDay(now, TimeZone.getDefault().getOffset(now))
-        val who = whoFiveResults.value.sortedBy { it.timestamp }
+        val who = dataStore.whoFiveResults.first().sortedBy { it.timestamp }
         val whoSpanDays = if (who.size >= 2) ((who.last().timestamp - who.first().timestamp) / 86_400_000L).toInt() else 0
-        val re = roughEdge.value
+        val re = dataStore.roughEdge.first()
         val lapseDays = re?.lapses?.map { KindStreak.epochDay(it, TimeZone.getDefault().getOffset(it)) } ?: emptyList()
-        val rh = rhythm.value
+        val rh = dataStore.rhythm.first()
+        // The degree is derived from the same WorkStats the Board uses — recompute it from persisted counts.
+        val streak = dataStore.daysTended.first()
+        val aar = dataStore.aarEntries.first()
+        val plumb = dataStore.plumbSessions.first()
+        val gauge = dataStore.gaugeDaysComplete.first()
+        val recall = dataStore.recallSessions.first()
+        val degree = Degrees.current(Degrees.score(WorkStats(streak, aar.size, plumb, gauge, recall)))
         return com.ashlarprotocol.tools.ReflectionInput(
-            daysTended = briefingStreak.value,
-            currentRun = currentRun.value,
-            degreeDisplay = currentDegree.value.display,
-            intention = intention.value,
-            practicesCount = practices.value.size,
-            journalCount = aarEntries.value.size,
-            plumbCount = plumbSessions.value,
-            gaugeDays = gaugeDaysComplete.value,
-            recallCount = recallSessions.value,
-            keptReflectionsCount = reflections.value.size,
-            signatureStrengths = signatureStrengths.value.map { it.display },
-            automaticityLevel = automaticityLevel.value,
+            daysTended = streak,
+            currentRun = dataStore.streakState.first().currentRun,
+            degreeDisplay = degree.display,
+            intention = dataStore.intention.first(),
+            practicesCount = dataStore.practices.first().size,
+            journalCount = aar.size,
+            plumbCount = plumb,
+            gaugeDays = gauge,
+            recallCount = recall,
+            keptReflectionsCount = dataStore.reflections.first().size,
+            signatureStrengths = dataStore.signatureStrengths.first().map { it.display },
+            automaticityLevel = dataStore.automaticityLevel.first(),
             rhythmWake = rh?.let { com.ashlarprotocol.tools.Rhythm.formatTime(it.wakeMinutesOfDay) },
             rhythmWindDown = rh?.let { com.ashlarprotocol.tools.Rhythm.formatTime(it.windDownMinutesOfDay) },
             roughEdgeName = re?.name,
@@ -101,7 +117,7 @@ class AshlarAppViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
     /** The reflections for "What the Stone Remembers" — computed on demand (pull-only, snapshot on open). */
-    fun reflect(): List<com.ashlarprotocol.tools.Reflection> =
+    suspend fun reflect(): List<com.ashlarprotocol.tools.Reflection> =
         com.ashlarprotocol.tools.Reflections.reflect(buildReflectionInput())
 
     fun recordAutomaticity(value: Int) {
