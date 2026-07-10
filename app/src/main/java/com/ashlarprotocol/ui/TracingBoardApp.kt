@@ -122,7 +122,9 @@ fun TracingBoardApp(
                             onGaugeDayComplete = { viewModel.recordGaugeDayComplete() },
                             onRecallHeld = { viewModel.recordRecallSession() },
                             onSquareSetIntention = { viewModel.setIntention(it) },
-                            onTrowelKeep = { viewModel.addReflection(it) }
+                            onTrowelKeep = { viewModel.addReflection(it) },
+                            existingCornerstone = viewModel.cornerstone.collectAsState().value,
+                            onCornerstoneSave = { viewModel.setCornerstone(it) }
                         )
                     }
                 }

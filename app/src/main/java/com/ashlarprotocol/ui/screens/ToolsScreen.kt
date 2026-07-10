@@ -30,6 +30,8 @@ import com.ashlarprotocol.tools.MouthToEar
 import com.ashlarprotocol.tools.DEFAULT_PRINCIPLES
 import com.ashlarprotocol.tools.Degree
 import com.ashlarprotocol.tools.Degrees
+import com.ashlarprotocol.data.CornerstoneEntry
+import com.ashlarprotocol.ui.components.TheCornerstone
 import com.ashlarprotocol.tools.BreathPacer
 import com.ashlarprotocol.tools.BreathPattern
 import com.ashlarprotocol.tools.BreathPhase
@@ -54,9 +56,11 @@ fun ToolsScreen(
     onGaugeDayComplete: () -> Unit = {},
     onRecallHeld: () -> Unit = {},
     onSquareSetIntention: (String) -> Unit = {},
-    onTrowelKeep: (String) -> Unit = {}
+    onTrowelKeep: (String) -> Unit = {},
+    existingCornerstone: CornerstoneEntry? = null,
+    onCornerstoneSave: (CornerstoneEntry) -> Unit = {}
 ) {
-    var activeTool by remember { mutableStateOf("menu") } // menu, gavel, plumb, gauge, level, mouth
+    var activeTool by remember { mutableStateOf("menu") } // menu, gavel, plumb, gauge, level, mouth, cornerstone
 
     androidx.compose.foundation.lazy.LazyColumn(
         modifier = Modifier
@@ -78,6 +82,7 @@ fun ToolsScreen(
                     modifier = Modifier.padding(bottom = 4.dp)
                 )
             }
+            item { ToolMenuItem("cornerstone", "The Cornerstone", "Square Your Surroundings", Degree.ENTERED_APPRENTICE, currentDegree) { activeTool = it } }
             item { ToolMenuItem("gauge", "The Gauge", "Divide the Day", Degree.ENTERED_APPRENTICE, currentDegree) { activeTool = it } }
             item { ToolMenuItem("gavel", "The Gavel", "Sharpen the Mind", Degree.ENTERED_APPRENTICE, currentDegree) { activeTool = it } }
             item { ToolMenuItem("level", "The Level", "Steady the Breath", Degree.ENTERED_APPRENTICE, currentDegree) { activeTool = it } }
@@ -99,6 +104,7 @@ fun ToolsScreen(
 
             item {
                 when (activeTool) {
+                    "cornerstone" -> TheCornerstone(existing = existingCornerstone, onSave = onCornerstoneSave)
                     "gavel" -> TheGavel()
                     "plumb" -> ThePlumb(onComplete = onPlumbComplete)
                     "gauge" -> TheGauge(onDayComplete = onGaugeDayComplete)

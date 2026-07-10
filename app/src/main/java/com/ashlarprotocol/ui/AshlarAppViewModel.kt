@@ -47,6 +47,14 @@ class AshlarAppViewModel(application: Application) : AndroidViewModel(applicatio
         .map { it.graceRemaining }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), com.ashlarprotocol.tools.KindStreak.MAX_GRACE)
 
+    // The Cornerstone — the person's one self-directed environment change (F1).
+    val cornerstone: StateFlow<com.ashlarprotocol.data.CornerstoneEntry?> = dataStore.cornerstone
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
+    fun setCornerstone(entry: com.ashlarprotocol.data.CornerstoneEntry) {
+        viewModelScope.launch { dataStore.setCornerstone(entry) }
+    }
+
     val aarEntries: StateFlow<List<com.ashlarprotocol.data.AarEntry>> = dataStore.aarEntries.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000),
