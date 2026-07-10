@@ -52,24 +52,24 @@ fun TempleCard(
         Text("THE TEMPLE", style = MaterialTheme.typography.labelSmall, color = Gold.copy(alpha = 0.6f), letterSpacing = 2.sp)
         Spacer(Modifier.height(16.dp))
 
-        // The rising courses — each raised course is a laid stone; unraised courses are faint outlines.
+        // The rising courses — one row per course of the WHOLE 50-course journey, so every course laid
+        // grows the Temple (raised = gold stone; the rest wait as faint outlines above). A wider base
+        // taxes upward into a narrowing crown. The taper scales with the row count.
         Canvas(modifier = Modifier.fillMaxWidth().height(150.dp)) {
-            val shown = 12
-            val gap = 4.dp.toPx()
+            val shown = Temple.PLANNED_COURSES
+            val gap = 1.5.dp.toPx()
             val rowH = ((size.height - gap * (shown - 1)) / shown).coerceAtLeast(1f)
             val fullW = size.width
             for (i in 0 until shown) {
                 val raised = i < coursesRaised
-                // Draw from the bottom up: a wider base narrowing slightly as it rises.
-                val inset = (i * (fullW * 0.012f))
+                val inset = (i.toFloat() / shown) * (fullW * 0.30f)
                 val top = size.height - (i + 1) * rowH - i * gap
-                val left = inset
                 val w = fullW - inset * 2
                 if (raised) {
-                    drawRect(color = Gold.copy(alpha = 0.30f), topLeft = Offset(left, top), size = Size(w, rowH))
-                    drawRect(color = Gold.copy(alpha = 0.55f), topLeft = Offset(left, top), size = Size(w, rowH), style = Stroke(width = 1.5f))
+                    drawRect(color = Gold.copy(alpha = 0.32f), topLeft = Offset(inset, top), size = Size(w, rowH))
+                    drawRect(color = Gold.copy(alpha = 0.55f), topLeft = Offset(inset, top), size = Size(w, rowH), style = Stroke(width = 1f))
                 } else {
-                    drawRect(color = Silver.copy(alpha = 0.10f), topLeft = Offset(left, top), size = Size(w, rowH), style = Stroke(width = 1f))
+                    drawRect(color = Silver.copy(alpha = 0.09f), topLeft = Offset(inset, top), size = Size(w, rowH), style = Stroke(width = 1f))
                 }
             }
         }
