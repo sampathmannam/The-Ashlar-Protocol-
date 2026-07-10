@@ -42,6 +42,11 @@ class AshlarAppViewModel(application: Application) : AndroidViewModel(applicatio
         0
     )
 
+    // The grace reserve — surfaced (F3) so it can be protected, not a silent buffer (Sharif & Shu).
+    val graceRemaining: StateFlow<Int> = dataStore.streakState
+        .map { it.graceRemaining }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), com.ashlarprotocol.tools.KindStreak.MAX_GRACE)
+
     val aarEntries: StateFlow<List<com.ashlarprotocol.data.AarEntry>> = dataStore.aarEntries.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000),

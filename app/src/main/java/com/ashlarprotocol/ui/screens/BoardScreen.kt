@@ -113,12 +113,15 @@ fun BoardScreen(viewModel: AshlarAppViewModel) {
             )
             // The degree names the skill layer beneath the stone (Phase 2, the rite of passage).
             val degree = com.ashlarprotocol.tools.Degrees.current(score)
+            // The grace reserve, made visible (F3) — shown only once tending has begun.
+            val grace by viewModel.graceRemaining.collectAsState()
             TracingBoardVisual(
                 progress = com.ashlarprotocol.tools.KindStreak.stoneProgress(daysTended),
                 degreeName = degree.display,
                 daysTended = daysTended,
                 pulse = actionPulse,
-                facets = com.ashlarprotocol.tools.StoneFacets.orderedFacets(signature, score)
+                facets = com.ashlarprotocol.tools.StoneFacets.orderedFacets(signature, score),
+                graceLabel = if (daysTended > 0) com.ashlarprotocol.tools.KindStreak.graceLabel(grace) else null
             )
         }
 
@@ -464,7 +467,8 @@ fun TracingBoardVisual(
     degreeName: String,
     daysTended: Int,
     pulse: Int = 0,
-    facets: FloatArray? = null
+    facets: FloatArray? = null,
+    graceLabel: String? = null
 ) {
     val animatedProgress by animateFloatAsState(
         targetValue = progress,
@@ -530,6 +534,20 @@ fun TracingBoardVisual(
             letterSpacing = 1.sp,
             textAlign = TextAlign.Center
         )
+
+        // The grace reserve, made visible (F3). A small, scarce, protectable number the stone holds
+        // for you — surfacing it (rather than a silent buffer) raises persistence after a miss because
+        // a named, limited reserve is something you protect (Sharif & Shu). Never a warning.
+        if (graceLabel != null) {
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = graceLabel,
+                style = MaterialTheme.typography.labelSmall,
+                color = Gold.copy(alpha = 0.45f),
+                letterSpacing = 1.sp,
+                textAlign = TextAlign.Center
+            )
+        }
     }
 }
 

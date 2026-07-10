@@ -70,7 +70,12 @@ class SafetyAuditTest {
                     Degree.values().mapNotNull { Degrees.towardNextLabel(it) }
             ),
             // The West Gate (Phase 3): doorways to real connection — must stay on belonging, never death.
-            "WestGate" to WestGate.allText()
+            "WestGate" to WestGate.allText(),
+            // The grace reserve copy (Phase 4 / F3): the visible reserve + the "held for you" note.
+            "KindStreak.grace" to listOf(
+                KindStreak.graceLabel(0), KindStreak.graceLabel(1), KindStreak.graceLabel(2),
+                KindStreak.graceMessage(1)!!
+            )
         )
 
         val violations = SafetyAudit.audit(corpus)
