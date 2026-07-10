@@ -9,8 +9,10 @@ package com.ashlarprotocol.tools
  * pathway (the always-open NEED HELP header), which takes precedence on any risk signal.
  *
  * Each is grounded, not gimmicky: paced breathing ~6/min with a longer exhale (RESEARCH_BASIS §8),
- * 5-4-3-2-1 sensory grounding, a brief body-release (progressive relaxation), and a self-compassion
- * line (common humanity; Neff). Pure content — no Android, no I/O; the sheet just renders it.
+ * 5-4-3-2-1 sensory grounding, a brief body-release (progressive relaxation), a self-compassion line
+ * (common humanity; Neff), and a gratitude-outward turn — expressing thanks to a specific person
+ * raises wellbeing (Seligman, Steen, Park & Peterson, 2005; RESEARCH_BASIS §11, the turn toward
+ * others). Pure content — no Android, no I/O; the sheet just renders it.
  */
 object PowerUps {
 
@@ -67,6 +69,18 @@ object PowerUps {
                 "You'd not sneer at a friend carrying this. Don't sneer at yourself.",
                 "You showed up. That already counts for something.",
                 "Be on your own side for the next few minutes."
+            )
+        ),
+        PowerUp(
+            id = "thank",
+            title = "Thank someone",
+            invite = "Turning toward a real person lifts the one who gives thanks, too.",
+            steps = listOf(
+                "Bring to mind one person who made something a little better for you.",
+                "Picture the specific thing they did — small is fine.",
+                "Notice that it actually helped. Let that land for a slow breath.",
+                "Tell them. One honest line: \"I was just thinking of when you… thank you.\"",
+                "Sending it is the whole practice — through the West Gate, or your own way."
             )
         )
     )
