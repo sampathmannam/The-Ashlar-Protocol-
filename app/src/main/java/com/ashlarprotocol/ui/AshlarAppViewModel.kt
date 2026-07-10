@@ -337,7 +337,9 @@ class AshlarAppViewModel(application: Application) : AndroidViewModel(applicatio
         val outcome = KindStreak.tend(state, today)
         dataStore.saveStreakState(outcome.state)
         if (outcome.isComeback) {
-            _streakComeback.value = KindStreak.comebackMessage()
+            // A warm comeback, plus a landmark "clean page" if it's a new week (fresh-start effect, F8).
+            _streakComeback.value = KindStreak.comebackMessage() +
+                (KindStreak.freshStartLine(today)?.let { "\n\n$it" } ?: "")
         }
     }
 

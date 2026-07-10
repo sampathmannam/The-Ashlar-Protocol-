@@ -56,7 +56,7 @@ class SafetyAuditTest {
                     Trowel.grounding +
                     listOf(Trowel.closing(""), Trowel.commonHumanity(""), Trowel.asABrother(""))
                 ),
-            "KindStreak.comeback" to listOf(KindStreak.comebackMessage()),
+            "KindStreak.comeback" to listOf(KindStreak.comebackMessage(), KindStreak.freshStartLine(4)!!),
             "Working" to (Readiness.values().map { Working.acknowledgment(it) } + Readiness.values().map { it.display }),
             // The Chamber is the mortality-sensitive surface (§10) — it must lean to meaning, never death.
             "Chamber.MEANING_PROMPTS" to MEANING_PROMPTS,
