@@ -55,6 +55,48 @@ class AshlarAppViewModel(application: Application) : AndroidViewModel(applicatio
         viewModelScope.launch { dataStore.setCornerstone(entry) }
     }
 
+    // Automaticity — the honest progress signal (F4). The epoch-day last asked; -1 = never.
+    val automaticityDay: StateFlow<Int> = dataStore.automaticityDay
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), -1)
+
+    fun recordAutomaticity(value: Int) {
+        val now = System.currentTimeMillis()
+        val today = KindStreak.epochDay(now, TimeZone.getDefault().getOffset(now)).toInt()
+        viewModelScope.launch { dataStore.setAutomaticity(value, today) }
+    }
+
+    // The rhythm anchor (F6) — a steady rise + wind-down. Associational, never an alarm.
+    val rhythm: StateFlow<com.ashlarprotocol.data.RhythmAnchor?> = dataStore.rhythm
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
+    fun setRhythm(wakeMinutesOfDay: Int, windDownMinutesOfDay: Int) {
+        viewModelScope.launch {
+            dataStore.setRhythm(com.ashlarprotocol.data.RhythmAnchor(wakeMinutesOfDay, windDownMinutesOfDay))
+        }
+    }
+
+    // The Rough Edge (F5) — one bad habit worked on the anti-AVE spine; the lapse ledger only ever grows.
+    val roughEdge: StateFlow<com.ashlarprotocol.data.RoughEdgeEntry?> = dataStore.roughEdge
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
+    fun setRoughEdge(name: String, cue: String, environmentMove: String, replacement: String) {
+        viewModelScope.launch {
+            dataStore.setRoughEdge(
+                com.ashlarprotocol.data.RoughEdgeEntry(
+                    name = name.trim(), cue = cue.trim(),
+                    environmentMove = environmentMove.trim(), replacement = replacement.trim(),
+                    lapses = roughEdge.value?.lapses ?: emptyList() // preserve the ledger; never reset
+                )
+            )
+        }
+    }
+
+    /** Log a slip — appended to the ledger, never a streak to break (anti-AVE). */
+    fun recordLapse() {
+        val current = roughEdge.value ?: return
+        viewModelScope.launch { dataStore.setRoughEdge(current.copy(lapses = current.lapses + System.currentTimeMillis())) }
+    }
+
     val aarEntries: StateFlow<List<com.ashlarprotocol.data.AarEntry>> = dataStore.aarEntries.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000),
@@ -337,7 +379,9 @@ class AshlarAppViewModel(application: Application) : AndroidViewModel(applicatio
         val outcome = KindStreak.tend(state, today)
         dataStore.saveStreakState(outcome.state)
         if (outcome.isComeback) {
-            _streakComeback.value = KindStreak.comebackMessage()
+            // A warm comeback, plus a landmark "clean page" if it's a new week (fresh-start effect, F8).
+            _streakComeback.value = KindStreak.comebackMessage() +
+                (KindStreak.freshStartLine(today)?.let { "\n\n$it" } ?: "")
         }
     }
 

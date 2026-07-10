@@ -110,6 +110,17 @@ object KindStreak {
             "you've done. Pick up the tools again when you're ready."
 
     /**
+     * A landmark "clean page" line when [epochDay] falls on a Monday (a new week). Temporal landmarks
+     * re-motivate by letting people file past failure into a previous period — the fresh-start effect
+     * (Dai, Milkman & Riis 2014; F8). Null on other days. Never loss-framed. (Epoch day 0 = Thursday,
+     * so Monday ⇔ ((d % 7) + 7) % 7 == 4.)
+     */
+    fun freshStartLine(epochDay: Long): String? {
+        val dow = ((epochDay % 7) + 7) % 7
+        return if (dow == 4L) "And a new week begins — a clean page. Take up the stone again." else null
+    }
+
+    /**
      * Whole days since the Unix epoch in LOCAL time. [tzOffsetMillis] is the timezone's offset at
      * that instant (e.g. `TimeZone.getDefault().getOffset(millis)`), so a "day" rolls over at LOCAL
      * midnight rather than UTC midnight. Pure — the ViewModel supplies the offset at the boundary.

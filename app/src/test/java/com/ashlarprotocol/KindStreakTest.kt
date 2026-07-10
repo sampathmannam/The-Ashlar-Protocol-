@@ -175,4 +175,14 @@ class KindStreakTest {
             assertFalse("grace message must not guilt ($it)", m.lowercase().contains(it))
         }
     }
+
+    @Test
+    fun freshStartLineOnlyOnMonday_andNeverGuilts() {
+        assertNull("no landmark on a Tuesday", KindStreak.freshStartLine(5)) // epoch day 5 = Tue
+        val monday = KindStreak.freshStartLine(4)                            // epoch day 4 = Mon
+        assertTrue("Monday offers a fresh start", monday != null && monday.isNotBlank())
+        listOf("lost", "broke", "fail", "behind", "should").forEach {
+            assertFalse("fresh-start line must not guilt ($it)", monday!!.lowercase().contains(it))
+        }
+    }
 }

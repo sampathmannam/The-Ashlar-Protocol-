@@ -11,7 +11,11 @@ import com.ashlarprotocol.tools.Readiness
 import com.ashlarprotocol.tools.Relief
 import com.ashlarprotocol.tools.SafetyAudit
 import com.ashlarprotocol.tools.Square
+import com.ashlarprotocol.data.RhythmAnchor
+import com.ashlarprotocol.tools.Automaticity
 import com.ashlarprotocol.tools.Cornerstone
+import com.ashlarprotocol.tools.Rhythm
+import com.ashlarprotocol.tools.RoughEdge
 import com.ashlarprotocol.tools.Trowel
 import com.ashlarprotocol.tools.WestGate
 import com.ashlarprotocol.tools.Working
@@ -56,7 +60,7 @@ class SafetyAuditTest {
                     Trowel.grounding +
                     listOf(Trowel.closing(""), Trowel.commonHumanity(""), Trowel.asABrother(""))
                 ),
-            "KindStreak.comeback" to listOf(KindStreak.comebackMessage()),
+            "KindStreak.comeback" to listOf(KindStreak.comebackMessage(), KindStreak.freshStartLine(4)!!),
             "Working" to (Readiness.values().map { Working.acknowledgment(it) } + Readiness.values().map { it.display }),
             // The Chamber is the mortality-sensitive surface (§10) — it must lean to meaning, never death.
             "Chamber.MEANING_PROMPTS" to MEANING_PROMPTS,
@@ -77,7 +81,23 @@ class SafetyAuditTest {
                 KindStreak.graceMessage(1)!!
             ),
             // The Cornerstone (Phase 4 / F1): cue kinds + friction moves.
-            "Cornerstone" to Cornerstone.allText()
+            "Cornerstone" to Cornerstone.allText(),
+            // Automaticity (Phase 4b / F4): the prompt, the level labels, and the reflections.
+            "Automaticity" to (
+                listOf(Automaticity.PROMPT) + Automaticity.LEVELS.map { it.label } + (0..2).map { Automaticity.reflection(it) }
+            ),
+            // Rhythm anchor (Phase 4b / F6): card copy + an associational reflection.
+            "Rhythm" to listOf(
+                "YOUR RHYTHM",
+                "A steady rise and a wind-down. It's the regularity that's linked to steadier days — not the hours, and no perfect night required.",
+                Rhythm.reflection(RhythmAnchor(7 * 60, 22 * 60))
+            ),
+            // The Rough-Edge track (Phase 4b / F5) — the addiction face. A slip must never be catastrophized;
+            // the handoff must never shame. This is the most safety-sensitive copy in the app after §9.
+            "RoughEdge" to listOf(
+                RoughEdge.lapseResponse(), RoughEdge.SAFETY_NOTE, RoughEdge.INTRO,
+                "Don't wrestle it — ride it. Pull \"Ride the urge\" from STEADY and let the wave pass."
+            )
         )
 
     @Test

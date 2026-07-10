@@ -33,11 +33,18 @@ class LocalDataStore(private val context: Context) {
     // The highest degree the member has been ceremonially raised into (ordinal). Drives the rite
     // so an advancement is marked exactly once (see tools/Advancement.kt). Local only.
     private val ACK_DEGREE_KEY = androidx.datastore.preferences.core.intPreferencesKey("acknowledged_degree_ordinal")
+    // Automaticity — the honest progress signal (F4): the last self-report + the epoch-day it was asked.
+    private val AUTO_LEVEL_KEY = androidx.datastore.preferences.core.intPreferencesKey("automaticity_level")
+    private val AUTO_DAY_KEY = androidx.datastore.preferences.core.intPreferencesKey("automaticity_day")
     // The initiation rite (first-run). Stored locally only, like everything else.
     private val INITIATED_KEY = androidx.datastore.preferences.core.booleanPreferencesKey("initiated")
     private val INTENTION_KEY = androidx.datastore.preferences.core.stringPreferencesKey("intention")
     // One self-directed environment change (Phase 4, F1). JSON of a CornerstoneEntry, or blank.
     private val CORNERSTONE_KEY = androidx.datastore.preferences.core.stringPreferencesKey("cornerstone")
+    // The rhythm anchor (F6): JSON of a RhythmAnchor (wake + wind-down minutes-of-day), or blank.
+    private val RHYTHM_KEY = androidx.datastore.preferences.core.stringPreferencesKey("rhythm_anchor")
+    // The rough edge (F5): JSON of a RoughEdgeEntry (one bad habit + its plan + lapse ledger), or blank.
+    private val ROUGH_EDGE_KEY = androidx.datastore.preferences.core.stringPreferencesKey("rough_edge")
     private val BASELINE_KEY = floatPreferencesKey("baseline_weight")
     // The kind streak ("tending the stone", tools/KindStreak.kt): a cumulative total that never
     // decreases, plus a grace-softened current run. Supersedes the old resettable briefing_streak.
@@ -197,6 +204,8 @@ class LocalDataStore(private val context: Context) {
     val gaugeDaysComplete: Flow<Int> = context.dataStore.data.map { it[GAUGE_DAYS_KEY] ?: 0 }
     val recallSessions: Flow<Int> = context.dataStore.data.map { it[RECALL_SESSIONS_KEY] ?: 0 }
     val acknowledgedDegreeOrdinal: Flow<Int> = context.dataStore.data.map { it[ACK_DEGREE_KEY] ?: 0 }
+    /** The epoch-day the automaticity question was last asked, or -1 if never (F4). */
+    val automaticityDay: Flow<Int> = context.dataStore.data.map { it[AUTO_DAY_KEY] ?: -1 }
 
     suspend fun incrementPlumbSessions() {
         context.dataStore.edit { it[PLUMB_SESSIONS_KEY] = (it[PLUMB_SESSIONS_KEY] ?: 0) + 1 }
@@ -208,6 +217,10 @@ class LocalDataStore(private val context: Context) {
 
     suspend fun incrementRecallSessions() {
         context.dataStore.edit { it[RECALL_SESSIONS_KEY] = (it[RECALL_SESSIONS_KEY] ?: 0) + 1 }
+    }
+
+    suspend fun setAutomaticity(value: Int, epochDay: Int) {
+        context.dataStore.edit { it[AUTO_LEVEL_KEY] = value; it[AUTO_DAY_KEY] = epochDay }
     }
 
     suspend fun setAcknowledgedDegreeOrdinal(ordinal: Int) {
@@ -246,6 +259,38 @@ class LocalDataStore(private val context: Context) {
     suspend fun setCornerstone(entry: CornerstoneEntry) {
         context.dataStore.edit {
             it[CORNERSTONE_KEY] = kotlinx.serialization.json.Json.encodeToString(CornerstoneEntry.serializer(), entry)
+        }
+    }
+
+    val rhythm: Flow<RhythmAnchor?> = context.dataStore.data.map { prefs ->
+        prefs[RHYTHM_KEY]?.takeIf { it.isNotBlank() }?.let {
+            try {
+                kotlinx.serialization.json.Json.decodeFromString(RhythmAnchor.serializer(), it)
+            } catch (e: Exception) {
+                null
+            }
+        }
+    }
+
+    suspend fun setRhythm(anchor: RhythmAnchor) {
+        context.dataStore.edit {
+            it[RHYTHM_KEY] = kotlinx.serialization.json.Json.encodeToString(RhythmAnchor.serializer(), anchor)
+        }
+    }
+
+    val roughEdge: Flow<RoughEdgeEntry?> = context.dataStore.data.map { prefs ->
+        prefs[ROUGH_EDGE_KEY]?.takeIf { it.isNotBlank() }?.let {
+            try {
+                kotlinx.serialization.json.Json.decodeFromString(RoughEdgeEntry.serializer(), it)
+            } catch (e: Exception) {
+                null
+            }
+        }
+    }
+
+    suspend fun setRoughEdge(entry: RoughEdgeEntry) {
+        context.dataStore.edit {
+            it[ROUGH_EDGE_KEY] = kotlinx.serialization.json.Json.encodeToString(RoughEdgeEntry.serializer(), entry)
         }
     }
 

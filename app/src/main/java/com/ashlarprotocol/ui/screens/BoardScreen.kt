@@ -217,6 +217,27 @@ fun BoardScreen(viewModel: AshlarAppViewModel) {
             item { WhoFiveCard(onComplete = { viewModel.addWhoFiveResult(it) }) }
         }
 
+        // Automaticity (F4): a gentle, ~weekly "is it becoming automatic?" — the honest progress signal
+        // (a habit is context-cued automaticity, not a streak count). Noticing, not grading; skippable.
+        item {
+            val autoDay by viewModel.automaticityDay.collectAsState()
+            val tendedForAuto by viewModel.briefingStreak.collectAsState()
+            val today = com.ashlarprotocol.tools.KindStreak.epochDay(
+                System.currentTimeMillis(),
+                java.util.TimeZone.getDefault().getOffset(System.currentTimeMillis())
+            ).toInt()
+            if (tendedForAuto > 0 && com.ashlarprotocol.tools.Automaticity.isDue(autoDay.toLong(), today.toLong())) {
+                AutomaticityCard(onRecord = { viewModel.recordAutomaticity(it) })
+            }
+        }
+
+        // The rhythm anchor (F6): a steady rise + wind-down. Regularity (not earliness/duration) is
+        // linked to steadier days. A gentle set-your-own anchor — never an alarm, never a bad-night scold.
+        item {
+            val rhythm by viewModel.rhythm.collectAsState()
+            RhythmCard(current = rhythm, onSet = { wake, wind -> viewModel.setRhythm(wake, wind) })
+        }
+
         // Your practices — self-authored, anchored, approach-framed (T1.4). The autonomy heart of the
         // Working: write your own "After [anchor], I will [action]" and it's yours to keep.
         item {
@@ -412,6 +433,128 @@ fun PracticesCard(
     }
     if (show) {
         com.ashlarprotocol.ui.components.PracticeDialog(intention = intention, onDismiss = { show = false }, onSave = onSave)
+    }
+}
+
+/**
+ * The rhythm card (F6) — a steady rise and wind-down. Sleep-wake *regularity* (not duration or
+ * earliness) is what the research associates with steadier days (Windred 2024; Li 2025). Framed
+ * associationally ("linked to"), never causal/clinical; never an alarm; never shames a bad night.
+ */
+@OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
+@Composable
+fun RhythmCard(current: com.ashlarprotocol.data.RhythmAnchor?, onSet: (Int, Int) -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(32.dp))
+            .background(Surface)
+            .border(1.dp, DividerWhite.copy(alpha = 0.05f), RoundedCornerShape(32.dp))
+            .padding(24.dp)
+    ) {
+        Text("YOUR RHYTHM", style = MaterialTheme.typography.labelSmall, color = Gold.copy(alpha = 0.4f), letterSpacing = 2.sp)
+        Spacer(modifier = Modifier.height(12.dp))
+        Text(
+            text = "A steady rise and a wind-down. It's the regularity that's linked to steadier days — " +
+                "not the hours, and no perfect night required.",
+            style = MaterialTheme.typography.bodySmall, color = Silver, lineHeight = 19.sp
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text("RISE", style = MaterialTheme.typography.labelSmall, color = Gold.copy(alpha = 0.5f), letterSpacing = 1.sp)
+        Spacer(modifier = Modifier.height(8.dp))
+        androidx.compose.foundation.layout.FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            com.ashlarprotocol.tools.Rhythm.WAKE_SLOTS.forEach { m ->
+                RhythmPill(com.ashlarprotocol.tools.Rhythm.formatTime(m), current?.wakeMinutesOfDay == m) {
+                    onSet(m, current?.windDownMinutesOfDay ?: 22 * 60)
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(14.dp))
+        Text("WIND DOWN", style = MaterialTheme.typography.labelSmall, color = Gold.copy(alpha = 0.5f), letterSpacing = 1.sp)
+        Spacer(modifier = Modifier.height(8.dp))
+        androidx.compose.foundation.layout.FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            com.ashlarprotocol.tools.Rhythm.WIND_DOWN_SLOTS.forEach { m ->
+                RhythmPill(com.ashlarprotocol.tools.Rhythm.formatTime(m), current?.windDownMinutesOfDay == m) {
+                    onSet(current?.wakeMinutesOfDay ?: 7 * 60, m)
+                }
+            }
+        }
+        if (current != null) {
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = com.ashlarprotocol.tools.Rhythm.reflection(current),
+                style = MaterialTheme.typography.bodyMedium, color = Silver, lineHeight = 22.sp
+            )
+        }
+    }
+}
+
+@Composable
+private fun RhythmPill(label: String, selected: Boolean, onClick: () -> Unit) {
+    Text(
+        text = label,
+        style = MaterialTheme.typography.labelSmall,
+        color = if (selected) Gold else Silver,
+        modifier = Modifier
+            .clip(RoundedCornerShape(20.dp))
+            .background(if (selected) Gold.copy(alpha = 0.2f) else Slate.copy(alpha = 0.2f))
+            .border(1.dp, if (selected) Gold.copy(alpha = 0.5f) else Slate, RoundedCornerShape(20.dp))
+            .clickable { onClick() }
+            .padding(horizontal = 14.dp, vertical = 9.dp)
+    )
+}
+
+/**
+ * The automaticity card (F4) — a gentle, occasional "is the work becoming automatic?" A habit IS
+ * context-cued automaticity, not a streak count, so this is the honest progress signal. Noticing,
+ * not grading: it names what automaticity means and never scores the person. Always skippable.
+ */
+@Composable
+fun AutomaticityCard(onRecord: (Int) -> Unit) {
+    var recorded by remember { mutableStateOf<Int?>(null) }
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(32.dp))
+            .background(Surface)
+            .border(1.dp, Gold.copy(alpha = 0.2f), RoundedCornerShape(32.dp))
+            .padding(24.dp)
+    ) {
+        Text("A MOMENT TO NOTICE", style = MaterialTheme.typography.labelSmall, color = Gold.copy(alpha = 0.5f), letterSpacing = 2.sp)
+        Spacer(modifier = Modifier.height(12.dp))
+        Text(
+            text = com.ashlarprotocol.tools.Automaticity.PROMPT,
+            style = MaterialTheme.typography.bodyLarge, color = LightText, lineHeight = 26.sp
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        val chosen = recorded
+        if (chosen == null) {
+            com.ashlarprotocol.tools.Automaticity.LEVELS.forEach { lvl ->
+                Text(
+                    text = lvl.label,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Silver,
+                    modifier = Modifier
+                        .fillMaxWidth().padding(top = 8.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(Slate.copy(alpha = 0.18f))
+                        .border(1.dp, Slate.copy(alpha = 0.6f), RoundedCornerShape(12.dp))
+                        .clickable { recorded = lvl.value; onRecord(lvl.value) }
+                        .padding(horizontal = 14.dp, vertical = 12.dp)
+                )
+            }
+        } else {
+            Text(
+                text = com.ashlarprotocol.tools.Automaticity.reflection(chosen),
+                style = MaterialTheme.typography.bodyMedium, color = Silver, lineHeight = 22.sp
+            )
+        }
     }
 }
 
