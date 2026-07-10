@@ -15,7 +15,7 @@
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="The Ashlar Protocol" />
 <meta property="og:title" content="You were not meant to remain a rough stone." />
-<meta property="og:description" content="A private society for the shaping of the self. Advance through the degrees of the Craft. Entry is by petition — not everyone who knocks is admitted." />
+<meta property="og:description" content="A private society for the shaping of the self. Advance through the degrees of the Craft. Entry is by petition — the filter is the work itself." />
 <meta property="og:url" content="https://theashlarprotocol.org/" />
 <meta property="og:image" content="https://theashlarprotocol.org/og.png" />
 <meta property="og:image:width" content="1200" />
@@ -35,7 +35,7 @@
     --line:#332d24;
     --ink:#e9e3d6;
     --ink-dim:#a89f8d;
-    --ink-faint:#6f685a;
+    --ink-faint:#8b8271;
     --gold:#c9a24b;
     --gold-soft:#b9974a;
     --serif:'Iowan Old Style','Palatino Linotype','Palatino',Palatino,Georgia,'Times New Roman',serif;
@@ -116,9 +116,14 @@
   form{max-width:600px;margin:36px auto 0}
   .field{margin-bottom:22px}
   label.fl{display:block;font-family:var(--sans);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:9px}
-  input,textarea{width:100%;background:var(--stone-000);border:1px solid var(--line);color:var(--ink);
+  input,textarea,select{width:100%;background:var(--stone-000);border:1px solid var(--line);color:var(--ink);
     font-family:var(--serif);font-size:17px;padding:14px 15px;border-radius:1px;transition:.2s}
-  input:focus,textarea:focus{outline:none;border-color:var(--gold-soft);box-shadow:0 0 0 1px rgba(201,162,75,.3)}
+  select{appearance:none;-webkit-appearance:none;cursor:pointer;padding-right:42px;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23b9974a' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:right 15px center}
+  select option{background:var(--stone-100);color:var(--ink)}
+  input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold-soft);box-shadow:0 0 0 1px rgba(201,162,75,.3)}
+  .opt{text-transform:none;letter-spacing:0;color:var(--ink-faint);font-family:var(--serif);font-size:14px}
   textarea{resize:vertical;min-height:120px;line-height:1.5}
   .ack{display:flex;gap:12px;align-items:flex-start;font-family:var(--sans);font-size:13.5px;color:var(--ink-dim);line-height:1.5;margin:6px 0 26px}
   .ack input{width:18px;height:18px;margin-top:2px;flex:0 0 auto;accent-color:var(--gold)}
@@ -155,7 +160,7 @@
     </svg>
     <div class="label" style="margin-bottom:26px">A private society for the shaping of the self</div>
     <h1>You were not meant<br>to remain a <em>rough stone.</em></h1>
-    <p class="lede">The Ashlar Protocol is an initiatory order of daily practice — a Craft for the person who intends to become deliberate, disciplined, and whole. Entry is by petition. Not everyone who knocks is admitted.</p>
+    <p class="lede">The Ashlar Protocol is an initiatory order of daily practice — a Craft for the person who intends to become deliberate, disciplined, and whole. Entry is by petition, and the filter is the work itself. The door opens to anyone willing to knock; few are willing to keep knocking.</p>
     <div class="hero-cta">
       <a href="#petition" class="btn btn-solid">Petition for initiation</a>
       <a href="#craft" class="btn">See the Craft</a>
@@ -233,8 +238,8 @@
         <ul>
           <li>Therapy, treatment, or medical care</li>
           <li>A substitute for a clinician in a crisis</li>
-          <li>Open to all — admission is deliberate</li>
-          <li>A place to be a passive member; the Craft asks work</li>
+          <li>For the merely curious — the Craft asks daily work</li>
+          <li>A place to be a passive member; you shape the stone</li>
         </ul>
       </div>
     </div>
@@ -291,16 +296,27 @@
         <label class="fl" for="wh">Why do you seek the Craft?</label>
         <textarea id="wh" name="reason" required placeholder="What are you trying to become? What is the rough edge you mean to work?"></textarea>
       </div>
+      <div class="field">
+        <label class="fl" for="intent">If dues open later — $149 to be initiated, then $19/mo — do you see yourself staying? <span class="opt">Optional, but an honest answer shapes the order.</span></label>
+        <select id="intent" name="pay_intent">
+          <option value="">Prefer not to say</option>
+          <option value="yes">Yes — I would pay to keep my place</option>
+          <option value="maybe">Maybe — it depends what the Craft becomes</option>
+          <option value="free_only">No — I am here only while it is free</option>
+        </select>
+      </div>
       <label class="ack">
         <input type="checkbox" name="acknowledged" value="yes" required />
         <span>I understand the Ashlar Protocol is a society of practice — not therapy or medical care — and that I am petitioning to join the founding cohort, whose entry is free.</span>
       </label>
       <button type="submit">Submit my petition</button>
+      <p class="fineprint center" style="margin:16px auto 0">We keep your petition only to write to you about initiation — nothing else, and never shared or sold.</p>
+      <p id="petitionErr" class="center" style="display:none;color:var(--gold);font-family:var(--sans);font-size:13.5px;margin-top:16px">That didn't send — check your connection and try once more.</p>
     </form>
 
     <div class="thanks" id="thanks">
       <h3>Your petition is received.</h3>
-      <p>The door does not open at once. We read every petition in the order it arrives; if the Craft is right for you, you will hear from us about initiation into the founding cohort. Watch for us.</p>
+      <p>The door does not open at once. We read every petition in the order it arrives, and write back with your initiation into the founding cohort. The Craft asks the work of you, not our approval — watch for us.</p>
     </div>
   </div>
 </section>
@@ -315,20 +331,29 @@
 </footer>
 
 <script>
-  // Progressive enhancement: on submit, POST in the background and reveal the rite of confirmation.
-  // Works with Netlify Forms; if no backend is wired yet, it still shows the confirmation for testing.
+  // Progressive enhancement: on submit, POST in the background (Netlify Forms) and reveal the rite of
+  // confirmation ONLY on a real success. A failed POST must NOT show "received" — a false confirmation
+  // would lose a genuine petition silently and quietly poison the validation count. So it fails loudly.
   var form = document.getElementById('petitionForm');
   var thanks = document.getElementById('thanks');
+  var err = document.getElementById('petitionErr');
   form.addEventListener('submit', function(e){
     e.preventDefault();
+    var btn = form.querySelector('button[type=submit]');
+    err.style.display = 'none';
+    btn.disabled = true; btn.textContent = 'Sending…';
     var data = new FormData(form);
     fetch('/', { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'},
       body: new URLSearchParams(data).toString() })
-      .catch(function(){/* ignore — still confirm to the petitioner */})
-      .finally(function(){
+      .then(function(res){
+        if(!res.ok) throw new Error('submit failed');
         form.style.display='none';
         thanks.classList.add('show');
         thanks.scrollIntoView({behavior:'smooth', block:'center'});
+      })
+      .catch(function(){
+        btn.disabled = false; btn.textContent = 'Submit my petition';
+        err.style.display = 'block';
       });
   });
 </script>
