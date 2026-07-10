@@ -55,6 +55,8 @@ fun BoardScreen(viewModel: AshlarAppViewModel) {
         val hour = java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY)
         com.ashlarprotocol.tools.AntiHarm.restNudge(hour, didTodaysWork = todayWorking != null)
     }
+    // "What the Stone Remembers" (the mirror) — pull-only; expands to reflect your own data back.
+    var showRemembers by remember { mutableStateOf(false) }
     androidx.compose.foundation.lazy.LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -136,6 +138,16 @@ fun BoardScreen(viewModel: AshlarAppViewModel) {
                 degree = degree,
                 progress = degreeProgress,
                 towardLabel = com.ashlarprotocol.tools.Degrees.towardNextLabel(degree)
+            )
+        }
+
+        // What the Stone Remembers (the mirror) — pull-only: tap to expand and see your own data
+        // reflected back (facts + hedged noticings). Computed on demand; a snapshot at open.
+        item {
+            com.ashlarprotocol.ui.components.StoneRemembersCard(
+                expanded = showRemembers,
+                reflections = if (showRemembers) viewModel.reflect() else emptyList(),
+                onToggle = { showRemembers = !showRemembers }
             )
         }
 

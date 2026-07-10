@@ -16,6 +16,7 @@ import com.ashlarprotocol.data.RhythmAnchor
 import com.ashlarprotocol.tools.Automaticity
 import com.ashlarprotocol.tools.Cornerstone
 import com.ashlarprotocol.tools.Rhythm
+import com.ashlarprotocol.tools.Reflections
 import com.ashlarprotocol.tools.RoughEdge
 import com.ashlarprotocol.tools.Trowel
 import com.ashlarprotocol.tools.WestGate
@@ -100,7 +101,12 @@ class SafetyAuditTest {
                 "Don't wrestle it — ride it. Pull \"Ride the urge\" from STEADY and let the wave pass."
             ),
             // The Gavel (Phase 4c): rough-corner examples + a sample composed competing-response.
-            "Gavel" to Gavel.allText()
+            "Gavel" to Gavel.allText(),
+            // What the Stone Remembers (the mirror): a fully-populated facts + noticings reflection set.
+            "Reflections" to (Reflections.allSampleText() + listOf(
+                "The stone is still learning your shape — tend it a while, and it will remember.",
+                "Patterns from your own days — held lightly, never proof."
+            ))
         )
 
     @Test

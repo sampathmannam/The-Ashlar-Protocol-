@@ -206,6 +206,8 @@ class LocalDataStore(private val context: Context) {
     val acknowledgedDegreeOrdinal: Flow<Int> = context.dataStore.data.map { it[ACK_DEGREE_KEY] ?: 0 }
     /** The epoch-day the automaticity question was last asked, or -1 if never (F4). */
     val automaticityDay: Flow<Int> = context.dataStore.data.map { it[AUTO_DAY_KEY] ?: -1 }
+    /** The last automaticity reading (0..2), or -1 if never asked (F4). */
+    val automaticityLevel: Flow<Int> = context.dataStore.data.map { it[AUTO_LEVEL_KEY] ?: -1 }
 
     suspend fun incrementPlumbSessions() {
         context.dataStore.edit { it[PLUMB_SESSIONS_KEY] = (it[PLUMB_SESSIONS_KEY] ?: 0) + 1 }
