@@ -12,6 +12,7 @@ import com.ashlarprotocol.tools.Relief
 import com.ashlarprotocol.tools.SafetyAudit
 import com.ashlarprotocol.tools.Square
 import com.ashlarprotocol.tools.Trowel
+import com.ashlarprotocol.tools.WestGate
 import com.ashlarprotocol.tools.Working
 import com.ashlarprotocol.ui.components.RaisingCopy
 import com.ashlarprotocol.ui.screens.MEANING_PROMPTS
@@ -67,7 +68,9 @@ class SafetyAuditTest {
                 listOf("THE WORK BENEATH THE STONE", "The work is now lifelong.") +
                     Degree.values().map { it.display } +
                     Degree.values().mapNotNull { Degrees.towardNextLabel(it) }
-            )
+            ),
+            // The West Gate (Phase 3): doorways to real connection — must stay on belonging, never death.
+            "WestGate" to WestGate.allText()
         )
 
         val violations = SafetyAudit.audit(corpus)
@@ -75,5 +78,21 @@ class SafetyAuditTest {
             "Phase-1 mortality-symbolism gate FAILED — death imagery found: $violations",
             violations.isEmpty()
         )
+    }
+
+    /**
+     * The West Gate is ORDINARY, non-crisis connection (Phase 3). Crisis help is a separate, always-on
+     * surface (§9 / CrisisSupportDialog). The gate must not masquerade as the crisis line — no doorway
+     * action should be a crisis call-to-action; that would blur the safety boundary.
+     */
+    @Test
+    fun westGateIsNotTheCrisisSurface() {
+        val actions = WestGate.DOORWAYS.mapNotNull { it.action }.joinToString(" ")
+        listOf("988", "911", "999", "116123", "741741").forEach { crisisTarget ->
+            assertTrue(
+                "West Gate doorway must not act as the crisis line ($crisisTarget)",
+                !actions.contains(crisisTarget)
+            )
+        }
     }
 }
