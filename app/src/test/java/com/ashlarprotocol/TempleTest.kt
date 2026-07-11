@@ -6,6 +6,19 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class TempleTest {
+    @Test fun degreeIsTheTempleMilestoneYouHaveBuiltTo() {
+        // Phase-3 consolidation: degree = how far you've built, not a separate practice-score.
+        assertEquals(Degree.ENTERED_APPRENTICE, Temple.degreeFor(0))    // ground level
+        assertEquals(Degree.ENTERED_APPRENTICE, Temple.degreeFor(12))   // finished the Apprentice courses
+        assertEquals(Degree.FELLOWCRAFT, Temple.degreeFor(13))          // crossed into Fellowcraft
+        assertEquals(Degree.FELLOWCRAFT, Temple.degreeFor(31))
+        assertEquals(Degree.MASTER_MASON, Temple.degreeFor(32))         // crossed into Master Mason
+        assertEquals(Degree.MASTER_MASON, Temple.degreeFor(50))         // the summit
+        // out-of-range never throws
+        assertEquals(Degree.MASTER_MASON, Temple.degreeFor(999))
+        assertEquals(Degree.ENTERED_APPRENTICE, Temple.degreeFor(-5))
+    }
+
     @Test fun fellowcraftTrancheIsRealAndCited() {
         val fc = Temple.COURSES.filter { it.degree == Degree.FELLOWCRAFT }
         assertTrue("the Fellowcraft tranche is authored", fc.size >= 15)

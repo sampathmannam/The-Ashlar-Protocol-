@@ -112,11 +112,12 @@ fun BoardScreen(viewModel: AshlarAppViewModel) {
             // The stone's six faces are the six VIA virtues (tools/StoneFacets); the ones you've claimed
             // as signature strengths refine a little faster. Empty signature => an even, coherent stone.
             val signature by viewModel.signatureStrengths.collectAsState()
+            // `score` = total work done; it still refines the stone's six virtue facets (below).
             val score = com.ashlarprotocol.tools.Degrees.score(
                 com.ashlarprotocol.tools.WorkStats(daysTended, entries.size, plumb, gauge, recall)
             )
-            // The degree names the skill layer beneath the stone (Phase 2, the rite of passage).
-            val degree = com.ashlarprotocol.tools.Degrees.current(score)
+            // The degree names the layer beneath the stone — now the Temple's milestone (Phase-3).
+            val degree by viewModel.currentDegree.collectAsState()
             // The grace reserve, made visible (F3) — shown only once tending has begun.
             val grace by viewModel.graceRemaining.collectAsState()
             TracingBoardVisual(
@@ -129,19 +130,9 @@ fun BoardScreen(viewModel: AshlarAppViewModel) {
             )
         }
 
-        // The rite of passage made legible (Phase 2): the earned degree and the arc toward the next,
-        // shown as "the work beneath the stone" — distinct from the stone itself, which is tending-
-        // driven and never completes. The degree advances by deliberate work (plumb/gauge/recall), so
-        // an advancement (the Raising) is anticipated, not a surprise.
-        item {
-            val degree by viewModel.currentDegree.collectAsState()
-            val degreeProgress by viewModel.degreeProgress.collectAsState()
-            DegreePathCard(
-                degree = degree,
-                progress = degreeProgress,
-                towardLabel = com.ashlarprotocol.tools.Degrees.towardNextLabel(degree)
-            )
-        }
+        // (Phase-3 consolidation) The standalone "work beneath the stone" degree card is retired: the
+        // degree is now the Temple's milestone, and the Temple card already reads "Course N of 50 ·
+        // <Degree>". One progression surface, not two stacked ones.
 
         // What the Stone Remembers (the mirror) — pull-only: tap to expand and see your own data
         // reflected back (facts + hedged noticings). Computed on demand; a snapshot at open.
