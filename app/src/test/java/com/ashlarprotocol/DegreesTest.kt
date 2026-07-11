@@ -59,24 +59,6 @@ class DegreesTest {
     }
 
     @Test
-    fun journeyProgressSpansTheWholeArcRoughToPerfect() {
-        // 0 at the start, 1 at the final degree's threshold (Master Mason = 40), clamped beyond.
-        assertEquals(0f, Degrees.journeyProgress(0), 0.0001f)
-        assertEquals(0.5f, Degrees.journeyProgress(20), 0.0001f)
-        assertEquals(1f, Degrees.journeyProgress(40), 0.0001f)
-        assertEquals(1f, Degrees.journeyProgress(1000), 0.0001f)
-        assertEquals(0f, Degrees.journeyProgress(-10), 0.0001f)
-    }
-
-    @Test
-    fun progressToNextIsFractionWithinBand() {
-        assertEquals(0f, Degrees.progressToNext(0), 0.0001f)     // just entered EA (band 0..15)
-        assertEquals(0.2f, Degrees.progressToNext(20), 0.0001f)  // Fellowcraft band 15..40: (20-15)/25
-        assertEquals(1f, Degrees.progressToNext(40), 0.0001f)    // Master Mason: nothing above
-        assertEquals(1f, Degrees.progressToNext(1000), 0.0001f)
-    }
-
-    @Test
     fun towardNextLabelNamesTheNextDegreeOrNullAtSummit() {
         assertEquals("Toward Fellowcraft", Degrees.towardNextLabel(Degree.ENTERED_APPRENTICE))
         assertEquals("Toward Master Mason", Degrees.towardNextLabel(Degree.FELLOWCRAFT))

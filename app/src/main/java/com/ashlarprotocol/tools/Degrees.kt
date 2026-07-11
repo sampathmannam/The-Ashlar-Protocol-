@@ -56,25 +56,9 @@ object Degrees {
         return if (idx in 0 until all.size - 1) all[idx + 1] else null
     }
 
-    /**
-     * Progress across the WHOLE arc — rough ashlar (0f) to perfect ashlar (1f) at the final
-     * degree's threshold. Drives the central stone visual so it smooths as real work is done.
-     */
-    fun journeyProgress(score: Int): Float {
-        val summit = Degree.values().last().threshold.toFloat()
-        if (summit <= 0f) return 1f
-        return (score.coerceAtLeast(0).toFloat() / summit).coerceIn(0f, 1f)
-    }
-
-    /** Progress from the current degree's threshold toward the next, in 0f..1f. 1f at Master Mason. */
-    fun progressToNext(score: Int): Float {
-        val s = score.coerceAtLeast(0)
-        val cur = current(s)
-        val nxt = next(cur) ?: return 1f
-        val span = (nxt.threshold - cur.threshold).toFloat()
-        if (span <= 0f) return 1f
-        return ((s - cur.threshold).toFloat() / span).coerceIn(0f, 1f)
-    }
+    // NOTE: the score→progress-fraction helpers (journeyProgress / progressToNext) were retired in the
+    // Phase-3 consolidation. The stone now smooths on tending (KindStreak.stoneProgress), and the degree
+    // is the Temple's milestone (Temple.degreeFor), so neither fraction has a consumer any more.
 
     /**
      * A gentle, invitational label for the arc ahead — "Toward Fellowcraft" — or null at the summit.
