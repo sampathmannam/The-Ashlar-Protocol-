@@ -82,7 +82,7 @@ fun PracticeDialog(
                 Column(
                     modifier = Modifier.fillMaxWidth()
                         .clip(RoundedCornerShape(16.dp)).background(Slate.copy(alpha = 0.3f))
-                        .border(1.dp, Gold.copy(alpha = 0.3f), RoundedCornerShape(16.dp)).padding(16.dp)
+                        .border(1.dp, Gold.copy(alpha = 0.55f), RoundedCornerShape(16.dp)).padding(16.dp)
                 ) {
                     Text(
                         text = "First, name what you're working toward — set an intention with The Square. " +
@@ -109,7 +109,7 @@ fun PracticeDialog(
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(16.dp))
                         .background(Slate.copy(alpha = 0.3f))
-                        .border(1.dp, Gold.copy(alpha = 0.3f), RoundedCornerShape(16.dp))
+                        .border(1.dp, Gold.copy(alpha = 0.55f), RoundedCornerShape(16.dp))
                         .padding(16.dp)
                 ) {
                     Text(PracticeAuthoring.REFRAME_HINT, style = MaterialTheme.typography.bodyMedium, color = Gold.copy(alpha = 0.85f), lineHeight = 22.sp)
