@@ -215,6 +215,29 @@ fun BoardScreen(viewModel: AshlarAppViewModel) {
             )
         }
 
+        // (Phase-3 IA) A quiet divider: above is today's work (the Stone, the Day's Work, the Temple);
+        // below is the record you've kept — strengths, counts, thoughts, rhythms, practices. Grouping
+        // the sprawl into two legible halves without moving anything.
+        item {
+            Column(modifier = Modifier.fillMaxWidth().padding(top = 8.dp)) {
+                Column(modifier = Modifier.fillMaxWidth().height(1.dp).background(DividerWhite.copy(alpha = 0.06f))) {}
+                Spacer(Modifier.height(16.dp))
+                Text(
+                    "THE RECORD",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Gold.copy(alpha = 0.55f),
+                    letterSpacing = 2.sp
+                )
+                Spacer(Modifier.height(2.dp))
+                Text(
+                    "What you've kept and noticed — yours to read back, never a scoreboard.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Silver.copy(alpha = 0.7f),
+                    lineHeight = 18.sp
+                )
+            }
+        }
+
         // Strengths — the intrinsic progression (identity, not points): name your VIA signature
         // strengths, then each day get one to use "in a new way" (Seligman 2005). On-device.
         item {
