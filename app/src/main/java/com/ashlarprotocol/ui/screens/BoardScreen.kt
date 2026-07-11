@@ -39,6 +39,8 @@ import com.ashlarprotocol.ui.theme.LightText
 import com.ashlarprotocol.ui.theme.Silver
 import com.ashlarprotocol.ui.theme.Slate
 import com.ashlarprotocol.ui.theme.Surface
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import com.ashlarprotocol.ui.theme.ashlarCard
 import com.ashlarprotocol.ui.theme.CardEmphasis
 import com.ashlarprotocol.ui.theme.A11y
@@ -67,6 +69,20 @@ fun BoardScreen(viewModel: AshlarAppViewModel) {
     }
     // "What the Stone Remembers" (the mirror) — pull-only; expands to reflect your own data back.
     var showRemembers by remember { mutableStateOf(false) }
+
+    // One signature "stone-set" haptic. Every real action bumps actionPulse, so a single gentle,
+    // felt confirmation fires here — honest feedback, not a reward. Guarded so it never fires on the
+    // initial composition, only on an actual new action.
+    val haptics = LocalHapticFeedback.current
+    val actionPulse by viewModel.actionPulse.collectAsState()
+    var lastPulse by remember { mutableStateOf(actionPulse) }
+    LaunchedEffect(actionPulse) {
+        if (actionPulse != lastPulse) {
+            lastPulse = actionPulse
+            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+        }
+    }
+
     androidx.compose.foundation.lazy.LazyColumn(
         modifier = Modifier
             .fillMaxSize()
