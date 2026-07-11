@@ -439,7 +439,7 @@ fun PlumbRecordsCard(records: List<com.ashlarprotocol.data.PlumbRecord>) {
                             text = if (open) "READING" else "RE-READ",
                             style = MaterialTheme.typography.labelSmall,
                             color = Gold.copy(alpha = 0.5f),
-                            fontSize = 9.sp
+                            fontSize = 12.sp
                         )
                     }
                     Spacer(modifier = Modifier.height(8.dp))

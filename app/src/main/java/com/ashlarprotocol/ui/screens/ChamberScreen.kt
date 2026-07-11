@@ -36,6 +36,7 @@ import com.ashlarprotocol.ui.AshlarAppViewModel
 import com.ashlarprotocol.ui.theme.Charcoal
 import com.ashlarprotocol.ui.theme.Gold
 import com.ashlarprotocol.ui.theme.RedAlert
+import com.ashlarprotocol.ui.theme.animationsEnabled
 import com.ashlarprotocol.ui.theme.Silver
 import com.ashlarprotocol.ui.theme.Slate
 import com.ashlarprotocol.ui.theme.LightText
@@ -206,8 +207,11 @@ fun ChamberScreen(viewModel: AshlarAppViewModel) {
                             modifier = Modifier.padding(horizontal = 16.dp)
                         )
                     } else {
+                        // Called unconditionally (rules of composition); under reduced-motion we simply
+                        // ignore the pulsing value and hold a steady alpha instead of the fade loop.
+                        val motionOn = animationsEnabled()
                         val infiniteTransition = rememberInfiniteTransition(label = "release")
-                        val alpha by infiniteTransition.animateFloat(
+                        val pulse by infiniteTransition.animateFloat(
                             initialValue = 0.2f,
                             targetValue = 1f,
                             animationSpec = infiniteRepeatable(
@@ -215,6 +219,7 @@ fun ChamberScreen(viewModel: AshlarAppViewModel) {
                                 repeatMode = RepeatMode.Reverse
                             ), label = "alpha"
                         )
+                        val alpha = if (motionOn) pulse else 0.8f
 
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Icon(

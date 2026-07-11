@@ -41,6 +41,12 @@ import com.ashlarprotocol.ui.theme.Slate
 import com.ashlarprotocol.ui.theme.Surface
 import com.ashlarprotocol.ui.theme.ashlarCard
 import com.ashlarprotocol.ui.theme.CardEmphasis
+import com.ashlarprotocol.ui.theme.A11y
+import com.ashlarprotocol.ui.theme.Radius
+import com.ashlarprotocol.ui.theme.RedAlert
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.stateDescription
 
 @Composable
 fun BoardScreen(viewModel: AshlarAppViewModel) {
@@ -472,12 +478,23 @@ fun PracticesCard(
                             modifier = Modifier.weight(1f)
                         )
                         Spacer(modifier = Modifier.width(12.dp))
+                        // Forgiving delete: first tap arms ("REMOVE?"), second confirms — a 9sp one-tap
+                        // destructive control on the user's own words was the sharpest error-prevention gap.
+                        var confirmingRemove by remember(p.id) { mutableStateOf(false) }
                         Text(
-                            text = "REMOVE",
+                            text = if (confirmingRemove) "REMOVE?" else "REMOVE",
                             style = MaterialTheme.typography.labelSmall,
-                            color = Silver.copy(alpha = 0.5f),
-                            fontSize = 9.sp,
-                            modifier = Modifier.clickable { onRemove(p.id) }
+                            color = if (confirmingRemove) RedAlert else Silver.copy(alpha = 0.5f),
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(Radius.sm))
+                                .clickable { if (confirmingRemove) onRemove(p.id) else confirmingRemove = true }
+                                .semantics {
+                                    role = Role.Button
+                                    stateDescription = if (confirmingRemove) "Tap again to remove" else "Remove practice"
+                                }
+                                .defaultMinSize(minHeight = A11y.minTarget)
+                                .wrapContentHeight(Alignment.CenterVertically)
+                                .padding(horizontal = 8.dp)
                         )
                     }
                 }
@@ -956,7 +973,7 @@ fun CognitiveBriefingCard(
                         text = "TENDED: $streak",
                         style = MaterialTheme.typography.labelSmall,
                         color = Gold,
-                        fontSize = 10.sp,
+                        fontSize = 12.sp,
                         modifier = Modifier.padding(end = 12.dp)
                     )
                 }
