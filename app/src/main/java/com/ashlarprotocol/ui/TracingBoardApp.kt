@@ -3,6 +3,11 @@ package com.ashlarprotocol.ui
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Build
@@ -229,7 +234,10 @@ fun Header(onNeedHelp: () -> Unit = {}, onSteady: () -> Unit = {}) {
                         .background(Gold.copy(alpha = 0.10f))
                         .border(1.dp, Gold.copy(alpha = 0.40f), RoundedCornerShape(20.dp))
                         .clickable { onSteady() }
-                        .padding(horizontal = 14.dp, vertical = 8.dp)
+                        .semantics { role = Role.Button }
+                        .defaultMinSize(minHeight = 48.dp)
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    contentAlignment = Alignment.Center
                 ) {
                     Text(
                         text = "STEADY",
@@ -239,14 +247,18 @@ fun Header(onNeedHelp: () -> Unit = {}, onSteady: () -> Unit = {}) {
                     )
                 }
                 Spacer(modifier = Modifier.width(8.dp))
-                // Always-available path to human help. Reachable from every screen.
+                // Always-available path to human help. Reachable from every screen — and the single most
+                // important control, so it gets a full 48dp target and a clear TalkBack label.
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(20.dp))
                         .background(RedAlert.copy(alpha = 0.12f))
                         .border(1.dp, RedAlert.copy(alpha = 0.45f), RoundedCornerShape(20.dp))
                         .clickable { onNeedHelp() }
-                        .padding(horizontal = 14.dp, vertical = 8.dp)
+                        .semantics { role = Role.Button; contentDescription = "Need help. Crisis support." }
+                        .defaultMinSize(minHeight = 48.dp)
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    contentAlignment = Alignment.Center
                 ) {
                     Text(
                         text = "NEED HELP?",
@@ -265,7 +277,9 @@ fun Header(onNeedHelp: () -> Unit = {}, onSteady: () -> Unit = {}) {
 fun AshlarBottomNav(navController: NavHostController) {
     val items = listOf(
         NavItem("Board", "board", Icons.Default.Home),
-        NavItem("Chamber", "chamber", Icons.Default.Delete),
+        // The Chamber keeps your reflections and holds the West Gate (turning toward people) —
+        // a candle flame (reflection, lit), not the stray "trash can" that was here by accident.
+        NavItem("Chamber", "chamber", com.ashlarprotocol.ui.theme.AshlarFlame),
         NavItem("Tools", "tools", Icons.Default.Build)
     )
 
@@ -285,7 +299,9 @@ fun AshlarBottomNav(navController: NavHostController) {
             val selected = currentRoute == item.route
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
                 modifier = Modifier
+                    .clip(RoundedCornerShape(20.dp))
                     .clickable {
                         navController.navigate(item.route) {
                             popUpTo(navController.graph.startDestinationId) { saveState = true }
@@ -293,19 +309,26 @@ fun AshlarBottomNav(navController: NavHostController) {
                             restoreState = true
                         }
                     }
-                    .padding(horizontal = 16.dp)
+                    // A real tab for TalkBack: announced as a selected/unselected tab, one target.
+                    .semantics(mergeDescendants = true) {
+                        role = Role.Tab
+                        this.selected = selected
+                        contentDescription = item.name
+                    }
+                    .heightIn(min = 48.dp)
+                    .padding(horizontal = 16.dp, vertical = 4.dp)
             ) {
                 Box(
                     modifier = Modifier
                         .width(48.dp)
-                        .height(32.dp)
-                        .clip(RoundedCornerShape(16.dp))
+                        .height(28.dp)
+                        .clip(RoundedCornerShape(14.dp))
                         .background(if (selected) Gold.copy(alpha = 0.2f) else Color.Transparent),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = item.icon,
-                        contentDescription = item.name,
+                        contentDescription = null, // the tab itself carries the label
                         tint = if (selected) Gold else Silver,
                         modifier = Modifier.size(20.dp)
                     )
@@ -314,8 +337,7 @@ fun AshlarBottomNav(navController: NavHostController) {
                     text = item.name.uppercase(),
                     style = MaterialTheme.typography.labelSmall,
                     color = if (selected) Gold else Silver,
-                    modifier = Modifier.padding(top = 4.dp),
-                    fontSize = 9.sp
+                    modifier = Modifier.padding(top = 4.dp)
                 )
             }
         }
