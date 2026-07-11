@@ -39,6 +39,8 @@ import com.ashlarprotocol.ui.theme.LightText
 import com.ashlarprotocol.ui.theme.Silver
 import com.ashlarprotocol.ui.theme.Slate
 import com.ashlarprotocol.ui.theme.Surface
+import com.ashlarprotocol.ui.theme.ashlarCard
+import com.ashlarprotocol.ui.theme.CardEmphasis
 
 @Composable
 fun BoardScreen(viewModel: AshlarAppViewModel) {
@@ -351,9 +353,7 @@ fun GracefulExitCard() {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(32.dp))
-            .background(Surface)
-            .border(1.dp, DividerWhite.copy(alpha = 0.05f), RoundedCornerShape(32.dp))
+            .ashlarCard()
             .padding(24.dp)
     ) {
         Text(
@@ -435,9 +435,7 @@ fun PracticesCard(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(32.dp))
-            .background(Surface)
-            .border(1.dp, DividerWhite.copy(alpha = 0.05f), RoundedCornerShape(32.dp))
+            .ashlarCard()
             .padding(24.dp)
     ) {
         Text(
@@ -513,9 +511,7 @@ fun RhythmCard(current: com.ashlarprotocol.data.RhythmAnchor?, onSet: (Int, Int)
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(32.dp))
-            .background(Surface)
-            .border(1.dp, DividerWhite.copy(alpha = 0.05f), RoundedCornerShape(32.dp))
+            .ashlarCard()
             .padding(24.dp)
     ) {
         Text("YOUR RHYTHM", style = MaterialTheme.typography.labelSmall, color = Gold.copy(alpha = 0.4f), letterSpacing = 2.sp)
@@ -634,9 +630,7 @@ fun WhoFiveCard(onComplete: (Int) -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(32.dp))
-            .background(Surface)
-            .border(1.dp, DividerWhite.copy(alpha = 0.05f), RoundedCornerShape(32.dp))
+            .ashlarCard()
             .padding(24.dp)
     ) {
         Text(
@@ -717,9 +711,7 @@ fun WorkSoFarCard(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(32.dp))
-            .background(Surface)
-            .border(1.dp, DividerWhite.copy(alpha = 0.05f), RoundedCornerShape(32.dp))
+            .ashlarCard()
             .padding(24.dp)
     ) {
         Text(
@@ -809,9 +801,7 @@ private fun WorkingCard(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(32.dp))
-            .background(Surface)
-            .border(1.dp, DividerWhite.copy(alpha = 0.05f), RoundedCornerShape(32.dp))
+            .ashlarCard()
             .padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
@@ -898,9 +888,7 @@ private fun StrengthsCard(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(32.dp))
-            .background(Surface)
-            .border(1.dp, DividerWhite.copy(alpha = 0.05f), RoundedCornerShape(32.dp))
+            .ashlarCard()
             .padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
@@ -949,9 +937,7 @@ fun CognitiveBriefingCard(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(32.dp))
-            .background(Surface)
-            .border(1.dp, DividerWhite.copy(alpha = 0.05f), RoundedCornerShape(32.dp))
+            .ashlarCard()
             .padding(24.dp)
     ) {
         Row(

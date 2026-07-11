@@ -39,6 +39,8 @@ import com.ashlarprotocol.ui.theme.LightText
 import com.ashlarprotocol.ui.theme.Silver
 import com.ashlarprotocol.ui.theme.Slate
 import com.ashlarprotocol.ui.theme.Surface
+import com.ashlarprotocol.ui.theme.ashlarCard
+import com.ashlarprotocol.ui.theme.CardEmphasis
 
 // The 3D ashlar renderer — extracted from BoardScreen (Phase-4 breakup of the 1,715-line file).
 // Same package as BoardScreen, so the call site (TracingBoardVisual) needs no new import.
@@ -61,9 +63,7 @@ fun TracingBoardVisual(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(32.dp))
-            .background(Surface)
-            .border(1.dp, DividerWhite.copy(alpha = 0.05f), RoundedCornerShape(32.dp))
+            .ashlarCard(CardEmphasis.Hero)
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
