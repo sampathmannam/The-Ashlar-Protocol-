@@ -19,6 +19,8 @@ import com.ashlarprotocol.ui.theme.Gold
 import com.ashlarprotocol.ui.theme.Silver
 import com.ashlarprotocol.ui.theme.Slate
 import com.ashlarprotocol.ui.theme.animationsEnabled
+import androidx.compose.foundation.selection.toggleable
+import androidx.compose.ui.semantics.Role
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Lock
 import com.ashlarprotocol.tools.TILTS
@@ -941,7 +943,13 @@ fun TheGauge(onDayComplete: () -> Unit = {}) {
                             .fillMaxWidth()
                             .clip(androidx.compose.foundation.shape.RoundedCornerShape(12.dp))
                             .background(Slate.copy(alpha = 0.2f))
-                            .clickable { items[i] = entry.copy(done = !entry.done) }
+                            // Toggle semantics so TalkBack announces "checkbox, checked / not checked"
+                            // rather than an unlabeled tap target.
+                            .toggleable(
+                                value = entry.done,
+                                role = Role.Checkbox,
+                                onValueChange = { items[i] = entry.copy(done = it) }
+                            )
                             .padding(12.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -950,8 +958,12 @@ fun TheGauge(onDayComplete: () -> Unit = {}) {
                                 .size(20.dp)
                                 .clip(androidx.compose.foundation.shape.RoundedCornerShape(4.dp))
                                 .background(if (entry.done) Gold.copy(alpha = 0.8f) else Color.Transparent)
-                                .border(1.dp, Gold.copy(alpha = 0.6f), androidx.compose.foundation.shape.RoundedCornerShape(4.dp))
-                        )
+                                .border(1.dp, Gold.copy(alpha = 0.6f), androidx.compose.foundation.shape.RoundedCornerShape(4.dp)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            // Non-color affordance: a checkmark, so "done" doesn't rely on the gold fill alone.
+                            if (entry.done) Text("✓", color = Charcoal, fontSize = 14.sp)
+                        }
                         Spacer(modifier = Modifier.width(12.dp))
                         Column(modifier = Modifier.weight(1f)) {
                             Text(entry.text, style = MaterialTheme.typography.bodyMedium, color = if (entry.done) Silver.copy(alpha = 0.5f) else Silver)
