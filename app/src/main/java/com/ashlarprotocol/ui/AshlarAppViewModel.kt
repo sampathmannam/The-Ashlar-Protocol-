@@ -180,6 +180,9 @@ class AshlarAppViewModel(application: Application) : AndroidViewModel(applicatio
             )
             dataStore.addWages(com.ashlarprotocol.tools.Challenges.wageFor(challenge.cadence))
             updateStreak()
+            // The stone catches the light on the actual daily action (P2.1). The Day's Work is the
+            // on-Board spine, so the pulse now fires where the stone is actually on screen.
+            bumpActionPulse()
         }
     }
 
@@ -188,7 +191,10 @@ class AshlarAppViewModel(application: Application) : AndroidViewModel(applicatio
         viewModelScope.launch {
             val raised = dataStore.coursesRaised.first()
             val next = com.ashlarprotocol.tools.Temple.nextCourse(raised) ?: return@launch
-            if (currentBalance() >= next.cost) dataStore.setCoursesRaised(raised + 1)
+            if (currentBalance() >= next.cost) {
+                dataStore.setCoursesRaised(raised + 1)
+                bumpActionPulse()   // laying a course is a real act of building — the stone catches it too
+            }
         }
     }
 
