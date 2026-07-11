@@ -39,6 +39,8 @@ import com.ashlarprotocol.ui.theme.LightText
 import com.ashlarprotocol.ui.theme.Silver
 import com.ashlarprotocol.ui.theme.Slate
 import com.ashlarprotocol.ui.theme.Surface
+import com.ashlarprotocol.ui.theme.ashlarCard
+import com.ashlarprotocol.ui.theme.CardEmphasis
 
 // "THE RECORD" — the look-back cards on the Board's lower section: the tag heatmap over your
 // after-action notes, the notes themselves, and your kept Plumb records. Extracted from BoardScreen
@@ -51,9 +53,7 @@ fun TagHeatmapCard(entries: List<com.ashlarprotocol.data.AarEntry>) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(32.dp))
-            .background(Surface)
-            .border(1.dp, DividerWhite.copy(alpha = 0.05f), RoundedCornerShape(32.dp))
+            .ashlarCard(CardEmphasis.Quiet)
             .padding(24.dp)
             // The 150-cell grid is decorative to a screen reader; give it one clear summary instead.
             .semantics(mergeDescendants = true) {
@@ -179,9 +179,7 @@ fun AarNotesCard(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(32.dp))
-            .background(Surface)
-            .border(1.dp, DividerWhite.copy(alpha = 0.05f), RoundedCornerShape(32.dp))
+            .ashlarCard(CardEmphasis.Quiet)
             .padding(24.dp)
     ) {
         Row(
@@ -403,9 +401,7 @@ fun PlumbRecordsCard(records: List<com.ashlarprotocol.data.PlumbRecord>) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(32.dp))
-            .background(Surface)
-            .border(1.dp, DividerWhite.copy(alpha = 0.05f), RoundedCornerShape(32.dp))
+            .ashlarCard(CardEmphasis.Quiet)
             .padding(24.dp)
     ) {
         Text(
@@ -443,7 +439,7 @@ fun PlumbRecordsCard(records: List<com.ashlarprotocol.data.PlumbRecord>) {
                             text = if (open) "READING" else "RE-READ",
                             style = MaterialTheme.typography.labelSmall,
                             color = Gold.copy(alpha = 0.5f),
-                            fontSize = 9.sp
+                            fontSize = 12.sp
                         )
                     }
                     Spacer(modifier = Modifier.height(8.dp))

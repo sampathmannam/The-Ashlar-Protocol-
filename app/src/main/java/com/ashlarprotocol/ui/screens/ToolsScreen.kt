@@ -18,6 +18,9 @@ import com.ashlarprotocol.ui.theme.Charcoal
 import com.ashlarprotocol.ui.theme.Gold
 import com.ashlarprotocol.ui.theme.Silver
 import com.ashlarprotocol.ui.theme.Slate
+import com.ashlarprotocol.ui.theme.animationsEnabled
+import androidx.compose.foundation.selection.toggleable
+import androidx.compose.ui.semantics.Role
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Lock
 import com.ashlarprotocol.tools.TILTS
@@ -508,17 +511,19 @@ fun TheLevel() {
     // A real paced-breathing timer. Timing/scale come from the tested BreathPacer; here we just
     // animate a clock over one cycle and render the state. Default ~6 breaths/min (RESEARCH_BASIS §8).
     val pattern = BreathPattern.RESONANCE
-    val transition = rememberInfiniteTransition(label = "breath")
-    val elapsed by transition.animateFloat(
-        initialValue = 0f,
-        targetValue = pattern.totalMs.toFloat(),
-        animationSpec = infiniteRepeatable(
-            animation = tween(pattern.totalMs, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart
-        ),
-        label = "elapsed"
-    )
-    val state = BreathPacer.stateAt(elapsed.toLong(), pattern)
+    // Drive the cycle from the frame clock, not an InfiniteTransition — the latter freezes when the OS
+    // animator scale is 0, which would silently break the pacer for reduced-motion users. withFrameNanos
+    // still ticks every frame, so the countdown and phase always advance regardless of that setting.
+    val motionOn = animationsEnabled()
+    var elapsed by remember { mutableStateOf(0L) }
+    LaunchedEffect(pattern.totalMs) {
+        val startNanos = withFrameNanos { it }
+        while (true) {
+            val nowNanos = withFrameNanos { it }
+            elapsed = ((nowNanos - startNanos) / 1_000_000L) % pattern.totalMs
+        }
+    }
+    val state = BreathPacer.stateAt(elapsed, pattern)
     val label = when (state.phase) {
         BreathPhase.INHALE -> "BREATHE IN"
         BreathPhase.HOLD_IN -> "HOLD"
@@ -545,7 +550,9 @@ fun TheLevel() {
         ) {
             Box(
                 modifier = Modifier
-                    .size((80f + 120f * state.scale).dp)
+                    // Breathe the circle with the pattern when motion is allowed; hold it steady under
+                    // reduced-motion (the phase word + countdown still guide the breath).
+                    .size((if (motionOn) 80f + 120f * state.scale else 140f).dp)
                     .border(2.dp, Gold.copy(alpha = 0.4f), shape = androidx.compose.foundation.shape.CircleShape)
             )
             Text("${state.secondsLeft}", style = MaterialTheme.typography.titleLarge, color = Gold, textAlign = TextAlign.Center)
@@ -936,7 +943,13 @@ fun TheGauge(onDayComplete: () -> Unit = {}) {
                             .fillMaxWidth()
                             .clip(androidx.compose.foundation.shape.RoundedCornerShape(12.dp))
                             .background(Slate.copy(alpha = 0.2f))
-                            .clickable { items[i] = entry.copy(done = !entry.done) }
+                            // Toggle semantics so TalkBack announces "checkbox, checked / not checked"
+                            // rather than an unlabeled tap target.
+                            .toggleable(
+                                value = entry.done,
+                                role = Role.Checkbox,
+                                onValueChange = { items[i] = entry.copy(done = it) }
+                            )
                             .padding(12.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -945,12 +958,16 @@ fun TheGauge(onDayComplete: () -> Unit = {}) {
                                 .size(20.dp)
                                 .clip(androidx.compose.foundation.shape.RoundedCornerShape(4.dp))
                                 .background(if (entry.done) Gold.copy(alpha = 0.8f) else Color.Transparent)
-                                .border(1.dp, Gold.copy(alpha = 0.6f), androidx.compose.foundation.shape.RoundedCornerShape(4.dp))
-                        )
+                                .border(1.dp, Gold.copy(alpha = 0.6f), androidx.compose.foundation.shape.RoundedCornerShape(4.dp)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            // Non-color affordance: a checkmark, so "done" doesn't rely on the gold fill alone.
+                            if (entry.done) Text("✓", color = Charcoal, fontSize = 14.sp)
+                        }
                         Spacer(modifier = Modifier.width(12.dp))
                         Column(modifier = Modifier.weight(1f)) {
                             Text(entry.text, style = MaterialTheme.typography.bodyMedium, color = if (entry.done) Silver.copy(alpha = 0.5f) else Silver)
-                            Text(entry.part.display.uppercase(), style = MaterialTheme.typography.labelSmall, color = Gold.copy(alpha = 0.5f), fontSize = 9.sp)
+                            Text(entry.part.display.uppercase(), style = MaterialTheme.typography.labelSmall, color = Gold.copy(alpha = 0.5f), fontSize = 12.sp)
                         }
                     }
                 }

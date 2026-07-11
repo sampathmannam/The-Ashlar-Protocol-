@@ -39,6 +39,14 @@ import com.ashlarprotocol.ui.theme.LightText
 import com.ashlarprotocol.ui.theme.Silver
 import com.ashlarprotocol.ui.theme.Slate
 import com.ashlarprotocol.ui.theme.Surface
+import com.ashlarprotocol.ui.theme.ashlarCard
+import com.ashlarprotocol.ui.theme.CardEmphasis
+import com.ashlarprotocol.ui.theme.A11y
+import com.ashlarprotocol.ui.theme.Radius
+import com.ashlarprotocol.ui.theme.RedAlert
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.stateDescription
 
 @Composable
 fun BoardScreen(viewModel: AshlarAppViewModel) {
@@ -351,9 +359,7 @@ fun GracefulExitCard() {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(32.dp))
-            .background(Surface)
-            .border(1.dp, DividerWhite.copy(alpha = 0.05f), RoundedCornerShape(32.dp))
+            .ashlarCard()
             .padding(24.dp)
     ) {
         Text(
@@ -435,9 +441,7 @@ fun PracticesCard(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(32.dp))
-            .background(Surface)
-            .border(1.dp, DividerWhite.copy(alpha = 0.05f), RoundedCornerShape(32.dp))
+            .ashlarCard()
             .padding(24.dp)
     ) {
         Text(
@@ -474,12 +478,23 @@ fun PracticesCard(
                             modifier = Modifier.weight(1f)
                         )
                         Spacer(modifier = Modifier.width(12.dp))
+                        // Forgiving delete: first tap arms ("REMOVE?"), second confirms — a 9sp one-tap
+                        // destructive control on the user's own words was the sharpest error-prevention gap.
+                        var confirmingRemove by remember(p.id) { mutableStateOf(false) }
                         Text(
-                            text = "REMOVE",
+                            text = if (confirmingRemove) "REMOVE?" else "REMOVE",
                             style = MaterialTheme.typography.labelSmall,
-                            color = Silver.copy(alpha = 0.5f),
-                            fontSize = 9.sp,
-                            modifier = Modifier.clickable { onRemove(p.id) }
+                            color = if (confirmingRemove) RedAlert else Silver.copy(alpha = 0.5f),
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(Radius.sm))
+                                .clickable { if (confirmingRemove) onRemove(p.id) else confirmingRemove = true }
+                                .semantics {
+                                    role = Role.Button
+                                    stateDescription = if (confirmingRemove) "Tap again to remove" else "Remove practice"
+                                }
+                                .defaultMinSize(minHeight = A11y.minTarget)
+                                .wrapContentHeight(Alignment.CenterVertically)
+                                .padding(horizontal = 8.dp)
                         )
                     }
                 }
@@ -513,9 +528,7 @@ fun RhythmCard(current: com.ashlarprotocol.data.RhythmAnchor?, onSet: (Int, Int)
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(32.dp))
-            .background(Surface)
-            .border(1.dp, DividerWhite.copy(alpha = 0.05f), RoundedCornerShape(32.dp))
+            .ashlarCard()
             .padding(24.dp)
     ) {
         Text("YOUR RHYTHM", style = MaterialTheme.typography.labelSmall, color = Gold.copy(alpha = 0.4f), letterSpacing = 2.sp)
@@ -634,9 +647,7 @@ fun WhoFiveCard(onComplete: (Int) -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(32.dp))
-            .background(Surface)
-            .border(1.dp, DividerWhite.copy(alpha = 0.05f), RoundedCornerShape(32.dp))
+            .ashlarCard()
             .padding(24.dp)
     ) {
         Text(
@@ -717,9 +728,7 @@ fun WorkSoFarCard(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(32.dp))
-            .background(Surface)
-            .border(1.dp, DividerWhite.copy(alpha = 0.05f), RoundedCornerShape(32.dp))
+            .ashlarCard()
             .padding(24.dp)
     ) {
         Text(
@@ -809,9 +818,7 @@ private fun WorkingCard(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(32.dp))
-            .background(Surface)
-            .border(1.dp, DividerWhite.copy(alpha = 0.05f), RoundedCornerShape(32.dp))
+            .ashlarCard()
             .padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
@@ -898,9 +905,7 @@ private fun StrengthsCard(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(32.dp))
-            .background(Surface)
-            .border(1.dp, DividerWhite.copy(alpha = 0.05f), RoundedCornerShape(32.dp))
+            .ashlarCard()
             .padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
@@ -949,9 +954,7 @@ fun CognitiveBriefingCard(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(32.dp))
-            .background(Surface)
-            .border(1.dp, DividerWhite.copy(alpha = 0.05f), RoundedCornerShape(32.dp))
+            .ashlarCard()
             .padding(24.dp)
     ) {
         Row(
@@ -970,7 +973,7 @@ fun CognitiveBriefingCard(
                         text = "TENDED: $streak",
                         style = MaterialTheme.typography.labelSmall,
                         color = Gold,
-                        fontSize = 10.sp,
+                        fontSize = 12.sp,
                         modifier = Modifier.padding(end = 12.dp)
                     )
                 }
