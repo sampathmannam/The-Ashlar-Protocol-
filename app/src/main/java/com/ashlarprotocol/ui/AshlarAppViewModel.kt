@@ -234,11 +234,13 @@ class AshlarAppViewModel(application: Application) : AndroidViewModel(applicatio
 
     fun setRoughEdge(name: String, cue: String, environmentMove: String, replacement: String) {
         viewModelScope.launch {
+            // Read the persisted ledger, not a cold StateFlow — a re-authored edge must never lose its lapses.
+            val existingLapses = dataStore.roughEdge.first()?.lapses ?: emptyList()
             dataStore.setRoughEdge(
                 com.ashlarprotocol.data.RoughEdgeEntry(
                     name = name.trim(), cue = cue.trim(),
                     environmentMove = environmentMove.trim(), replacement = replacement.trim(),
-                    lapses = roughEdge.value?.lapses ?: emptyList() // preserve the ledger; never reset
+                    lapses = existingLapses // preserve the ledger; never reset
                 )
             )
         }
@@ -246,8 +248,10 @@ class AshlarAppViewModel(application: Application) : AndroidViewModel(applicatio
 
     /** Log a slip — appended to the ledger, never a streak to break (anti-AVE). */
     fun recordLapse() {
-        val current = roughEdge.value ?: return
-        viewModelScope.launch { dataStore.setRoughEdge(current.copy(lapses = current.lapses + System.currentTimeMillis())) }
+        viewModelScope.launch {
+            val current = dataStore.roughEdge.first() ?: return@launch
+            dataStore.setRoughEdge(current.copy(lapses = current.lapses + System.currentTimeMillis()))
+        }
     }
 
     val aarEntries: StateFlow<List<com.ashlarprotocol.data.AarEntry>> = dataStore.aarEntries.stateIn(
@@ -363,7 +367,7 @@ class AshlarAppViewModel(application: Application) : AndroidViewModel(applicatio
                 score = score.coerceIn(0, 100),
                 timestamp = System.currentTimeMillis()
             )
-            dataStore.setWhoFiveResults((listOf(entry) + whoFiveResults.value).take(60))
+            dataStore.setWhoFiveResults((listOf(entry) + dataStore.whoFiveResults.first()).take(60))
         }
     }
 
@@ -383,13 +387,13 @@ class AshlarAppViewModel(application: Application) : AndroidViewModel(applicatio
                 reminderMinutesOfDay = reminderMinutesOfDay,
                 cueKind = cueKind
             )
-            dataStore.setPractices((listOf(entry) + practices.value).take(30))
+            dataStore.setPractices((listOf(entry) + dataStore.practices.first()).take(30))
             if (reminderMinutesOfDay != null) schedulePracticeReminder(entry)
         }
     }
 
     fun removePractice(id: String) {
-        viewModelScope.launch { dataStore.setPractices(practices.value.filter { it.id != id }) }
+        viewModelScope.launch { dataStore.setPractices(dataStore.practices.first().filter { it.id != id }) }
         cancelPracticeReminder(id)
     }
 
@@ -427,7 +431,7 @@ class AshlarAppViewModel(application: Application) : AndroidViewModel(applicatio
                 reflection = reflection.trim(),
                 timestamp = System.currentTimeMillis()
             )
-            dataStore.setPlumbRecords((listOf(entry) + plumbRecords.value).take(50))
+            dataStore.setPlumbRecords((listOf(entry) + dataStore.plumbRecords.first()).take(50))
         }
     }
 
@@ -443,13 +447,13 @@ class AshlarAppViewModel(application: Application) : AndroidViewModel(applicatio
                 text = text.trim(),
                 timestamp = System.currentTimeMillis()
             )
-            dataStore.setReflections(listOf(entry) + reflections.value)
+            dataStore.setReflections(listOf(entry) + dataStore.reflections.first())
         }
     }
 
     fun removeReflection(id: String) {
         viewModelScope.launch {
-            dataStore.setReflections(reflections.value.filter { it.id != id })
+            dataStore.setReflections(dataStore.reflections.first().filter { it.id != id })
         }
     }
 
@@ -505,7 +509,7 @@ class AshlarAppViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
     fun nudgeDial(delta: Int) {
-        viewModelScope.launch { dataStore.setDial((dial.value + delta).coerceIn(-1, 1)) }
+        viewModelScope.launch { dataStore.setDial((dataStore.dial.first() + delta).coerceIn(-1, 1)) }
     }
 
     // Bundled, on-device word rotation — no network, no API key, no cost. Starts on today's word;
@@ -540,15 +544,15 @@ class AshlarAppViewModel(application: Application) : AndroidViewModel(applicatio
 
     fun addAarEntry(entry: com.ashlarprotocol.data.AarEntry) {
         viewModelScope.launch {
-            val current = aarEntries.value.toMutableList()
+            val current = dataStore.aarEntries.first().toMutableList()
             current.add(0, entry)
             dataStore.setAarEntries(current)
         }
     }
-    
+
     fun removeAarEntry(id: String) {
         viewModelScope.launch {
-            val current = aarEntries.value.filter { it.id != id }
+            val current = dataStore.aarEntries.first().filter { it.id != id }
             dataStore.setAarEntries(current)
         }
     }
