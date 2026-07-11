@@ -685,7 +685,7 @@ fun TracingBoardVisual(
         Text(
             text = "THE PATH",
             style = MaterialTheme.typography.labelSmall,
-            color = Gold.copy(alpha = 0.3f),
+            color = Gold.copy(alpha = 0.55f),
             letterSpacing = 2.sp,
             modifier = Modifier.align(Alignment.Start)
         )
@@ -1019,7 +1019,7 @@ fun WorkSoFarCard(
         Text(
             text = "THE WORK SO FAR",
             style = MaterialTheme.typography.labelSmall,
-            color = Gold.copy(alpha = 0.3f),
+            color = Gold.copy(alpha = 0.55f),
             letterSpacing = 2.sp
         )
         Spacer(modifier = Modifier.height(16.dp))
@@ -1256,7 +1256,7 @@ fun CognitiveBriefingCard(
             Text(
                 text = "A WORD FOR TODAY",
                 style = MaterialTheme.typography.labelSmall,
-                color = Gold.copy(alpha = 0.3f)
+                color = Gold.copy(alpha = 0.55f)
             )
             Row(verticalAlignment = Alignment.CenterVertically) {
                 if (streak > 0) {
@@ -1295,7 +1295,7 @@ fun CognitiveBriefingCard(
 @Composable
 fun TagHeatmapCard(entries: List<com.ashlarprotocol.data.AarEntry>) {
     val allTags = listOf("#focus", "#stress", "#recovery", "#flow", "#fatigue")
-    
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -1303,15 +1303,31 @@ fun TagHeatmapCard(entries: List<com.ashlarprotocol.data.AarEntry>) {
             .background(Surface)
             .border(1.dp, DividerWhite.copy(alpha = 0.05f), RoundedCornerShape(32.dp))
             .padding(24.dp)
+            // The 150-cell grid is decorative to a screen reader; give it one clear summary instead.
+            .semantics(mergeDescendants = true) {
+                contentDescription =
+                    "Your patterns over the last 30 days, drawn from your journal tags."
+            }
     ) {
         Text(
             text = "YOUR PATTERNS (30 DAYS)",
             style = MaterialTheme.typography.labelSmall,
-            color = Gold.copy(alpha = 0.3f)
+            color = Gold.copy(alpha = 0.55f)
         )
-        
+
         Spacer(modifier = Modifier.height(16.dp))
-        
+
+        if (entries.isEmpty()) {
+            // A blank dark grid told a new user nothing; name what will fill it.
+            Text(
+                text = "As you keep a few notes, a month of your patterns will chart itself here.",
+                style = MaterialTheme.typography.bodySmall,
+                color = Silver.copy(alpha = 0.7f),
+                lineHeight = 18.sp
+            )
+            return@Column
+        }
+
         val dayInMillis = 24 * 60 * 60 * 1000L
         val now = System.currentTimeMillis()
         val calendar = java.util.Calendar.getInstance()
@@ -1424,7 +1440,7 @@ fun AarNotesCard(
             Text(
                 text = "THE DAY'S RECORD",
                 style = MaterialTheme.typography.labelSmall,
-                color = Gold.copy(alpha = 0.3f)
+                color = Gold.copy(alpha = 0.55f)
             )
         }
         
@@ -1643,7 +1659,7 @@ fun PlumbRecordsCard(records: List<com.ashlarprotocol.data.PlumbRecord>) {
         Text(
             text = "THOUGHTS YOU'VE STRAIGHTENED",
             style = MaterialTheme.typography.labelSmall,
-            color = Gold.copy(alpha = 0.3f),
+            color = Gold.copy(alpha = 0.55f),
             letterSpacing = 2.sp
         )
         Spacer(modifier = Modifier.height(16.dp))

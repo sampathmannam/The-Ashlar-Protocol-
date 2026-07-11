@@ -63,7 +63,7 @@ fun PowerUpsSheet(controller: PowerUpsController) {
                 .heightIn(max = 640.dp)
                 .clip(RoundedCornerShape(28.dp))
                 .background(Surface)
-                .border(1.dp, Gold.copy(alpha = 0.3f), RoundedCornerShape(28.dp))
+                .border(1.dp, Gold.copy(alpha = 0.55f), RoundedCornerShape(28.dp))
                 .verticalScroll(rememberScrollState())
                 .padding(24.dp)
         ) {

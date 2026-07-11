@@ -18,6 +18,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -495,14 +498,48 @@ private fun KeptReflectionCard(reflection: com.ashlarprotocol.data.Reflection, o
                 color = Silver
             )
         }
-        Icon(
-            imageVector = Icons.Default.Delete,
-            contentDescription = "Delete this reflection",
-            tint = Silver.copy(alpha = 0.4f),
-            modifier = Modifier
-                .padding(start = 12.dp)
-                .size(20.dp)
-                .clickable { onDelete() }
-        )
+        // Forgiving delete: one tap asks, it doesn't act. A kept reflection is precious — no
+        // accidental one-tap loss, and a clear "Keep" to back out. Also a real 48dp target.
+        var confirming by remember { mutableStateOf(false) }
+        if (confirming) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = "KEEP",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Silver,
+                    modifier = Modifier
+                        .clip(androidx.compose.foundation.shape.RoundedCornerShape(12.dp))
+                        .clickable { confirming = false }
+                        .defaultMinSize(minHeight = 48.dp)
+                        .padding(horizontal = 10.dp, vertical = 14.dp)
+                )
+                Text(
+                    text = "REMOVE",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = RedAlert,
+                    modifier = Modifier
+                        .clip(androidx.compose.foundation.shape.RoundedCornerShape(12.dp))
+                        .clickable { onDelete() }
+                        .defaultMinSize(minHeight = 48.dp)
+                        .padding(horizontal = 10.dp, vertical = 14.dp)
+                )
+            }
+        } else {
+            Box(
+                modifier = Modifier
+                    .clip(androidx.compose.foundation.shape.CircleShape)
+                    .clickable { confirming = true }
+                    .defaultMinSize(minWidth = 48.dp, minHeight = 48.dp)
+                    .semantics { role = Role.Button },
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "Remove this reflection",
+                    tint = Silver.copy(alpha = 0.5f),
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+        }
     }
 }
