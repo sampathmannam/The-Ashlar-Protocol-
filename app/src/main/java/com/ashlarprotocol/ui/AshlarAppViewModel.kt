@@ -19,8 +19,6 @@ import com.ashlarprotocol.tools.Strengths
 import com.ashlarprotocol.tools.Working
 import com.ashlarprotocol.tools.Readiness
 import com.ashlarprotocol.tools.Degree
-import com.ashlarprotocol.tools.Degrees
-import com.ashlarprotocol.tools.WorkStats
 import com.ashlarprotocol.tools.Advancement
 import com.ashlarprotocol.tools.Effort
 
@@ -86,15 +84,17 @@ class AshlarAppViewModel(application: Application) : AndroidViewModel(applicatio
         val re = dataStore.roughEdge.first()
         val lapseDays = re?.lapses?.map { KindStreak.epochDay(it, TimeZone.getDefault().getOffset(it)) } ?: emptyList()
         val rh = dataStore.rhythm.first()
-        // The degree is derived from the same WorkStats the Board uses — recompute it from persisted counts.
+        // The practice tallies the mirror reflects back as plain counts.
         val streak = dataStore.daysTended.first()
         val aar = dataStore.aarEntries.first()
         val plumb = dataStore.plumbSessions.first()
         val gauge = dataStore.gaugeDaysComplete.first()
         val recall = dataStore.recallSessions.first()
-        val degree = Degrees.current(Degrees.score(WorkStats(streak, aar.size, plumb, gauge, recall)))
         // The Temple (the monthly review): progress on the 50-course journey + the month's challenge rhythm.
         val coursesRaised = dataStore.coursesRaised.first()
+        // Degree = the Temple's milestone (Phase-3 single source of truth). Deriving it here the same way
+        // the Board does keeps the mirror from ever telling the user a different degree than the Board shows.
+        val degree = com.ashlarprotocol.tools.Temple.degreeFor(coursesRaised)
         val completions = dataStore.challengeCompletions.first()
         val challengeDaysLast30 = completions
             .map { KindStreak.epochDay(it.timestamp, TimeZone.getDefault().getOffset(it.timestamp)) }
