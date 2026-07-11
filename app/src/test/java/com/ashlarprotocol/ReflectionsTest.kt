@@ -77,4 +77,19 @@ class ReflectionsTest {
     @Test fun sampleTextIsNonEmptyForTheSafetySweep() {
         assertTrue(Reflections.allSampleText().isNotEmpty())
     }
+
+    @Test fun templeProgressAndMonthlyRhythmAreFacts() {
+        // No Temple activity → no Temple/monthly facts (never fabricated).
+        assertTrue(Reflections.reflect(ReflectionInput()).none { it.provenance == "temple" || it.provenance == "monthly rhythm" })
+        // With activity → literal FACTs, never noticings (a count is not an inference).
+        val r = Reflections.reflect(ReflectionInput(coursesRaised = 14, latestCourseName = "The Square", challengeDaysLast30 = 18))
+        val temple = r.first { it.provenance == "temple" }
+        assertEquals(ReflectionKind.FACT, temple.kind)
+        assertTrue(temple.text.contains("14"))
+        assertTrue("names the latest course", temple.text.contains("The Square"))
+        val monthly = r.first { it.provenance == "monthly rhythm" }
+        assertEquals(ReflectionKind.FACT, monthly.kind)
+        assertTrue(monthly.text.contains("18"))
+        assertTrue(monthly.text.contains("30 days"))
+    }
 }

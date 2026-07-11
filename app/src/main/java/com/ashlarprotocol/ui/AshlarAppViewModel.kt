@@ -93,6 +93,13 @@ class AshlarAppViewModel(application: Application) : AndroidViewModel(applicatio
         val gauge = dataStore.gaugeDaysComplete.first()
         val recall = dataStore.recallSessions.first()
         val degree = Degrees.current(Degrees.score(WorkStats(streak, aar.size, plumb, gauge, recall)))
+        // The Temple (the monthly review): progress on the 50-course journey + the month's challenge rhythm.
+        val coursesRaised = dataStore.coursesRaised.first()
+        val completions = dataStore.challengeCompletions.first()
+        val challengeDaysLast30 = completions
+            .map { KindStreak.epochDay(it.timestamp, TimeZone.getDefault().getOffset(it.timestamp)) }
+            .filter { it > today - 30 }
+            .distinct().size
         return com.ashlarprotocol.tools.ReflectionInput(
             daysTended = streak,
             currentRun = dataStore.streakState.first().currentRun,
@@ -112,7 +119,11 @@ class AshlarAppViewModel(application: Application) : AndroidViewModel(applicatio
             roughEdgeLapseDays = lapseDays,
             todayEpochDay = today,
             whoFiveScores = who.map { it.score },
-            whoFiveSpanDays = whoSpanDays
+            whoFiveSpanDays = whoSpanDays,
+            coursesRaised = coursesRaised,
+            latestCourseName = com.ashlarprotocol.tools.Temple.courseAt(coursesRaised)?.name ?: "",
+            challengesAnswered = completions.size,
+            challengeDaysLast30 = challengeDaysLast30
         )
     }
 

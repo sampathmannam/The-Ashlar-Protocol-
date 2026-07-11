@@ -44,7 +44,13 @@ data class ReflectionInput(
     /** WHO-5 scores in chronological order. */
     val whoFiveScores: List<Int> = emptyList(),
     /** Days between the first and last WHO-5 check. */
-    val whoFiveSpanDays: Int = 0
+    val whoFiveSpanDays: Int = 0,
+    // The Temple (the monthly review, folded in): progress on the 50-course journey + challenge rhythm.
+    val coursesRaised: Int = 0,
+    val latestCourseName: String = "",
+    val challengesAnswered: Int = 0,
+    /** Distinct days in the last 30 that any challenge was answered — the monthly-window signal. */
+    val challengeDaysLast30: Int = 0
 )
 
 object Reflections {
@@ -91,8 +97,16 @@ object Reflections {
             if (input.gaugeDays > 0) add("${input.gaugeDays} ${dayWord(input.gaugeDays)} divided by the Gauge")
             if (input.recallCount > 0) add("${input.recallCount} ${plural(input.recallCount, "principle", "principles")} held to memory")
             if (input.keptReflectionsCount > 0) add("${input.keptReflectionsCount} ${plural(input.keptReflectionsCount, "reflection", "reflections")} kept")
+            if (input.challengesAnswered > 0) add("${input.challengesAnswered} ${plural(input.challengesAnswered, "challenge", "challenges")} answered in the day's work")
         }
         if (counts.isNotEmpty()) out += fact("The work so far: ${counts.joinToString("; ")}.", "counts")
+        // The Temple (progress on the 50-course journey) and the monthly rhythm — the monthly review, folded in.
+        if (input.coursesRaised > 0) {
+            val latest = if (input.latestCourseName.isNotBlank()) " — the latest, ${input.latestCourseName}." else "."
+            out += fact("You've raised ${input.coursesRaised} ${plural(input.coursesRaised, "course", "courses")} of your Temple$latest", "temple")
+        }
+        if (input.challengeDaysLast30 > 0)
+            out += fact("This past month, the day's work was tended on ${input.challengeDaysLast30} of the last 30 days.", "monthly rhythm")
         if (input.signatureStrengths.isNotEmpty())
             out += fact("Your signature strengths: ${input.signatureStrengths.joinToString(", ")}.", "strengths")
         if (input.rhythmWake != null && input.rhythmWindDown != null)
@@ -132,7 +146,8 @@ object Reflections {
             keptReflectionsCount = 2, signatureStrengths = listOf("Bravery", "Hope"), automaticityLevel = 1,
             rhythmWake = "6:30 AM", rhythmWindDown = "10:00 PM", roughEdgeName = "late scrolling",
             roughEdgeLapseDays = listOf(2, 3, 9, 10, 16), todayEpochDay = 30,
-            whoFiveScores = listOf(50, 72), whoFiveSpanDays = 21
+            whoFiveScores = listOf(50, 72), whoFiveSpanDays = 21,
+            coursesRaised = 14, latestCourseName = "The Square", challengesAnswered = 21, challengeDaysLast30 = 18
         )
     ).map { it.text }
 
