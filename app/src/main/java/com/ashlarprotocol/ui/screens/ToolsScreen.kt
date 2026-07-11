@@ -86,8 +86,10 @@ fun ToolsScreen(
             item { ToolMenuItem("level", "The Level", "Steady the Breath", Degree.ENTERED_APPRENTICE, currentDegree) { activeTool = it } }
             item { ToolMenuItem("square", "The Square", "Square to Your Values", Degree.ENTERED_APPRENTICE, currentDegree) { activeTool = it } }
             item { ToolMenuItem("trowel", "The Trowel", "Spread the Cement Inward", Degree.ENTERED_APPRENTICE, currentDegree) { activeTool = it } }
-            item { ToolMenuItem("plumb", "The Plumb", "Straighten a Thought", Degree.FELLOWCRAFT, currentDegree) { activeTool = it } }
-            item { ToolMenuItem("mouth", "Mouth to Ear", "Memory Work", Degree.MASTER_MASON, currentDegree) { activeTool = it } }
+            // (Phase-3) No longer degree-gated — core tools are always available (the guardrail), and
+            // these deliberate practices now feed the Day's Work engine rather than unlocking by rank.
+            item { ToolMenuItem("plumb", "The Plumb", "Straighten a Thought", Degree.ENTERED_APPRENTICE, currentDegree) { activeTool = it } }
+            item { ToolMenuItem("mouth", "Mouth to Ear", "Memory Work", Degree.ENTERED_APPRENTICE, currentDegree) { activeTool = it } }
         } else {
             item {
                 Button(

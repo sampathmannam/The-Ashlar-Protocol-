@@ -277,30 +277,22 @@ class AshlarAppViewModel(application: Application) : AndroidViewModel(applicatio
         viewModelScope, SharingStarted.WhileSubscribed(5000), 0
     )
 
-    // ── The rite of passage (Phase 2) ──────────────────────────────────────────
-    // The same WorkStats the Board builds → the earned degree score.
-    private val degreeScore: StateFlow<Int> = combine(
-        briefingStreak, aarEntries, plumbSessions, gaugeDaysComplete, recallSessions
-    ) { streak, entries, plumb, gauge, recall ->
-        Degrees.score(WorkStats(streak, entries.size, plumb, gauge, recall))
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
-
-    /** The degree earned by the work done so far. Names the layer beneath the stone. */
-    val currentDegree: StateFlow<Degree> = degreeScore
-        .map { Degrees.current(it) }
+    // ── The rite of passage — degrees are the Temple's milestones (Phase-3 consolidation) ──────
+    // Degree is no longer a separate practice-count score; it's how far you've built the Temple
+    // (Temple.degreeFor). "Fellowcraft" now means "you built into the Fellowcraft courses", one
+    // meaning instead of two. The stone stays tending-driven; only the degree moved.
+    /** The degree you stand in — derived from courses raised. Names the layer beneath the stone. */
+    val currentDegree: StateFlow<Degree> = dataStore.coursesRaised
+        .map { com.ashlarprotocol.tools.Temple.degreeFor(it) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), Degree.ENTERED_APPRENTICE)
-
-    /** Progress across the current degree toward the next (0f..1f); 1f at the summit. */
-    val degreeProgress: StateFlow<Float> = degreeScore
-        .map { Degrees.progressToNext(it) }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0f)
 
     private val ackDegreeOrdinal: StateFlow<Int> = dataStore.acknowledgedDegreeOrdinal
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
 
-    /** Non-null when a newly-earned degree awaits its raising rite (see tools/Advancement.kt). */
-    val pendingAdvancement: StateFlow<Degree?> = combine(ackDegreeOrdinal, degreeScore) { ack, score ->
-        Advancement.pending(ack, score)
+    /** Non-null when you've built into a new degree whose Raising hasn't been received yet. */
+    val pendingAdvancement: StateFlow<Degree?> = combine(ackDegreeOrdinal, dataStore.coursesRaised) { ack, raised ->
+        val d = com.ashlarprotocol.tools.Temple.degreeFor(raised)
+        if (d.ordinal > ack) d else null
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     /** Mark the pending raising as received, so the rite fires exactly once per degree. */
@@ -309,18 +301,28 @@ class AshlarAppViewModel(application: Application) : AndroidViewModel(applicatio
         viewModelScope.launch { dataStore.setAcknowledgedDegreeOrdinal(d.ordinal) }
     }
 
+    // (Phase-3) The deliberate practices feed the one engine: doing them pays wages toward the Temple.
     fun recordPlumbSession() {
-        viewModelScope.launch { dataStore.incrementPlumbSessions() }
+        viewModelScope.launch {
+            dataStore.incrementPlumbSessions()
+            dataStore.addWages(com.ashlarprotocol.tools.Temple.PRACTICE_WAGE)
+        }
         bumpActionPulse()
     }
 
     fun recordGaugeDayComplete() {
-        viewModelScope.launch { dataStore.incrementGaugeDaysComplete() }
+        viewModelScope.launch {
+            dataStore.incrementGaugeDaysComplete()
+            dataStore.addWages(com.ashlarprotocol.tools.Temple.PRACTICE_WAGE)
+        }
         bumpActionPulse()
     }
 
     fun recordRecallSession() {
-        viewModelScope.launch { dataStore.incrementRecallSessions() }
+        viewModelScope.launch {
+            dataStore.incrementRecallSessions()
+            dataStore.addWages(com.ashlarprotocol.tools.Temple.PRACTICE_WAGE)
+        }
         bumpActionPulse()
     }
 

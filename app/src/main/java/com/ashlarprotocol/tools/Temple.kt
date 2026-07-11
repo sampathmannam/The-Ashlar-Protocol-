@@ -24,6 +24,8 @@ object Temple {
      *  days to a week of genuine engagement, never a grind. */
     const val DAILY_WAGE = 1
     const val WEEKLY_WAGE = 3
+    /** A deliberate practice (Plumb / Gauge / Recall) is real work — it pays into the Temple too. */
+    const val PRACTICE_WAGE = 2
 
     /** The full planned journey is 50 courses; MVP authors the Apprentice tranche below. */
     const val PLANNED_COURSES = 50

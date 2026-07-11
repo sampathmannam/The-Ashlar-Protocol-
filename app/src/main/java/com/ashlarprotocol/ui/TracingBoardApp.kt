@@ -102,22 +102,7 @@ fun TracingBoardApp(
                     composable("board") { BoardScreen(viewModel) }
                     composable("chamber") { ChamberScreen(viewModel) }
                     composable("tools") {
-                        val streak by viewModel.briefingStreak.collectAsState()
-                        val entries by viewModel.aarEntries.collectAsState()
-                        val plumb by viewModel.plumbSessions.collectAsState()
-                        val gauge by viewModel.gaugeDaysComplete.collectAsState()
-                        val recall by viewModel.recallSessions.collectAsState()
-                        val degree = com.ashlarprotocol.tools.Degrees.current(
-                            com.ashlarprotocol.tools.Degrees.score(
-                                com.ashlarprotocol.tools.WorkStats(
-                                    briefingStreak = streak,
-                                    journalEntries = entries.size,
-                                    plumbSessions = plumb,
-                                    gaugeDaysComplete = gauge,
-                                    recallSessions = recall
-                                )
-                            )
-                        )
+                        val degree by viewModel.currentDegree.collectAsState()
                         ToolsScreen(
                             currentDegree = degree,
                             onPlumbComplete = { thought, reflection ->
