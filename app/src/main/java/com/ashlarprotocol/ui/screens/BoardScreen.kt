@@ -14,6 +14,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -197,14 +199,12 @@ fun BoardScreen(viewModel: AshlarAppViewModel) {
             item { IntentionCard(intention = intention) }
         }
 
-        // Cognitive Briefing
+        // A word for today — bundled and local; it appears instantly (no network, no spinner).
         item {
             val dailyBriefing by viewModel.dailyBriefing.collectAsState()
-            val isFetchingBriefing by viewModel.isFetchingBriefing.collectAsState()
             val briefingStreak by viewModel.briefingStreak.collectAsState()
             CognitiveBriefingCard(
                 briefing = dailyBriefing,
-                isFetching = isFetchingBriefing,
                 streak = briefingStreak,
                 onRefresh = { viewModel.fetchDailyBriefing() }
             )
@@ -696,7 +696,13 @@ fun TracingBoardVisual(
             progress = animatedProgress,
             pulse = pulse,
             facets = facets,
-            modifier = Modifier.size(190.dp)
+            // The hero was invisible to TalkBack; describe its state so screen readers get the metaphor.
+            modifier = Modifier
+                .size(190.dp)
+                .semantics {
+                    contentDescription =
+                        "The stone, in the working — $daysTended ${if (daysTended == 1) "day" else "days"} tended, $degreeName."
+                }
         )
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -756,6 +762,9 @@ fun TracingBoardVisual(
  */
 @Composable
 fun AshlarStone(progress: Float, pulse: Int = 0, facets: FloatArray? = null, modifier: Modifier = Modifier) {
+    // Respect reduced-motion: if the system disables animations, the stone rests at a still angle
+    // instead of the slow 30s spin — a vestibular + battery courtesy (no continuous Canvas redraw).
+    val motionOn = com.ashlarprotocol.ui.theme.animationsEnabled()
     val rotation by rememberInfiniteTransition(label = "ashlar").animateFloat(
         initialValue = 0f,
         targetValue = 360f,
@@ -776,7 +785,7 @@ fun AshlarStone(progress: Float, pulse: Int = 0, facets: FloatArray? = null, mod
         }
     }
     Canvas(modifier = modifier) {
-        drawAshlar(rotationDeg = rotation, progress = progress, flash = flash.value, facets = facets)
+        drawAshlar(rotationDeg = if (motionOn) rotation else 22f, progress = progress, flash = flash.value, facets = facets)
     }
 }
 
@@ -1228,7 +1237,6 @@ private fun StrengthsCard(
 @Composable
 fun CognitiveBriefingCard(
     briefing: String?,
-    isFetching: Boolean,
     streak: Int,
     onRefresh: () -> Unit
 ) {
@@ -1260,17 +1268,13 @@ fun CognitiveBriefingCard(
                         modifier = Modifier.padding(end = 12.dp)
                     )
                 }
-                TextButton(
-                    onClick = onRefresh,
-                    enabled = !isFetching,
-                    contentPadding = PaddingValues(0.dp),
-                    modifier = Modifier.height(24.dp)
-                ) {
+                // The word is bundled and local — it appears instantly. No network, so no "SYNC"
+                // pretense and no spinner; the button simply offers ANOTHER word, honestly.
+                TextButton(onClick = onRefresh, contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp)) {
                     Text(
-                        text = "SYNC",
+                        text = "ANOTHER",
                         style = MaterialTheme.typography.labelSmall,
-                        color = Gold,
-                        fontSize = 10.sp
+                        color = Gold
                     )
                 }
             }
@@ -1278,21 +1282,13 @@ fun CognitiveBriefingCard(
         
         Spacer(modifier = Modifier.height(16.dp))
         
-        if (isFetching) {
-            CircularProgressIndicator(
-                color = Gold,
-                modifier = Modifier.size(24.dp).align(Alignment.CenterHorizontally),
-                strokeWidth = 2.dp
-            )
-        } else {
-            Text(
-                text = briefing ?: "No word yet.",
-                style = MaterialTheme.typography.bodyMedium,
-                color = Silver,
-                textAlign = TextAlign.Start,
-                lineHeight = 24.sp
-            )
-        }
+        Text(
+            text = briefing ?: "No word yet.",
+            style = MaterialTheme.typography.bodyMedium,
+            color = Silver,
+            textAlign = TextAlign.Start,
+            lineHeight = 24.sp
+        )
     }
 }
 
