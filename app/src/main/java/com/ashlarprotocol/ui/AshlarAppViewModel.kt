@@ -462,10 +462,6 @@ class AshlarAppViewModel(application: Application) : AndroidViewModel(applicatio
     private val _dailyBriefing = MutableStateFlow<String?>(null)
     val dailyBriefing: StateFlow<String?> = _dailyBriefing.asStateFlow()
 
-    // Kept only so the Board's card keeps its API; the local word never has to "fetch".
-    private val _isFetchingBriefing = MutableStateFlow(false)
-    val isFetchingBriefing: StateFlow<Boolean> = _isFetchingBriefing.asStateFlow()
-
     // A warm, self-forgiving message surfaced when the user returns after a lapse (see KindStreak).
     private val _streakComeback = MutableStateFlow<String?>(null)
     val streakComeback: StateFlow<String?> = _streakComeback.asStateFlow()
