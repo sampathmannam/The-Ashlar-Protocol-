@@ -114,7 +114,8 @@ class SafetyAuditTest {
                 "THE DAY'S WORK", "Small, real, and yours to take or leave. Each one done pays a wage.",
                 "THIS WEEK", "TODAY", "✓ tended", "tend",
                 "THE TEMPLE", "The ground is level. Lay your first stone.",
-                "This tranche of the Temple stands.", "in wages — corn, wine, and oil — in hand.",
+                "The Temple stands — all the courses raised. The work goes on.",
+                "in wages — corn, wine, and oil — in hand.",
                 "Lay the next course", "wages to raise."
             ))
         )

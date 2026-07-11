@@ -6,6 +6,35 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class TempleTest {
+    @Test fun fellowcraftTrancheIsRealAndCited() {
+        val fc = Temple.COURSES.filter { it.degree == Degree.FELLOWCRAFT }
+        assertTrue("the Fellowcraft tranche is authored", fc.size >= 15)
+        // The ladder now spans two degrees, and every FC course is a real, cited practice.
+        assertTrue(Temple.COURSES.any { it.degree == Degree.ENTERED_APPRENTICE })
+        fc.forEach {
+            assertTrue("named: ${it.index}", it.name.isNotBlank())
+            assertTrue("unlocks: ${it.index}", it.unlocks.isNotBlank())
+            assertTrue("cited: ${it.index}", it.basis.isNotBlank())
+            assertTrue("costs more than the opening Apprentice courses: ${it.index}", it.cost >= 8)
+        }
+        // Indices stay contiguous 1..N across the join.
+        Temple.COURSES.forEachIndexed { i, c -> assertEquals(i + 1, c.index) }
+    }
+
+    @Test fun masterMasonTrancheCompletesTheFiftyCourseJourney() {
+        assertEquals("all 50 courses authored", Temple.PLANNED_COURSES, Temple.COURSES.size)
+        val mm = Temple.COURSES.filter { it.degree == Degree.MASTER_MASON }
+        assertTrue("Master Mason tranche authored", mm.size >= 15)
+        // The ladder spans all three degrees.
+        assertTrue(Temple.COURSES.any { it.degree == Degree.ENTERED_APPRENTICE })
+        assertTrue(Temple.COURSES.any { it.degree == Degree.FELLOWCRAFT })
+        assertTrue(Temple.COURSES.any { it.degree == Degree.MASTER_MASON })
+        // Course 50 is the summit; nothing lies past it.
+        assertEquals(50, Temple.courseAt(50)!!.index)
+        assertNull(Temple.nextCourse(Temple.COURSES.size))
+        mm.forEach { assertTrue("cited: ${it.index}", it.basis.isNotBlank()); assertTrue(it.cost >= 13) }
+    }
+
     @Test fun apprenticeTrancheIsRealAndSequential() {
         val courses = Temple.COURSES
         assertTrue("MVP authors at least the Apprentice tranche", courses.size >= 10)
