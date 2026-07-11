@@ -18,6 +18,7 @@ import com.ashlarprotocol.tools.Cornerstone
 import com.ashlarprotocol.tools.Rhythm
 import com.ashlarprotocol.tools.Challenges
 import com.ashlarprotocol.tools.Reflections
+import com.ashlarprotocol.tools.Adornment
 import com.ashlarprotocol.tools.Temple
 import com.ashlarprotocol.tools.RoughEdge
 import com.ashlarprotocol.tools.Trowel
@@ -116,8 +117,10 @@ class SafetyAuditTest {
                 "THE TEMPLE", "The ground is level. Lay your first stone.",
                 "The Temple stands — all the courses raised. The work goes on.",
                 "in wages — corn, wine, and oil — in hand.",
-                "Lay the next course", "wages to raise."
-            ))
+                "Lay the next course", "wages to raise.",
+                "THE FINISH"
+            )),
+            "Adornment" to Adornment.allText()
         )
 
     @Test

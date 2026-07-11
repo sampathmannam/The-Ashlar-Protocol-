@@ -173,15 +173,21 @@ fun BoardScreen(viewModel: AshlarAppViewModel) {
             )
         }
 
-        // The Temple — lay wages to raise the next course.
+        // The Temple — lay wages to raise the next course, and adorn it with a finish.
         item {
             val raised by viewModel.coursesRaised.collectAsState()
             val balance by viewModel.wageBalance.collectAsState()
+            val selectedFinish by viewModel.selectedFinish.collectAsState()
+            val ownedFinishes by viewModel.unlockedFinishes.collectAsState()
             val next = com.ashlarprotocol.tools.Temple.nextCourse(raised)
             com.ashlarprotocol.ui.components.TempleCard(
                 coursesRaised = raised, nextCourse = next, balance = balance,
                 canRaise = next != null && balance >= next.cost,
-                onRaise = { viewModel.raiseCourse() }
+                onRaise = { viewModel.raiseCourse() },
+                selectedFinishId = selectedFinish,
+                ownedFinishIds = ownedFinishes,
+                onSelectFinish = { viewModel.selectFinish(it) },
+                onBuyFinish = { viewModel.unlockFinish(it) }
             )
         }
 
