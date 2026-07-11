@@ -24,6 +24,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -70,7 +72,12 @@ fun TempleCard(
         // The rising courses — one row per course of the WHOLE 50-course journey, so every course laid
         // grows the Temple (raised = the chosen finish; the rest wait as faint outlines above). A wider
         // base tapers upward into a narrowing crown; the taper scales with the row count.
-        Canvas(modifier = Modifier.fillMaxWidth().height(150.dp)) {
+        Canvas(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(150.dp)
+                .semantics { contentDescription = "Your Temple — $coursesRaised of ${Temple.PLANNED_COURSES} courses raised." }
+        ) {
             val shown = Temple.PLANNED_COURSES
             val gap = 1.5.dp.toPx()
             val rowH = ((size.height - gap * (shown - 1)) / shown).coerceAtLeast(1f)
