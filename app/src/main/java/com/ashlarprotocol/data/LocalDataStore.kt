@@ -49,6 +49,9 @@ class LocalDataStore(private val context: Context) {
     private val TOTAL_WAGES_KEY = androidx.datastore.preferences.core.intPreferencesKey("total_wages_earned")
     private val COURSES_RAISED_KEY = androidx.datastore.preferences.core.intPreferencesKey("courses_raised")
     private val CHALLENGE_COMPLETIONS_KEY = androidx.datastore.preferences.core.stringPreferencesKey("challenge_completions")
+    // Adornment (F: customize): finishes bought (append-only) + the one currently selected.
+    private val UNLOCKED_FINISHES_KEY = androidx.datastore.preferences.core.stringPreferencesKey("unlocked_finishes")
+    private val SELECTED_FINISH_KEY = androidx.datastore.preferences.core.stringPreferencesKey("selected_finish")
     private val BASELINE_KEY = floatPreferencesKey("baseline_weight")
     // The kind streak ("tending the stone", tools/KindStreak.kt): a cumulative total that never
     // decreases, plus a grace-softened current run. Supersedes the old resettable briefing_streak.
@@ -330,6 +333,23 @@ class LocalDataStore(private val context: Context) {
                 kotlinx.serialization.builtins.ListSerializer(com.ashlarprotocol.data.ChallengeCompletion.serializer()), list
             )
         }
+    }
+
+    // Adornment: the finishes bought (append-only) and the one selected (defaults to the free finish).
+    // Finish ids are simple words, so a comma-joined string is enough — no serializer needed.
+    val unlockedFinishes: Flow<List<String>> = context.dataStore.data.map { prefs ->
+        prefs[UNLOCKED_FINISHES_KEY]?.split(',')?.filter { it.isNotBlank() } ?: emptyList()
+    }
+    val selectedFinish: Flow<String> = context.dataStore.data.map {
+        it[SELECTED_FINISH_KEY] ?: com.ashlarprotocol.tools.Adornment.DEFAULT_ID
+    }
+
+    suspend fun setUnlockedFinishes(ids: List<String>) {
+        context.dataStore.edit { it[UNLOCKED_FINISHES_KEY] = ids.joinToString(",") }
+    }
+
+    suspend fun setSelectedFinish(id: String) {
+        context.dataStore.edit { it[SELECTED_FINISH_KEY] = id }
     }
 
     val reflections: Flow<List<Reflection>> = context.dataStore.data.map { preferences ->

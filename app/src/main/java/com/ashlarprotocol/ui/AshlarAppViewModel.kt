@@ -93,6 +93,13 @@ class AshlarAppViewModel(application: Application) : AndroidViewModel(applicatio
         val gauge = dataStore.gaugeDaysComplete.first()
         val recall = dataStore.recallSessions.first()
         val degree = Degrees.current(Degrees.score(WorkStats(streak, aar.size, plumb, gauge, recall)))
+        // The Temple (the monthly review): progress on the 50-course journey + the month's challenge rhythm.
+        val coursesRaised = dataStore.coursesRaised.first()
+        val completions = dataStore.challengeCompletions.first()
+        val challengeDaysLast30 = completions
+            .map { KindStreak.epochDay(it.timestamp, TimeZone.getDefault().getOffset(it.timestamp)) }
+            .filter { it > today - 30 }
+            .distinct().size
         return com.ashlarprotocol.tools.ReflectionInput(
             daysTended = streak,
             currentRun = dataStore.streakState.first().currentRun,
@@ -112,7 +119,11 @@ class AshlarAppViewModel(application: Application) : AndroidViewModel(applicatio
             roughEdgeLapseDays = lapseDays,
             todayEpochDay = today,
             whoFiveScores = who.map { it.score },
-            whoFiveSpanDays = whoSpanDays
+            whoFiveSpanDays = whoSpanDays,
+            coursesRaised = coursesRaised,
+            latestCourseName = com.ashlarprotocol.tools.Temple.courseAt(coursesRaised)?.name ?: "",
+            challengesAnswered = completions.size,
+            challengeDaysLast30 = challengeDaysLast30
         )
     }
 
@@ -127,11 +138,29 @@ class AshlarAppViewModel(application: Application) : AndroidViewModel(applicatio
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
     val challengeCompletions: StateFlow<List<com.ashlarprotocol.data.ChallengeCompletion>> =
         dataStore.challengeCompletions.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
-    /** Wages in hand = earned − laid into courses. Floors at 0 (never a scarcity debt). */
+    // Adornment (finishes bought + the one selected). Buying spends wages; selecting an owned finish is free.
+    val unlockedFinishes: StateFlow<List<String>> = dataStore.unlockedFinishes
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+    val selectedFinish: StateFlow<String> = dataStore.selectedFinish
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), com.ashlarprotocol.tools.Adornment.DEFAULT_ID)
+
+    /** Wages in hand = earned − laid into courses − spent on finishes. Floors at 0 (never a scarcity debt). */
     val wageBalance: StateFlow<Int> =
-        kotlinx.coroutines.flow.combine(dataStore.totalWagesEarned, dataStore.coursesRaised) { earned, raised ->
-            com.ashlarprotocol.tools.Temple.balance(earned, raised)
+        kotlinx.coroutines.flow.combine(
+            dataStore.totalWagesEarned, dataStore.coursesRaised, dataStore.unlockedFinishes
+        ) { earned, raised, finishes ->
+            (com.ashlarprotocol.tools.Temple.balance(earned, raised) -
+                com.ashlarprotocol.tools.Adornment.totalSpend(finishes)).coerceAtLeast(0)
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
+
+    /** The true wages in hand, read from persisted state (never a cold StateFlow). */
+    private suspend fun currentBalance(): Int {
+        val earned = dataStore.totalWagesEarned.first()
+        val raised = dataStore.coursesRaised.first()
+        val finishes = dataStore.unlockedFinishes.first()
+        return (com.ashlarprotocol.tools.Temple.balance(earned, raised) -
+            com.ashlarprotocol.tools.Adornment.totalSpend(finishes)).coerceAtLeast(0)
+    }
 
     /** The period a challenge is idempotent within: epoch-day for DAILY, epoch-week for WEEKLY. */
     private fun periodKey(cadence: com.ashlarprotocol.tools.Cadence, today: Long): Long =
@@ -157,11 +186,29 @@ class AshlarAppViewModel(application: Application) : AndroidViewModel(applicatio
     /** Lay wages to raise the next course — only if affordable. Reads persisted truth; never punitive. */
     fun raiseCourse() {
         viewModelScope.launch {
-            val earned = dataStore.totalWagesEarned.first()
             val raised = dataStore.coursesRaised.first()
-            if (com.ashlarprotocol.tools.Temple.canRaiseNext(earned, raised)) {
-                dataStore.setCoursesRaised(raised + 1)
+            val next = com.ashlarprotocol.tools.Temple.nextCourse(raised) ?: return@launch
+            if (currentBalance() >= next.cost) dataStore.setCoursesRaised(raised + 1)
+        }
+    }
+
+    /** Buy a finish (once) and select it — only if affordable. Bought finishes are permanent (spent, not lost). */
+    fun unlockFinish(id: String) {
+        viewModelScope.launch {
+            val owned = dataStore.unlockedFinishes.first()
+            if (id in owned) { dataStore.setSelectedFinish(id); return@launch }
+            if (currentBalance() >= com.ashlarprotocol.tools.Adornment.costOf(id)) {
+                dataStore.setUnlockedFinishes(owned + id)
+                dataStore.setSelectedFinish(id)
             }
+        }
+    }
+
+    /** Select a finish you already own (or the free default). Free to switch, any time. */
+    fun selectFinish(id: String) {
+        viewModelScope.launch {
+            if (com.ashlarprotocol.tools.Adornment.isAvailable(id, dataStore.unlockedFinishes.first()))
+                dataStore.setSelectedFinish(id)
         }
     }
 
