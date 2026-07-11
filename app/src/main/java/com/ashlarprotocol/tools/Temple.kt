@@ -137,6 +137,15 @@ object Temple {
 
     fun courseAt(index: Int): Course? = COURSES.getOrNull(index - 1)
 
+    /**
+     * The degree you stand in, derived from how far you've built (Phase-3 consolidation): degrees are
+     * the Temple's three great thresholds, not a separate practice-score. It's the degree of the last
+     * course you raised — Entered Apprentice until you cross into the Fellowcraft courses, and so on.
+     * This replaces the old "do 15 practice-count actions to rank up" mechanic with real, built work.
+     */
+    fun degreeFor(coursesRaised: Int): Degree =
+        courseAt(coursesRaised.coerceIn(0, COURSES.size))?.degree ?: Degree.ENTERED_APPRENTICE
+
     fun cumulativeCost(coursesRaised: Int): Int =
         COURSES.take(coursesRaised.coerceIn(0, COURSES.size)).sumOf { it.cost }
 
