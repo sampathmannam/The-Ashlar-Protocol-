@@ -81,7 +81,8 @@ This file is the evidence spine for [`VISION.md`](VISION.md) and [`MASTER_PLAN.m
 - **Ryan, R. M., & Deci, E. L. (2017).** *Self-Determination Theory.* Guilford.
 - **Howard, J. L., Slemp, G. R., & Wang, X. (2024).** SDT meta-analysis — all three needs predict motivation/wellbeing. https://selfdeterminationtheory.org/wp-content/uploads/2024/02/2024_HowardSlempWang_Meta.pdf
 - **Amabile, T. M., & Kramer, S. J. (2011).** *The Progress Principle.* HBR Press. Small wins are the strongest booster of "inner work life." https://www.hbs.edu/faculty/Pages/item.aspx?num=40692
-- **Finding:** Degrees & streaks are justified **only** when framed as competence/progress/autonomy — never as shame or compulsion.
+- **Deci, Koestner & Ryan (1999),** *Psychological Bulletin.* Overjustification: expected tangible contingent rewards **undermine** intrinsic motivation (d ≈ −0.28 to −0.40); *informational feedback/praise do not.* https://home.ubalt.edu/tmitch/642/articles%20syllabus/Deci%20Koestner%20Ryan%20meta%20IM%20psy%20bull%2099.pdf
+- **Finding:** Degrees & streaks are justified **only** when framed as competence/progress/autonomy — never as shame or compulsion. Feedback must be *informational* ("you can now…"), never *controlling* ("you earned N points"). → full mechanic design in [GAMIFICATION_PLAN.md](GAMIFICATION_PLAN.md).
 
 ## §10 — Meaning/purpose vs. mortality reflection — **Split**
 Purpose (**strong**):
@@ -93,6 +94,7 @@ Mortality-salience (**contested — flag**):
 - Terror Management Theory (Greenberg, Pyszczynski, Solomon) — 500+ studies, **BUT**:
 - **Many Labs 4 (Klein, R. A., et al., 2022), *Collabra: Psychology*** and **Sætrevik & Sjåstad (2022), *PLOS ONE*** — **failed to replicate** the core mortality-salience effect.
 - **Finding:** Build the Chamber around **meaning, values, and what matters now.** Memento-mori imagery is philosophical framing, never an evidence claim.
+- **⚠️ Safety gate (BINDING — operational rule, not evidence):** mortality/death-adjacent content is the highest-risk element in the Masonic source material. Default UX carries **zero** death imagery (no skull, scythe, grave, hourglass-as-death, countdowns, "life in weeks"); crisis screening is a **hard gate** in front of anything death-adjacent (on any risk signal → suppress entirely and route to support, do not "soften"); cut "write your last will" (rehearsal risk) → future-self letter instead; Hiram Abiff = the "brought low → raised" rising arc only, never the blows/murder/corpse. Full rules in [MASONIC_DESIGN_PRIMITIVES.md § "The Safety Wall"](MASONIC_DESIGN_PRIMITIVES.md).
 
 ## §11 — Freemasonry, social capital, men's mental health — **Weak/absent for the Craft itself**
 - **HONEST VERDICT: no credible empirical research links Freemasonry specifically to mental-health outcomes.** Do not claim it. Use the analogs below.
@@ -100,7 +102,7 @@ Mortality-salience (**contested — flag**):
 - **Men's Sheds (strongest "brotherhood" analog):**
   - **Foettinger, L., et al. (2022).** "The Role of Community-Based Men's Sheds in Health Promotion for Older Men." *American Journal of Men's Health*, 16(2). Counteracts isolation/loneliness; wellbeing benefits substantiated. https://journals.sagepub.com/doi/full/10.1177/15579883221084490
   - Milligan et al. (2016); Wilson & Cordier (2013) — foundational Men's Sheds reviews.
-- **Finding:** Frame Freemasonry as a *structural/historical exemplar* of the belonging and social-capital mechanisms that Putnam and the Men's Sheds evidence actually support. The mechanism is real; the Craft is the metaphor.
+- **Finding:** Frame Freemasonry as a *structural/historical exemplar* of the belonging and social-capital mechanisms that Putnam and the Men's Sheds evidence actually support. The mechanism is real; the Craft is the metaphor. → symbol-by-symbol → feature mapping in [MASONIC_DESIGN_PRIMITIVES.md](MASONIC_DESIGN_PRIMITIVES.md).
 
 ---
 *Compiled 2026-07-04 via dedicated research pass. Confidence labels favor caution. When in doubt, under-claim.*
